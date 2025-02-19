@@ -1,0 +1,9 @@
+Sample questions for CIA:
+
+1)Write a JAVA program to create a new directory on other machines using TCP. Create directories in minimum 2 machines excluding the sender machine. Directory name should be different for each machine. If the directory successfully created, then send the confirmation message to sender (like “Successfully Created”) and display it. [Note: Use mkdir method of File class for creating new directory.]
+
+2)Write a JAVA program to list out all file names, directories names and sub directories names of the client machines in server side. Send a message from server to client machine
+like “list c:\”, “list f:\temp\”. If the directory is not present in the client, then send error message to the server. If the directory is present, then send the name of files, directories and sub directories to the server. The server should display the list or the error message of the client. [Note: Use list method of File class for getting list of file names etc.]
+
+3)Write a Java program to get a message from user, encrypt it using Ceaser Cipher (Example : abc encrypted as cde (here key value is 2, mean a+2=97+2=99(‘c’))) and transmit it along with the key to another user using TCP. The receiver should decrypt it using the key received and display the original message. The Sender and Receiver should have the necessary user interface.
+
