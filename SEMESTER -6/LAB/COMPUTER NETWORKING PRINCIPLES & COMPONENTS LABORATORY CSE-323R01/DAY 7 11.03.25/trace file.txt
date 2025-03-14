@@ -1,0 +1,166 @@
+Step 1: Understanding the NS2 Trace File Format
+
+Each line in the out.tr file represents a network event. The basic format:
+
+Event Time From_Node To_Node Packet_Type Packet_Size Flags Flow_ID Source_Dest Seq_Num Packet_ID
+
+Common Trace Events
+
+Symbol	Meaning
+
++	Packet added to queue
+-	Packet dropped
+r	Packet received
+d	Packet dropped (due to congestion)
+s	Packet sent
+
+Example Trace File
+
+s 0.500000000 0 2 tcp 1000 ------- 1 0.0 2.0 1 1
+r 0.501000000 2 3 tcp 1000 ------- 1 0.0 3.0 1 1
+d 0.503000000 2 3 tcp 1000 ------- 1 0.0 3.0 1 1
+
+
+Interpretation
+
+s at 0.5s: Node 0 sends a TCP packet (1000 bytes) to Node 2.
+r at 0.501s: Node 2 receives the TCP packet.
+d at 0.503s: The packet is dropped at Node 2 due to congestion.
+
+
+Packet Delivery Ratio (PDR)
+
+Formula:
+
+PDR=( Sent Packets / Received Packets)×100
+
+
+AWK Script for PDR:
+
+awk '{ if ($1 == "s") sent++; if ($1 == "r") received++; } END { print "PDR: " (received/sent)*100 "%" }' out.tr
+
+
+Packet Loss Ratio (PLR)
+
+Formula:
+
+𝑃𝐿𝑅 =( Dropped Packets / Sent Packets ) × 100
+
+AWK Script for PLR
+
+awk '{ if ($1 == "s") sent++; if ($1 == "d") dropped++; } END { print "PLR: " (dropped/sent)*100 "%" }' out.tr
+
+Output Example:
+
+PDR: 92.5%
+
+
+Average End-to-End Delay
+
+Formula:
+
+Average Delay= ∑(Receive Time−Send Time)/Total Received Packets
+
+awk script:
+
+awk '{
+    if ($1 == "s") { time[$11] = $2; }
+    if ($1 == "r" && time[$11]) { delay += ($2 - time[$11]); received++; }
+} END {
+    print "Avg End-to-End Delay: " (delay/received) " sec"
+}' out.tr
+
+output:
+
+Avg End-to-End Delay: 0.0025 sec
+
+
+Network Throughput
+Formula:
+
+
+Throughput=( Total Received Bytes×8/Simulation Time×10^6)Mbps
+
+awk script:
+
+awk '{
+    if ($1 == "r") total_bytes += $5;
+} END {
+    print "Throughput: " (total_bytes * 8 / 5 / 1000000) " Mbps"
+}' out.tr
+
+output:
+
+Throughput: 1.25 Mbps
+
+
+Automating Trace Analysis
+
+For convenience, combine all metrics into one script:
+
+AWK script:
+
+BEGIN {
+    sent = 0; received = 0; dropped = 0;
+    delay = 0; total_bytes = 0;
+}
+
+{
+    if ($1 == "s") { sent++; time[$11] = $2; }
+    if ($1 == "r") { received++; total_bytes += $5; 
+    if (time[$11]) delay += ($2 - time[$11]); }
+    if ($1 == "d") { dropped++; }
+}
+
+END {
+    print " NS2 Simulation Analysis ";
+    print "---------------------------";
+    print " Packet Delivery Ratio (PDR): " (received/sent)*100 "%";
+    print " Packet Loss Ratio (PLR): " (dropped/sent)*100 "%";
+    print " Average End-to-End Delay: " (delay/received) " sec";
+    print " Throughput: " (total_bytes * 8 / 5 / 1000000) " Mbps";
+}
+
+
+Running the Script:
+
+awk -f analyze.awk out.tr
+
+
+Sample Output
+
+NS2 Simulation Analysis 
+---------------------------
+ Packet Delivery Ratio (PDR): 92.5%
+ Packet Loss Ratio (PLR): 7.5%
+ Average End-to-End Delay: 0.0025 sec
+ Throughput: 1.25 Mbps
+
+Summary:
+
+Packet Delivery Ratio (PDR)	
+
+awk '{ if ($1 == "s") sent++; if ($1 == "r") received++; } END { print (received/sent)*100 }' out.tr	
+
+Measures successful packet delivery.
+
+
+Packet Loss Ratio (PLR)	
+
+awk '{ if ($1 == "s") sent++; if ($1 == "d") dropped++; } END { print (dropped/sent)*100 }' out.tr	
+
+Measures percentage of packets lost.
+
+End-to-End Delay	
+
+awk '{ if ($1 == "s") { time[$11] = $2; } if ($1 == "r" && time[$11]) { delay += ($2 - time[$11]); received++; } } END { print (delay/received) }' out.tr	
+
+
+Calculates average packet delay.
+
+Throughput	
+
+awk '{ if ($1 == "r") total_bytes += $5; } END { print (total_bytes * 8 / 5 / 1000000) }' out.tr	
+
+Measures data transfer rate.
+

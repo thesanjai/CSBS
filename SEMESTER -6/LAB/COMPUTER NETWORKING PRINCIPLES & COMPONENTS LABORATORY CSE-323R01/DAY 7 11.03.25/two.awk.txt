@@ -1,0 +1,17 @@
+#!/usr/bin/awk -f
+# AWK script to calculate packet drops from an NS2 trace file
+
+# Initialize a counter
+BEGIN {
+    drop_count = 0;
+}
+
+# Increment the counter for dropped packets ('d' means dropped in NS2 trace files)
+$1 == "d" {
+    drop_count++;
+}
+
+# At the end, print the total number of dropped packets
+END {
+    print "Total Packets Dropped: " drop_count;
+}
