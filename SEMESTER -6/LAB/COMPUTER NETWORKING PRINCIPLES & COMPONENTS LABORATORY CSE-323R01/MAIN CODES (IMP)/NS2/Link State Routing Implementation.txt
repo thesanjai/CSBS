@@ -1,0 +1,124 @@
+Implementation and Analysis of Link State Routing in NS2
+
+Link State Routing (LSR) is another widely used dynamic routing algorithm, where each node maintains a full map of the network topology. The nodes exchange link state packets (LSPs) to share information about their neighbors, and then use Dijkstra's algorithm to compute the shortest path to each node in the network.
+
+This routing protocol is known for its ability to avoid routing loops and converge quickly after a network change, compared to Distance Vector Routing.
+
+While NS2 doesn't directly provide a built-in Link State Routing protocol, it is possible to simulate similar behavior using OLSR (Optimized Link State Routing) as a basis, or you can configure routing scenarios manually.
+
+Step 1: Overview of Link State Routing
+
+In Link State Routing:
+
+Each router independently constructs a complete view of the network topology by exchanging LSPs with its neighbors.
+
+Upon receiving an LSP, the router updates its local network topology graph and uses Dijkstra's algorithm to compute the shortest path to all other nodes.
+
+Routers send LSPs only when a change in their link state occurs, unlike Distance Vector Routing, which periodically broadcasts updates.
+
+Step 2: NS2 TCL Script for Simulating Link State Routing
+
+We can use the OLSR protocol in NS2 to simulate Link State Routing since OLSR is based on the exchange of link-state information.
+
+# Create a new simulator object
+set ns [new Simulator]
+
+# Open a file for tracing
+set tracefile [open "lsr_routing.tr" w]
+$ns trace-all $tracefile
+
+# Define network topology and nodes
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+
+# Create links between nodes with cost
+$ns duplex-link $n0 $n1 10Mb 10ms DropTail
+$ns duplex-link $n1 $n2 10Mb 10ms DropTail
+$ns duplex-link $n1 $n3 10Mb 15ms DropTail
+$ns duplex-link $n2 $n4 10Mb 20ms DropTail
+$ns duplex-link $n3 $n4 10Mb 25ms DropTail
+
+# Enable OLSR (Link State Routing protocol)
+$ns node-config -adhocRouting OLSR
+
+# Create TCP agent and CBR traffic to simulate data transmission
+set tcp0 [new Agent/TCP]
+set sink [new Agent/TCPSink]
+$ns attach-agent $n0 $tcp0
+$ns attach-agent $n4 $sink
+$ns connect $tcp0 $sink
+
+# Define a CBR traffic generator for TCP
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 512
+$cbr set interval_ 0.5
+$cbr attach-agent $tcp0
+
+# Start the CBR traffic
+$ns at 1.0 "$cbr start"
+
+# Schedule simulation end
+$ns at 20.0 "finish"
+
+# Define the finish procedure
+proc finish {} {
+    global ns tracefile
+    $ns flush-trace
+    close $tracefile
+    exit 0
+}
+
+# Run the simulation
+$ns run
+
+
+Step 3: Explanation of the Script
+
+Network Topology and Links: The script defines 5 nodes connected by duplex links. Each link has different propagation delays, which will affect routing decisions.
+
+OLSR Protocol: We enable the OLSR (Optimized Link State Routing) protocol, which simulates the behavior of Link State Routing. OLSR exchanges link state information between nodes and builds a complete network topology at each node.
+
+Traffic Generation: We use TCP and CBR (Constant Bit Rate) traffic to simulate data transmission from node 0 to node 4. This generates traffic that will force the nodes to update their routing tables.
+
+Simulation Runtime: The simulation runs for 20 seconds, after which it generates a trace file (lsr_routing.tr) that contains information about routing table updates, link state messages, and data transmissions.
+
+Step 4: Running the Simulation
+
+Step 5: Analyzing the Results
+
+We can analyze the trace file using an AWK script to count the number of link-state updates, the number of packets sent, and the number of packets received.
+
+BEGIN {
+    link_state_updates = 0;
+    data_packets_sent = 0;
+    data_packets_received = 0;
+}
+
+# Count OLSR link state updates
+$1 == "s" && $4 == "OLSR" && $7 == "LQ-HELLO" {
+    link_state_updates++;
+}
+
+# Count data packets sent
+$1 == "s" && $4 == "tcp" {
+    data_packets_sent++;
+}
+
+# Count data packets received
+$1 == "r" && $4 == "tcp" {
+    data_packets_received++;
+}
+
+END {
+    printf("Total link state updates: %d\n", link_state_updates);
+    printf("Total data packets sent: %d\n", data_packets_sent);
+    printf("Total data packets received: %d\n", data_packets_received);
+}
+
+This AWK script looks for link-state update messages (LQ-HELLO in OLSR) and counts the number of data packets sent and received. It prints out the total number of routing updates and packet transmission statistics.
+
+Step 6: Running the AWK Analysis : awk -f analyze_lsr_routing.awk lsr_routing.tr
+

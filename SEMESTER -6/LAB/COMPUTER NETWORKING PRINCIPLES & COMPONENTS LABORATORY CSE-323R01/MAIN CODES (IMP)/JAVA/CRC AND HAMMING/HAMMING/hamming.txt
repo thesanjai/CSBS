@@ -1,0 +1,119 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class HammingClient {
+
+    public static int[] generateHammingCode(int[] data) {
+        int[] hammingCode = new int[7];
+
+        // Data bits
+        hammingCode[2] = data[0];
+        hammingCode[4] = data[1];
+        hammingCode[5] = data[2];
+        hammingCode[6] = data[3];
+
+        // Parity bits
+        hammingCode[0] = hammingCode[2] ^ hammingCode[4] ^ hammingCode[6];
+        hammingCode[1] = hammingCode[2] ^ hammingCode[5] ^ hammingCode[6];
+        hammingCode[3] = hammingCode[4] ^ hammingCode[5] ^ hammingCode[6];
+
+        return hammingCode;
+    }
+
+    public static int[] introduceError(int[] code) {
+        Random rand = new Random();
+        int pos = rand.nextInt(7);  // random position to flip
+        code[pos] ^= 1; // Flip the bit
+        System.out.println("Bit flipped at position: " + pos);
+        return code;
+    }
+
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+        Socket socket = new Socket("localhost", 8888);
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+        int[] data = new int[4];
+        System.out.print("Enter 4-bit data (space-separated): ");
+        for (int i = 0; i < 4; i++) {
+            data[i] = sc.nextInt();
+        }
+
+        int[] hammingCode = generateHammingCode(data);
+
+        System.out.print("Do you want to introduce an error? (yes/no): ");
+        String choice = sc.next().toLowerCase();
+        if (choice.equals("yes")) {
+            hammingCode = introduceError(hammingCode);
+        }
+
+        System.out.print("Sending codeword: ");
+        for (int bit : hammingCode) {
+            System.out.print(bit);
+        }
+        System.out.println();
+
+        // Convert array to string
+        StringBuilder sb = new StringBuilder();
+        for (int bit : hammingCode) {
+            sb.append(bit);
+        }
+
+        out.writeUTF(sb.toString());
+        out.flush();
+
+        socket.close();
+        sc.close();
+    }
+}
+
+=======
+import java.io.*;
+import java.net.*;
+
+public class HammingServer {
+
+    public static void detectError(String codeword) {
+        int[] code = new int[7];
+        for (int i = 0; i < 7; i++) {
+            code[i] = Character.getNumericValue(codeword.charAt(i));
+        }
+
+        // Calculate parity bits
+        int p1 = code[0] ^ code[2] ^ code[4] ^ code[6];
+        int p2 = code[1] ^ code[2] ^ code[5] ^ code[6];
+        int p3 = code[3] ^ code[4] ^ code[5] ^ code[6];
+
+        int errorPos = p1 * 1 + p2 * 2 + p3 * 4;
+
+        if (errorPos == 0) {
+            System.out.println("Receiver: No error detected. Data is correct.");
+        } else {
+            System.out.println("Receiver: Error detected at position: " + (errorPos - 1));
+            code[errorPos - 1] ^= 1; // Correct the bit
+            System.out.print("Corrected codeword: ");
+            for (int bit : code) {
+                System.out.print(bit);
+            }
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        ServerSocket serverSocket = new ServerSocket(8888);
+        System.out.println("Waiting for client...");
+        Socket socket = serverSocket.accept();
+        System.out.println("Client connected.");
+
+        DataInputStream in = new DataInputStream(socket.getInputStream());
+        String codeword = in.readUTF();
+        System.out.println("Received codeword: " + codeword);
+
+        detectError(codeword);
+
+        socket.close();
+        serverSocket.close();
+    }
+}
+

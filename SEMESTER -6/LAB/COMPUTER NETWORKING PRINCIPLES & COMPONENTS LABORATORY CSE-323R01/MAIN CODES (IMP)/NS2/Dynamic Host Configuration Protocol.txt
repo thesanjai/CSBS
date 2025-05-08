@@ -1,0 +1,146 @@
+Dynamic Host Configuration Protocol (DHCP) Implementation
+
+Dynamic Host Configuration Protocol (DHCP) is a network management protocol used to automatically assign IP addresses and other network configuration parameters to devices (hosts) on a network. It reduces the need for manual IP address configuration. Here's a simple example of how to implement and simulate DHCP using NS2 (Network Simulator 2).
+
+Step 1: Overview of DHCP Operation
+
+DHCP works through four main messages:
+
+DHCP Discover: The client broadcasts a request for an IP address.
+
+DHCP Offer: The server replies with an available IP address offer.
+
+DHCP Request: The client requests the offered IP address.
+
+DHCP Acknowledge: The server acknowledges the IP assignment to the client.
+
+In an NS2 simulation, we simulate this basic interaction between a DHCP server and clients.
+
+Step 2: Network Setup for DHCP in NS2
+
+We'll create a simple network where clients request IP addresses from a DHCP server. Unfortunately, NS2 doesn't come with a built-in DHCP agent, so we'll simulate the interaction by designing the client-server communication manually using basic TCP or UDP packet exchanges.
+
+Step 3: NS2 TCL Script for Simulating DHCP
+
+# Create a new simulator object
+set ns [new Simulator]
+
+# Open a file for tracing
+set tracefile [open "dhcp_output.tr" w]
+$ns trace-all $tracefile
+
+# Define nodes for clients and the DHCP server
+set client1 [$ns node]
+set client2 [$ns node]
+set dhcpServer [$ns node]
+
+# Create links between clients and DHCP server
+$ns duplex-link $client1 $dhcpServer 10Mb 20ms DropTail
+$ns duplex-link $client2 $dhcpServer 10Mb 20ms DropTail
+
+# Define UDP agents for DHCP message exchange
+set udpClient1 [new Agent/UDP]
+set udpClient2 [new Agent/UDP]
+set udpServer [new Agent/UDP]
+
+# Attach agents to the nodes
+$ns attach-agent $client1 $udpClient1
+$ns attach-agent $client2 $udpClient2
+$ns attach-agent $dhcpServer $udpServer
+
+# Connect client agents to the DHCP server agent
+$ns connect $udpClient1 $udpServer
+$ns connect $udpClient2 $udpServer
+
+# Create traffic generator for DHCP Discover (client sends broadcast request)
+set dhcpDiscover1 [new Application/Traffic/Exponential]
+$dhcpDiscover1 set packetSize_ 100   ;# DHCP Discover message size
+$dhcpDiscover1 set burst_time_ 0.5   ;# Time burst lasts
+$dhcpDiscover1 set idle_time_ 0.1    ;# Idle time between bursts
+$dhcpDiscover1 attach-agent $udpClient1
+
+# Second client sends a DHCP Discover message later
+set dhcpDiscover2 [new Application/Traffic/Exponential]
+$dhcpDiscover2 set packetSize_ 100   ;# DHCP Discover message size
+$dhcpDiscover2 set burst_time_ 0.5
+$dhcpDiscover2 set idle_time_ 0.1
+$dhcpDiscover2 attach-agent $udpClient2
+
+# Schedule DHCP Discover messages from the clients
+$ns at 1.0 "$dhcpDiscover1 start"
+$ns at 2.0 "$dhcpDiscover2 start"
+
+# Simulate DHCP Offer, Request, and Acknowledge (Server sends back response)
+# We will use a basic message to simulate this interaction
+set dhcpOffer [new Application/Traffic/Exponential]
+$dhcpOffer set packetSize_ 200   ;# DHCP Offer message size
+$dhcpOffer attach-agent $udpServer
+
+# DHCP server responds with an IP offer after receiving Discover messages
+$ns at 1.5 "$dhcpOffer start"
+$ns at 2.5 "$dhcpOffer start"
+
+# Define a finish procedure
+proc finish {} {
+    global ns tracefile
+    $ns flush-trace
+    close $tracefile
+    exit 0
+}
+
+# Schedule simulation to end at 5.0 seconds
+$ns at 5.0 "finish"
+
+# Run the simulation
+$ns run
+
+
+Step 4: Simulation Explanation
+
+Clients and Server: The script creates two clients and one DHCP server. Each client sends a DHCP Discover message (broadcast) using a UDP agent, and the server responds with a DHCP Offer message.
+
+DHCP Exchange: The DHCP Discover, Offer, Request, and Acknowledge are simulated as UDP traffic with varying packet sizes.
+
+Traffic Generator: We use exponential traffic generators to simulate the DHCP messages between the clients and server.
+
+Step 5: Run the Simulation
+
+Step 6: Analyze the Results
+
+NS2 generates a trace file dhcp_output.tr, which contains detailed information about packet exchanges (Discover, Offer, Request, Acknowledge). You can analyze this file using an AWK script to compute metrics such as the number of DHCP offers, the average delay between DHCP Discover and DHCP Acknowledge, and packet loss if any.
+
+BEGIN {
+    dhcp_discover_count = 0;
+    dhcp_offer_count = 0;
+    total_delay = 0;
+}
+
+# Count DHCP Discover packets (from clients)
+$1 == "+" && $4 == "udp" && $3 == "client" {
+    dhcp_discover_count++;
+    discover_time[$3] = $2;
+}
+
+# Count DHCP Offer packets (from server)
+$1 == "r" && $4 == "udp" && $3 == "server" {
+    dhcp_offer_count++;
+    if ($3 in discover_time) {
+        total_delay += $2 - discover_time[$3];
+    }
+}
+
+END {
+    # Print statistics
+    printf("Total DHCP Discover messages: %d\n", dhcp_discover_count);
+    printf("Total DHCP Offer messages: %d\n", dhcp_offer_count);
+    if (dhcp_offer_count > 0) {
+        printf("Average DHCP response delay: %.5f seconds\n", total_delay / dhcp_offer_count);
+    }
+}
+
+
+Step 7: Run the AWK Analysis : awk -f analyze_dhcp.awk dhcp_output.tr
+
+This AWK script counts DHCP Discover and Offer messages and calculates the average delay between a client's DHCP Discover and the server's DHCP Offer.
+
+

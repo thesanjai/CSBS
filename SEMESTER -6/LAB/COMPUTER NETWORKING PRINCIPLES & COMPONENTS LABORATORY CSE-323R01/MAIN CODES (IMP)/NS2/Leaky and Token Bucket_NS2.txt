@@ -1,0 +1,190 @@
+Leaky Bucket in NS2 (TCL Script)
+================================
+
+# Create simulator
+set ns [new Simulator]
+
+# Trace files
+set tf [open leaky.tr w]
+set nf [open leaky.nam w]
+$ns trace-all $tf
+$ns namtrace-all $nf
+
+# Nodes
+set n0 [$ns node]
+set n1 [$ns node]
+
+# Link with limited queue size (emulating leaky bucket)
+$ns duplex-link $n0 $n1 1Mb 10ms DropTail
+$ns queue-limit $n0 $n1 10
+
+# UDP Agent
+set udp [new Agent/UDP]
+$ns attach-agent $n0 $udp
+
+# Traffic generator
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 500
+$cbr set interval_ 0.004
+$cbr attach-agent $udp
+
+# Null sink
+set null [new Agent/Null]
+$ns attach-agent $n1 $null
+$ns connect $udp $null
+
+# Simulation events
+$ns at 0.1 "$cbr start"
+$ns at 4.9 "$cbr stop"
+$ns at 5.0 "finish"
+
+# Finish procedure
+proc finish {} {
+    global ns tf nf
+    $ns flush-trace
+    close $tf
+    close $nf
+    exec nam leaky.nam &
+    exec awk -f analysis.awk leaky.tr > leaky_analysis.txt &
+    exit 0
+}
+
+$ns run
+
+
+Token Bucket in NS2 (TCL Script)
+================================
+
+# Create simulator
+set ns [new Simulator]
+
+# Trace files
+set tf [open token.tr w]
+set nf [open token.nam w]
+$ns trace-all $tf
+$ns namtrace-all $nf
+
+# Nodes
+set n0 [$ns node]
+set n1 [$ns node]
+
+# Link with queue limit (token bucket simulation)
+$ns duplex-link $n0 $n1 1Mb 10ms DropTail
+$ns queue-limit $n0 $n1 15
+
+# UDP Agent
+set udp [new Agent/UDP]
+$ns attach-agent $n0 $udp
+
+# Traffic generator (bursty)
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 500
+$cbr set interval_ 0.001
+$cbr attach-agent $udp
+
+# Null sink
+set null [new Agent/Null]
+$ns attach-agent $n1 $null
+$ns connect $udp $null
+
+# Simulation events
+$ns at 0.1 "$cbr start"
+$ns at 4.9 "$cbr stop"
+$ns at 5.0 "finish"
+
+# Finish procedure
+proc finish {} {
+    global ns tf nf
+    $ns flush-trace
+    close $tf
+    close $nf
+    exec nam token.nam &
+    exec awk -f analysis.awk token.tr > token_analysis.txt &
+    exit 0
+}
+
+$ns run
+
+
+AWK Analysis Script
+===================
+
+BEGIN {
+    sent = 0;
+    received = 0;
+    dropped = 0;
+    start_time = -1;
+    end_time = 0;
+    total_bytes = 0;
+}
+
+{
+    event = $1;
+    time = $2;
+    src = $3;
+    dst = $4;
+    pkt_size = $6;
+    flow_id = $8;
+
+    # Record start time
+    if (start_time == -1 && event == "+") {
+        start_time = time;
+    }
+
+    # Sent packet
+    if (event == "+" && src == "0") {
+        sent++;
+    }
+
+    # Received packet
+    if (event == "r" && dst == "1") {
+        received++;
+        total_bytes += pkt_size;
+        end_time = time;
+    }
+
+    # Dropped packet
+    if (event == "d") {
+        dropped++;
+    }
+}
+
+END {
+    print "Simulation Analysis Report";
+    print "--------------------------";
+    print "Total Packets Sent: ", sent;
+    print "Total Packets Received: ", received;
+    print "Total Packets Dropped: ", dropped;
+    print "Packet Delivery Ratio (%): ", (received / sent) * 100;
+    print "Packet Drop Ratio (%): ", (dropped / sent) * 100;
+    print "Throughput (Kbps): ", (total_bytes * 8) / (end_time - start_time) / 1000;
+}
+
+
+Run the Simulation
+==================
+
+1.Leaky Bucket
+
+ns leaky_bucket.tcl
+cat leaky_analysis.txt
+
+2.Token Bucket
+
+ns token_bucket.tcl
+cat token_analysis.txt
+
+
+Output: 
+=======
+Analysis report with:
+=====================
+
+Total sent/received/dropped
+
+Delivery ratio
+
+Drop ratio
+
+Throughput (in Kbps)
+

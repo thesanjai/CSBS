@@ -1,0 +1,15 @@
+V -t * -v 1.0a5 -a 0
+A -t * -n 1 -p 0 -o 0x7fffffff -c 30 -a 1
+A -t * -h 1 -m 1073741823 -s 0
+n -t * -a 0 -s 0 -S UP -v circle -c black -i black
+n -t * -a 1 -s 1 -S UP -v circle -c black -i black
+n -t * -a 2 -s 2 -S UP -v circle -c black -i black
+l -t * -s 0 -d 2 -S UP -r 10000000 -D 0.02 -c black
+l -t * -s 1 -d 2 -S UP -r 10000000 -D 0.02 -c black
++ -t 1.07122015473477 -s 0 -d 2 -p exp -e 100 -c 0 -i 0 -a 0 -x {0.0 2.0 0 ------- null}
+- -t 1.07122015473477 -s 0 -d 2 -p exp -e 100 -c 0 -i 0 -a 0 -x {0.0 2.0 0 ------- null}
+h -t 1.07122015473477 -s 0 -d 2 -p exp -e 100 -c 0 -i 0 -a 0 -x {0.0 2.0 -1 ------- null}
++ -t 1.08372015473477 -s 0 -d 2 -p exp -e 100 -c 0 -i 1 -a 0 -x {0.0 2.0 1 ------- null}
+- -t 1.08372015473477 -s 0 -d 2 -p exp -e 100 -c 0 -i 1 -a 0 -x {0.0 2.0 1 ------- null}
+h -t 1.08372015473477 -s 0 -d 2 -p exp -e 100 -c 0 -i 1 -a 0 -x {0.0 2.0 -1 ------- null}
+r -t 1.09130015473477 -s 0 -d 2 -p exp -e 100 -c 0 -i 0 -a 0 -x {0.0 2.0 0 ------- null}

@@ -1,0 +1,127 @@
+Distance Vector Routing Implementation and Analysis in NS2
+Distance Vector Routing is a type of dynamic routing algorithm where each node maintains a routing table with the distances (costs) to all other nodes. The main principle is that each node periodically shares its routing table with its immediate neighbors, which in turn update their own tables based on the information received.
+
+This algorithm is widely used in small to medium-sized networks due to its simplicity, though it is prone to routing loops and slow convergence.
+
+Step 1: Overview of Distance Vector Routing
+
+Each router maintains a distance table showing the cost to reach every destination.
+
+Periodically, each router sends its table to its neighboring routers.
+
+When a router receives a distance vector from a neighbor, it updates its own table using the Bellman-Ford equation:
+D(X, Z) = min { D(X, Y) + D(Y, Z) }
+where D(X, Z) is the cost from node X to node Z, and D(X, Y) is the cost to the neighbor Y.
+
+NS2 can simulate routing protocols through built-in agents. Although NS2 does not directly implement Distance Vector Routing (like RIP), we can simulate similar behavior using AODV or Bellman-Ford as a basis.
+
+Step 2: Network Setup for Distance Vector Routing in NS2
+
+The following script will set up a network of nodes and simulate the exchange of routing table updates using a distance vector-like approach.
+
+Step 3: NS2 TCL Script for Simulating Distance Vector Routing
+
+# Create a new simulator object
+set ns [new Simulator]
+
+# Open a file for tracing
+set tracefile [open "dv_routing.tr" w]
+$ns trace-all $tracefile
+
+# Define network topology and nodes
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+
+# Create links between nodes with cost
+$ns duplex-link $n0 $n1 10Mb 10ms DropTail
+$ns duplex-link $n1 $n2 10Mb 10ms DropTail
+$ns duplex-link $n1 $n3 10Mb 15ms DropTail
+$ns duplex-link $n2 $n4 10Mb 20ms DropTail
+$ns duplex-link $n3 $n4 10Mb 25ms DropTail
+
+# Define the distance vector routing protocol using a base agent (similar to AODV)
+# We use AODV here to simulate the behavior of a distance vector protocol
+set ragent [new Agent/AODV]
+
+# Attach the routing agent to the nodes
+$ns attach-agent $n0 $ragent
+$ns attach-agent $n1 $ragent
+$ns attach-agent $n2 $ragent
+$ns attach-agent $n3 $ragent
+$ns attach-agent $n4 $ragent
+
+# Define TCP agents and CBR traffic to simulate data transmission
+set tcp0 [new Agent/TCP]
+set sink [new Agent/TCPSink]
+$ns attach-agent $n0 $tcp0
+$ns attach-agent $n4 $sink
+$ns connect $tcp0 $sink
+
+# Generate traffic from node 0 to node 4 (to observe routing table updates)
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 512
+$cbr set interval_ 0.5
+$cbr attach-agent $tcp0
+
+# Start the traffic
+$ns at 1.0 "$cbr start"
+
+# Run the simulation for 20 seconds
+$ns at 20.0 "finish"
+
+# Define the finish procedure
+proc finish {} {
+    global ns tracefile
+    $ns flush-trace
+    close $tracefile
+    exit 0
+}
+
+# Run the simulation
+$ns run
+
+
+Step 4: Explanation of the Script
+Nodes and Links: The script defines 5 nodes and links them with duplex links, each with a bandwidth of 10Mb and different propagation delays (costs).
+
+AODV as Distance Vector Agent: We use AODV (Ad-hoc On-Demand Distance Vector) as it is the closest available protocol to Distance Vector Routing in NS2. AODV maintains a routing table and shares updates when a route request occurs.
+
+Traffic Simulation: We generate TCP traffic from node 0 to node 4 using a Constant Bit Rate (CBR) application. This simulates real data transmission, during which routing table updates are triggered.
+
+Routing: As traffic flows from node 0 to node 4, the routing tables are updated using the AODV mechanism. These updates are captured in the trace file.
+
+Step 5: Running the Simulation
+
+Step 6: Analyzing the Results
+
+We can analyze the trace file to observe routing updates, data packets sent and received, and other routing statistics using an AWK script.
+
+BEGIN {
+    route_updates = 0;
+    data_packets = 0;
+}
+
+# Count routing table updates
+$1 == "s" && $4 == "AODV" && $7 == "RT-UPD" {
+    route_updates++;
+}
+
+# Count data packets sent
+$1 == "s" && $4 == "tcp" {
+    data_packets++;
+}
+
+END {
+    printf("Total routing updates: %d\n", route_updates);
+    printf("Total data packets sent: %d\n", data_packets);
+}
+
+
+This AWK script looks for AODV routing updates and TCP data packets in the trace file. It counts the total number of routing updates and data packets transmitted.
+
+Step 7: Running the AWK Analysis :awk -f analyze_dv_routing.awk dv_routing.tr
+
+This will output statistics such as the total number of routing updates (which represents the behavior of Distance Vector Routing) and the number of data packets sent.

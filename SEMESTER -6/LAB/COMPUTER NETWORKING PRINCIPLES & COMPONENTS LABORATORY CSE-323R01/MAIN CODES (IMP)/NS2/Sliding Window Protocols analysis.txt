@@ -1,0 +1,179 @@
+Sliding Window Protocols in NS2 with AWK for Analysis:
+
+Step 1: Set up Sliding Window Protocols in NS2
+
+To implement and simulate sliding window protocols such as Go-Back-N in NS2, we’ll configure the network and adjust parameters like the window size to simulate the protocol. Since NS2 doesn't directly support Go-Back-N or Selective Repeat, we can use TCP and customize its parameters to mimic the behavior of these protocols.
+
+NS2 TCL Script for Sliding Window Protocol (Go-Back-N)
+Here's a TCL script that sets up a simple network topology and simulates the Go-Back-N sliding window protocol by adjusting the window size:
+
+
+# Create the simulator object
+set ns [new Simulator]
+
+# Open the trace file for writing
+set tracefile [open "sliding_window_output.tr" w]
+$ns trace-all $tracefile
+
+# Define nodes (n0 as sender, n1 as receiver)
+set n0 [$ns node]
+set n1 [$ns node]
+
+# Set up a duplex link between the sender and receiver
+$ns duplex-link $n0 $n1 10Mb 20ms DropTail
+
+# Set up TCP agent on sender (n0) and TCPSink on receiver (n1)
+set tcp [new Agent/TCP]
+$tcp set window_ 5   ;# Window size set to 5 to simulate Go-Back-N
+$ns attach-agent $n0 $tcp
+
+set sink [new Agent/TCPSink]
+$ns attach-agent $n1 $sink
+
+# Connect TCP source and sink agents
+$ns connect $tcp $sink
+
+# Create a CBR (Constant Bit Rate) traffic source to generate data
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 500   ;# Packet size of 500 bytes
+$cbr set rate_ 1Mb         ;# Sending rate
+$cbr attach-agent $tcp
+
+# Schedule the start and stop of the CBR traffic
+$ns at 0.5 "$cbr start"
+$ns at 4.5 "$cbr stop"
+
+# Define a finish procedure
+proc finish {} {
+    global ns tracefile
+    $ns flush-trace
+    close $tracefile
+    exit 0
+}
+
+# Schedule the end of the simulation
+$ns at 5.0 "finish"
+
+# Run the simulation
+$ns run
+
+
+Key Parameters:
+
+Window Size: The window_ variable controls the sliding window size. For Go-Back-N, you can set this value (e.g., 5).
+
+Traffic: Constant Bit Rate (CBR) traffic is sent between the sender and receiver to simulate data transmission.
+
+
+Step 2: Run the NS2 Simulation
+
+Step 3: AWK Script for Analyzing NS2 Trace File
+
+Once the simulation is complete, you can analyze the trace file to gather key performance metrics like throughput, packet loss, and delay using an AWK script.
+
+BEGIN {
+    sent_packets = 0;
+    received_packets = 0;
+    dropped_packets = 0;
+    total_delay = 0;
+    start_time = -1;
+    end_time = 0;
+}
+
+# Count sent packets: when a packet is enqueued for transmission
+$1 == "+" && $4 == "tcp" {
+    sent_packets++;
+}
+
+# Count received packets: when a packet reaches its destination
+$1 == "r" && $4 == "tcp" {
+    received_packets++;
+    if (start_time == -1) {
+        start_time = $2;
+    }
+    end_time = $2;
+}
+
+# Count dropped packets: when a packet is dropped
+$1 == "d" && $4 == "tcp" {
+    dropped_packets++;
+}
+
+# Calculate delay by tracking packet send and receive times using sequence numbers
+$1 == "r" && $4 == "tcp" {
+    seq_num = $11;
+    if (seq_num in send_time) {
+        delay = $2 - send_time[seq_num];
+        total_delay += delay;
+    }
+}
+
+$1 == "+" && $4 == "tcp" {
+    seq_num = $11;
+    send_time[seq_num] = $2;
+}
+
+END {
+    # Calculate throughput in bits per second (bps)
+    simulation_time = end_time - start_time;
+    throughput = (received_packets * 500 * 8) / simulation_time;
+
+    # Calculate packet loss ratio
+    packet_loss_ratio = dropped_packets / sent_packets;
+
+    # Calculate average packet delay
+    if (received_packets > 0) {
+        avg_delay = total_delay / received_packets;
+    } else {
+        avg_delay = 0;
+    }
+
+    # Print the results
+    printf("Sent Packets: %d\n", sent_packets);
+    printf("Received Packets: %d\n", received_packets);
+    printf("Dropped Packets: %d\n", dropped_packets);
+    printf("Packet Loss Ratio: %.2f%%\n", packet_loss_ratio * 100);
+    printf("Throughput: %.2f bits/sec\n", throughput);
+    printf("Average Packet Delay: %.5f seconds\n", avg_delay);
+}
+
+
+What the AWK Script Does:
+
+Sent Packets: Count packets enqueued for transmission (+ event).
+
+Received Packets: Count packets received (r event).
+
+Dropped Packets: Count packets dropped (d event).
+
+Delay: Track the time difference between when a packet was sent and when it was received using the sequence number ($11).
+
+Throughput: Compute throughput based on received packets and the total simulation time.
+
+Packet Loss Ratio: Calculate the ratio of dropped packets to sent packets.
+
+Average Packet Delay: Compute the average delay of received packets.
+
+Step 4: Running the AWK Analysis
+
+
+Sample Output:
+
+Sent Packets: 1000
+Received Packets: 950
+Dropped Packets: 50
+Packet Loss Ratio: 5.00%
+Throughput: 760000.00 bits/sec
+Average Packet Delay: 0.01234 seconds
+
+
+This output provides insights into the performance of the sliding window protocol, including:
+
+Throughput: How efficiently the data is transmitted.
+
+Packet Loss Ratio: The percentage of packets that were dropped.
+
+Average Packet Delay: The average delay experienced by packets between transmission and receipt.
+
+
+-This implementation and analysis show how to simulate sliding window protocols like Go-Back-N using NS2 and how to analyze the results using an AWK script. By adjusting parameters such as the window size, you can simulate different sliding window protocols (e.g., Go-Back-N, Selective Repeat) and measure their performance based on packet transmission, loss, and delay.

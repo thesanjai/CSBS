@@ -1,0 +1,19 @@
+1. Connected graph checking- check whether the graph is connected or disconnected, if disconnected, how many components?
+
+
+2. Get
+two input string each with 8 numbers (s1 and s2). Get the selection starting
+point and end point from the user and pass them to the function CROSSOVER along
+with s1 and s2. The CROSSOVER function should assign the selected numbers of s1
+to s2 and s2 to s1. Display s1 and s2 of original parents and the children s1
+and s2. 
+
+
+ 
+
+
+ 3. Get the positions of tic
+tac toe partially, 1st player as 0 and 2nd player as 1 as
+list. Create  the following using
+functions. a) Display the list as matrix b)Who is going to play next? c)Find
+the options of next player and display.

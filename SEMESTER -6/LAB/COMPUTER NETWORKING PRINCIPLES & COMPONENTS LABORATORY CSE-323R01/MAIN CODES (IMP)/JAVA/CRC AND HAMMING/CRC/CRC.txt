@@ -1,0 +1,148 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class CRCClient {
+
+    public static String xor(String a, String b) {
+        String result = "";
+        for (int i = 1; i < b.length(); i++) {
+            result += (a.charAt(i) == b.charAt(i)) ? '0' : '1';
+        }
+        return result;
+    }
+
+    public static String mod2div(String dividend, String divisor) {
+        int pick = divisor.length();
+        String tmp = dividend.substring(0, pick);
+
+        while (pick < dividend.length()) {
+            if (tmp.charAt(0) == '1') {
+                tmp = xor(divisor, tmp) + dividend.charAt(pick);
+            } else {
+                tmp = xor("0".repeat(pick), tmp) + dividend.charAt(pick);
+            }
+            pick += 1;
+        }
+
+        if (tmp.charAt(0) == '1') {
+            tmp = xor(divisor, tmp);
+        } else {
+            tmp = xor("0".repeat(pick), tmp);
+        }
+
+        return tmp;
+    }
+
+    public static String introduceError(String codeword) {
+        Random rand = new Random();
+        int pos = rand.nextInt(codeword.length()); // choose random bit to flip
+        char[] chars = codeword.toCharArray();
+        chars[pos] = (chars[pos] == '0') ? '1' : '0'; // flip the bit
+        System.out.println("Bit flipped at position: " + pos);
+        return new String(chars);
+    }
+
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+        Socket s = new Socket("localhost", 9999);
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+
+        System.out.print("Enter data (binary): ");
+        String data = sc.next();
+        System.out.print("Enter generator (binary): ");
+        String generator = sc.next();
+
+        String appended = data + "0".repeat(generator.length() - 1);
+        String crc = mod2div(appended, generator);
+        String codeword = data + crc;
+
+        System.out.println("Generated CRC: " + crc);
+        System.out.println("Original codeword: " + codeword);
+
+        System.out.print("Do you want to introduce an error? (yes/no): ");
+        String choice = sc.next().toLowerCase();
+
+        if (choice.equals("yes")) {
+            codeword = introduceError(codeword);
+            System.out.println("Corrupted codeword sent: " + codeword);
+        } else {
+            System.out.println("Codeword sent without error: " + codeword);
+        }
+
+        out.writeUTF(codeword + "," + generator); // Send to server
+        out.flush();
+
+        s.close();
+        sc.close();
+    }
+}
+
+SERVER
+
+import java.io.*;
+import java.net.*;
+
+public class CRCServer {
+
+    public static String xor(String a, String b) {
+        String result = "";
+        for (int i = 1; i < b.length(); i++) {
+            result += (a.charAt(i) == b.charAt(i)) ? '0' : '1';
+        }
+        return result;
+    }
+
+    public static String mod2div(String dividend, String divisor) {
+        int pick = divisor.length();
+        String tmp = dividend.substring(0, pick);
+
+        while (pick < dividend.length()) {
+            if (tmp.charAt(0) == '1') {
+                tmp = xor(divisor, tmp) + dividend.charAt(pick);
+            } else {
+                tmp = xor("0".repeat(pick), tmp) + dividend.charAt(pick);
+            }
+            pick += 1;
+        }
+
+        if (tmp.charAt(0) == '1') {
+            tmp = xor(divisor, tmp);
+        } else {
+            tmp = xor("0".repeat(pick), tmp);
+        }
+
+        return tmp;
+    }
+
+    public static void main(String[] args) throws Exception {
+        ServerSocket ss = new ServerSocket(9999);
+        System.out.println("Waiting for client...");
+        Socket s = ss.accept();
+        System.out.println("Client connected.");
+
+        DataInputStream in = new DataInputStream(s.getInputStream());
+        String received = in.readUTF();
+        String[] parts = received.split(",");
+
+        String codeword = parts[0];
+        String generator = parts[1];
+
+        String remainder = mod2div(codeword, generator);
+        if (remainder.contains("1")) {
+            System.out.println("Receiver: Error detected in received codeword!");
+        } else {
+            System.out.println("Receiver: Data received correctly!");
+        }
+
+        s.close();
+        ss.close();
+    }
+}
+
+
+
+Enter data (binary): 1101
+Enter generator (binary): 1011
+Sending codeword: 1101011
+

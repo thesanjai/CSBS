@@ -1,0 +1,486 @@
+Server Side:
+
+Sample code for sending and receiving the message:
+
+import java.net.*;
+import java.io.*;
+class TestServer
+{
+    public static void main(String ar[])
+    {
+        try
+        {
+            ServerSocket ss=new ServerSocket(2000);    
+            System.out.println("\n Waiting...");
+            Socket s=ss.accept();
+            System.out.println("\n Connection Established");
+
+            PrintStream pr=new PrintStream(s.getOutputStream());
+            pr.println("Welcome");
+
+            BufferedReader br=new BufferedReader(new InputStreamReader(s.getInputStream()));
+            String s1=br.readLine();
+            System.out.println(s1);
+           
+            Thread.sleep(10000);
+
+           
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+       
+    }
+}
+
+
+
+
+Client Side:
+
+
+import java.net.*;
+import java.io.*;
+class TestClient
+{
+    public static void main(String ar[])
+    {
+        try
+        {
+            Socket s=new Socket("172.22.67.53",2000);
+            BufferedReader br=new BufferedReader(new InputStreamReader(s.getInputStream()));
+            String s1=br.readLine();
+            System.out.println(s1);
+       
+            PrintStream pr=new PrintStream(s.getOutputStream());
+            pr.println("Thank u");
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+       
+    }
+}
+
+================================================================================================
+Pl. find the code for UDP:
+
+import java.io.*;
+import java.net.*;
+class TestReceiver
+{
+    public static void main(String are[])
+    {
+        try
+        {
+            DatagramSocket ds=new DatagramSocket(4000);
+            byte b[]=new byte[1000];
+            DatagramPacket dp=new DatagramPacket(b,b.length);
+            ds.receive(dp);
+            System.out.println("Received Msg :"+new String(b,0,10));
+           
+            System.out.println(dp.getAddress().getHostAddress());
+            System.out.println(dp.getPort());
+
+           
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
+
+class TestSender
+{
+    public static void main(String are[])
+    {
+        try
+        {
+            DatagramSocket ds=new DatagramSocket(3000);
+            String s="Welcome";
+            DatagramPacket dp=new DatagramPacket(s.getBytes(),s.length(),InetAddress.getByName("172.22.67.53"),4000);;
+            ds.send(dp);
+            System.out.println("Message sent..");
+           
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
+
+
+
+==================================================================================================================================
+
+code for GUI with encrypt and decrypt:
+
+import java.awt.*;
+import java.awt.event.*;
+import java.net.*;
+import java.io.*;
+class Test1 implements ActionListener
+{
+    Frame f;
+    TextField tf;
+    TextArea ta;    
+    Button b,b1;
+    PrintStream pr;
+    ServerSocket ss;
+    Socket s;
+    Test1()
+    {    
+        f=new Frame("Chat App.");
+        f.setSize(400,400);    
+        tf=new TextField(10);
+        ta=new TextArea(20,20);
+        b=new Button("Send");
+        b1=new Button("Cancel");
+        f.setLayout(new FlowLayout());
+        f.add(new Label("Enter Message:"));
+        f.add(tf);
+        f.add(ta);
+        f.add(b);
+        f.add(b1);
+        b.addActionListener(this);
+        b1.addActionListener(this);
+        f.setVisible(true);
+        try{
+            ss=new ServerSocket(2000);    
+            s=ss.accept();
+            pr=new PrintStream(s.getOutputStream());
+        }
+        catch(Exception e)
+        {}
+
+    }
+    public void actionPerformed(ActionEvent ae)
+    {
+        if(ae.getSource()==b)
+        {
+            String s1=tf.getText();
+            char c[]=s1.toCharArray();
+            for(int i=0;i<c.length;i++)
+            {
+                c[i]=(char)(c[i]-5);
+            }
+            String a=new String(c);
+            pr.println(a);        
+            System.out.println(a);
+
+        }
+        else if(ae.getSource()==b1)
+        {
+            System.out.println("cancel");
+        }
+
+    }
+}    
+
+class TestGUI
+{
+    public static void main(String ar[])
+    {    
+        Test1 t1=new Test1();
+    }
+}
+
+
+Encrypt without GUI:
+
+import java.net.*;
+import java.io.*;
+class TestServer
+{
+    public static void main(String ar[])
+    {
+        try
+        {
+            ServerSocket ss=new ServerSocket(2000);    
+            System.out.println("\n Waiting...");
+            Socket s=ss.accept();
+            System.out.println("\n Connection Established");
+
+            PrintStream pr=new PrintStream(s.getOutputStream());
+            String s1="Welcome";
+            char c[]=s1.toCharArray();
+            for(int i=0;i<c.length;i++)
+            {
+                c[i]=(char)(c[i]-5);
+            }
+            String a=new String(c);
+            pr.println(a);
+            System.out.println("Msg. sent successfully");
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+       
+    }
+}
+
+Decrypt without GUI:
+
+import java.net.*;
+import java.io.*;
+class TestClient
+{
+    public static void main(String ar[])
+    {
+        try
+        {
+            Socket s=new Socket("localhost",2000);
+            BufferedReader br=new BufferedReader(new InputStreamReader(s.getInputStream()));
+            String s1=br.readLine();
+            System.out.println("\n Received msg. "+s1);
+            //System.out.println(s1);'
+
+            char c[]=s1.toCharArray();
+            for(int i=0;i<c.length;i++)
+            {
+                c[i]=(char)(c[i]+5);
+            }
+            String a=new String(c);
+            System.out.println("\n After Decrypt :"+a);
+
+           
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+       
+    }
+}
+
+==================================================================================================================================
+
+code for file transfer
+
+import java.io.*;
+import java.net.*;
+class Test2
+{
+    public static void main(String ar[])
+    {    
+        String x="";
+       
+        try
+        {
+            File x1=new File("TestReceiver.java");
+           
+       
+            if(x1.exists())
+            {
+           
+            FileInputStream fin=new FileInputStream(x1);    
+            //System.out.println((char)fin.read());
+            //System.out.println((char)fin.read());
+            byte b;
+           
+            while((b=(byte)fin.read())!=-1)
+            {
+                x=x+(char)b;
+                //System.out.print((char)b);
+            }
+            //System.out.println(x);
+            }
+            else
+            {
+                System.out.println("File not found");
+            }
+            FileOutputStream fout=new FileOutputStream("csbs1.txt");
+            fout.write(x.getBytes());
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
+
+==================================================================================================================================
+
+#crc
+import java.io.*;
+class CRC
+{
+ public static void main(String args[]) throws IOException
+{
+      int[] data;
+          int[] div;
+           int[] divisor;
+            int[] rem;
+           int[] crc;
+       
+      int data_bits, divisor_bits, tot_length;
+
+      BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+       
+       
+       
+            System.out.println("Enter number of data bits : ");
+              data_bits=Integer.parseInt(br.readLine());
+               data=new int[data_bits];
+
+                System.out.println("Enter data bits : ");
+                    for(int i=0; i<data_bits; i++)
+                    data[i]=Integer.parseInt(br.readLine());
+
+                   System.out.println("Enter number of bits in divisor : ");
+                   divisor_bits=Integer.parseInt(br.readLine());
+                   divisor=new int[divisor_bits];
+       
+                   System.out.println("Enter Divisor bits : ");
+                   for(int i=0; i<divisor_bits; i++)
+                       divisor[i]=Integer.parseInt(br.readLine());
+
+
+           tot_length=data_bits+divisor_bits-1;
+       
+              div=new int[tot_length];
+            rem=new int[tot_length];
+             crc=new int[tot_length];
+
+
+
+            for(int i=0;i<data.length;i++)
+                    div[i]=data[i];
+       
+            System.out.print("\nDividend (after appending 0's) are : ");
+            for(int i=0; i< div.length; i++)
+                    System.out.print(div[i]);        
+   
+       
+             for(int j=0; j<div.length; j++)
+                  rem[j] = div[j];
+   
+                  rem=divide(div, divisor, rem);
+
+       
+            for(int i=0;i<div.length;i++)          
+             {
+                    crc[i]=(div[i]^rem[i]);
+            }
+       
+     
+           System.out.print("\nCRC code : ");    
+            for(int i=0;i<crc.length;i++)
+                    System.out.print(crc[i]);
+     
+
+            System.out.println("\nEnter CRC code of "+tot_length+" bits : ");
+           for(int i=0; i<crc.length; i++)
+                    crc[i]=Integer.parseInt(br.readLine());
+       
+       
+
+            for(int j=0; j<crc.length; j++)
+    {
+                      rem[j] = crc[j];
+          }
+   
+            rem=divide(crc, divisor, rem);
+       
+            for(int i=0; i< rem.length; i++)
+            {
+                    if(rem[i]!=0)
+                    {
+                           System.out.println("Error");
+                            break;
+                  }
+                    if(i==rem.length-1)
+                            System.out.println("No Error");
+            }
+       
+     
+    }
+   
+
+ static int[] divide(int div[],int divisor[], int rem[])
+ {
+           int cur=0;
+             while(true)
+              {
+                    for(int i=0;i<divisor.length;i++)
+                            rem[cur+i]=(rem[cur+i]^divisor[i]);
+           
+                    while(rem[cur]==0 && cur!=rem.length-1)
+                        cur++;
+   
+                    if((rem.length-cur)<divisor.length)
+                            break;
+             }
+              return rem;
+    }
+}
+===================================================================================================
+//1011001
+import java.io.*;
+import java.util.*;
+class Hamming
+{
+    public static void main(String args[])throws IOException
+    {
+        Scanner sc=new Scanner(System.in);
+        int m,h[],n,d[],i=0,j,k,x=0,sum=0,count=0;
+        System.out.print("Enter no. of data bits : ");
+        n=sc.nextInt();
+        while(n>(Math.pow(2,i)))
+        {
+            i++;
+        }
+        x=i+1;
+        m=x+n;
+        d=new int[n+1];
+        h=new int[m+1];
+        System.out.print("Enter data bits : ");
+        for(i=1;i<=n;i++)
+            d[i]=sc.nextInt();
+        for(i=1,j=0,k=1;k<=m;k++)
+        {
+            if (Math.pow(2,j)==k)
+            {
+                h[k]=0;j++;
+            }
+            else
+            {
+                h[k]=d[i];i++;
+            }
+        }
+        for(j=0,k=1;k<=m;k++)
+        {
+            if (Math.pow(2,j)==k)
+            {
+                h[k]=0; count=0; sum=0;
+                for(int c=k;c<=m;c++)
+                {
+                    if(count<k)
+                    {
+                        sum+=h[c];
+                        count++;
+                    }
+                    else
+                    {
+                         c+=k-1;
+                        count=0;
+                    }
+                }
+                if(sum%2!=0)
+                    h[k]=1;
+                else
+                    h[k]=0;
+                j++;
+            }
+        }
+        System.out.print("Transmitted codeword is : ");
+        for(i=1;i<=m;i++)
+            System.out.print(h[i]);
+    }
+}
+========================================================================================

@@ -1,0 +1,32 @@
+#!/usr/bin/awk -f
+# AWK script to calculate throughput
+
+BEGIN {
+    total_bytes = 0;
+    start_time = 0;
+    end_time = 0;
+}
+
+# Capture the first packet send time
+$1 == "s" && start_time == 0 {
+    start_time = $2;
+}
+
+# Capture the last packet receive time and accumulate the bytes received
+$1 == "r" {
+    total_bytes += $8;  # Assuming $8 is the size of the packet
+    end_time = $2;
+}
+
+END {
+    duration = end_time - start_time;
+    if (duration > 0) {
+        throughput = (total_bytes * 8) / (duration * 1000000);  # Throughput in Mbps
+        print "Throughput: " throughput " Mbps";
+    } else {
+        print "No packets received.";
+    }
+}
+
+
+awk -f throughput.awk output.tr

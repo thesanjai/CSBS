@@ -1,0 +1,8 @@
+Simulation Analysis Report
+--------------------------
+Total Packets Sent:  1201
+Total Packets Received:  1201
+Total Packets Dropped:  0
+Packet Delivery Ratio (%):  100
+Packet Drop Ratio (%):  0
+Throughput (Kbps):  997.923

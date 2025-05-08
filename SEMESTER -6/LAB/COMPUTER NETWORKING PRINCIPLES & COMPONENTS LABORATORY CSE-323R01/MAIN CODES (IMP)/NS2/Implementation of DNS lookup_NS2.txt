@@ -1,0 +1,132 @@
+Implementation of DNS lookup
+============================
+
+NS2 does not have built-in DNS simulation, we will mimic DNS lookup behavior by:
+
+Simulating a client-server model (client sends DNS query, server responds).
+
+Using TCP or UDP agents for the simulation.
+
+Tracing the packets.
+
+Using AWK to analyze delays, packet counts, etc.
+
+
+# dns_simulation.tcl
+
+# Create simulator
+set ns [new Simulator]
+
+# Open trace and nam files
+set tracefile [open dns.tr w]
+set namfile [open dns.nam w]
+$ns trace-all $tracefile
+$ns namtrace-all $namfile
+
+# Create nodes
+set client [$ns node]
+set dns_server [$ns node]
+
+# Link nodes
+$ns duplex-link $client $dns_server 1Mb 10ms DropTail
+
+# Define client and server agents (UDP for DNS simulation)
+set udpClient [new Agent/UDP]
+set udpServer [new Agent/UDP]
+$ns attach-agent $client $udpClient
+$ns attach-agent $dns_server $udpServer
+
+# Attach traffic generator to client (simulate DNS query)
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 50
+$cbr set interval_ 0.2 ;# simulate queries every 200ms
+$cbr attach-agent $udpClient
+
+# Attach null sink to server (simulate DNS reply handler)
+set null [new Agent/Null]
+$ns attach-agent $dns_server $null
+
+# Connect client to server
+$ns connect $udpClient $null
+
+# Start and stop traffic
+$ns at 0.5 "$cbr start"
+$ns at 4.5 "$cbr stop"
+$ns at 5.0 "finish"
+
+# Finish procedure
+proc finish {} {
+    global ns tracefile namfile
+    $ns flush-trace
+    close $tracefile
+    close $namfile
+    exec nam dns.nam &
+    exit 0
+}
+
+# Run simulation
+$ns run
+
+
+
+AWK Script for Analysis:
+========================
+
+This script will:
+
+Count total DNS query packets
+
+Calculate total bytes
+
+Estimate packet drop (if applicable)
+
+Compute average delay
+
+
+
+BEGIN {
+    query_count = 0
+    response_count = 0
+    total_delay = 0
+    completed = 0
+}
+
+{
+    # DNS query packet: look for 'cbr' (client -> server)
+    if ($1 == "s" && $7 == "cbr") {
+        query_count++
+        send_time[$11] = $2
+    }
+
+    # DNS reply received at server (simulate DNS response delay tracking)
+    if ($1 == "r" && $7 == "cbr") {
+        if (send_time[$11] != "") {
+            delay = $2 - send_time[$11]
+            total_delay += delay
+            completed++
+        }
+    }
+}
+
+END {
+    print "DNS Simulation Analysis Report:"
+    print "Total DNS Queries Sent: " query_count
+    print "Total DNS Responses Received: " completed
+    print "Packet Loss: " (query_count - completed)
+    if (completed > 0) {
+        print "Average DNS Response Delay: " total_delay / completed " sec"
+    } else {
+        print "No successful responses to compute delay."
+    }
+}
+
+
+
+Output:
+
+DNS Simulation Analysis Report:
+Total DNS Queries Sent: 20
+Total DNS Responses Received: 20
+Packet Loss: 0
+Average DNS Response Delay: 0.021 sec
+

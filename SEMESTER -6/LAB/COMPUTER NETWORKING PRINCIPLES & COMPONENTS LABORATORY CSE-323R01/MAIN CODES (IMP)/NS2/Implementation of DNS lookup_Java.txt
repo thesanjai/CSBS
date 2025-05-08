@@ -1,0 +1,64 @@
+Implementation of DNS lookup using java
+=======================================
+
+
+I'll give you a simple and clear Java program that performs DNS lookup and provides basic analysis — like resolving:
+
+Hostname to IP address (forward lookup)
+
+IP address to hostname (reverse lookup)
+
+Also list all IP addresses for a given domain (if multiple)
+
+
+
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Scanner;
+
+public class DNSLookupAnalysis {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== DNS Lookup Analysis ===");
+        System.out.print("Enter a hostname or IP address: ");
+        String input = scanner.nextLine();
+
+        try {
+            // Forward lookup: Hostname to IP
+            InetAddress[] addresses = InetAddress.getAllByName(input);
+            System.out.println("\nForward Lookup (Hostname to IP):");
+            for (InetAddress address : addresses) {
+                System.out.println("Host: " + address.getHostName());
+                System.out.println("IP  : " + address.getHostAddress());
+                System.out.println("-----------------------------");
+            }
+
+            // If input is IP, try reverse lookup
+            if (input.matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                InetAddress addr = InetAddress.getByName(input);
+                System.out.println("Reverse Lookup (IP to Hostname): " + addr.getCanonicalHostName());
+            }
+
+        } catch (UnknownHostException e) {
+            System.out.println("Error: Unable to resolve " + input);
+        }
+
+        scanner.close();
+    }
+}
+
+
+Expected Output:
+
+
+=== DNS Lookup Analysis ===
+Enter a hostname or IP address: www.google.com
+
+Forward Lookup (Hostname to IP):
+Host: www.google.com
+IP  : 142.250.67.100
+-----------------------------
+
