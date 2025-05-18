@@ -1,0 +1,2 @@
+Apply A-star to the following graph and draw tree. Critic the process in terms of optimality achievement and justify admissible heuristic.
+
