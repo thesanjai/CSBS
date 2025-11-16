@@ -1,0 +1,318 @@
+Set-2 
+Part-A - Create an Android app to display various images (one at a time) and switch between them when a button is clicked.
+Part-B - Create a passport registration form with SQLite DB to collect information such as Name, Phone number, mail ID, address, Father’s name, Mother’s name, Aadhaar number, Gender, etc. with the necessary validations for each field.
+
+Part a
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground" />
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next Image"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>
+java
+package com.kasinadhuni.imageswitcher;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+
+public class MainActivity extends AppCompatActivity {
+
+    ImageView imageView;
+    Button btnNext;
+    int currentIndex = 0;
+
+    // Array of images stored in res/drawable
+    int[] images = {
+            R.drawable.img1,
+            R.drawable.img2,
+            R.drawable.img3,
+            R.drawable.img4,
+            R.drawable.img5
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        imageView = findViewById(R.id.imageView);
+        btnNext = findViewById(R.id.btnNext);
+
+        // Set the first image
+        imageView.setImageResource(images[currentIndex]);
+
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Switch image
+                currentIndex++;
+                if (currentIndex >= images.length) {
+                    currentIndex = 0; // loop back to first
+                }
+                imageView.setImageResource(images[currentIndex]);
+            }
+        });
+    }
+}
+Part B
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            android:inputType="phone" />
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:inputType="textPostalAddress" />
+
+        <EditText
+            android:id="@+id/etFather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Father's Name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/etMother"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mother's Name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/etAadhaar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Aadhaar Number"
+            android:inputType="number" />
+
+        <RadioGroup
+            android:id="@+id/radioGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/rbFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/rbOther"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_marginTop="20dp" />
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Records"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+</ScrollView>
+java
+package com.kasinadhuni.passportapp;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etPhone, etEmail, etAddress, etFather, etMother, etAadhaar;
+    RadioGroup radioGender;
+    Button btnRegister, btnViewAll;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etPhone = findViewById(R.id.etPhone);
+        etEmail = findViewById(R.id.etEmail);
+        etAddress = findViewById(R.id.etAddress);
+        etFather = findViewById(R.id.etFather);
+        etMother = findViewById(R.id.etMother);
+        etAadhaar = findViewById(R.id.etAadhaar);
+        radioGender = findViewById(R.id.radioGender);
+
+        btnRegister = findViewById(R.id.btnRegister);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        db = openOrCreateDatabase("PassportDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS passport(" +
+                "name VARCHAR, phone VARCHAR, email VARCHAR, address VARCHAR," +
+                "father VARCHAR, mother VARCHAR, aadhaar VARCHAR, gender VARCHAR);");
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registerUser();
+            }
+        });
+
+        btnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewAll();
+            }
+        });
+    }
+
+    private void registerUser() {
+        String name = etName.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+        String father = etFather.getText().toString().trim();
+        String mother = etMother.getText().toString().trim();
+        String aadhaar = etAadhaar.getText().toString().trim();
+        int selectedGenderId = radioGender.getCheckedRadioButtonId();
+
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(email) ||
+                TextUtils.isEmpty(address) || TextUtils.isEmpty(father) || TextUtils.isEmpty(mother) ||
+                TextUtils.isEmpty(aadhaar) || selectedGenderId == -1) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            showMessage("Error", "Invalid email format");
+            return;
+        }
+
+        if (phone.length() != 10) {
+            showMessage("Error", "Phone number must be 10 digits");
+            return;
+        }
+
+        if (aadhaar.length() != 12) {
+            showMessage("Error", "Aadhaar must be 12 digits");
+            return;
+        }
+
+        RadioButton selectedGender = findViewById(selectedGenderId);
+        String gender = selectedGender.getText().toString();
+
+        db.execSQL("INSERT INTO passport VALUES('" + name + "','" + phone + "','" + email + "','" +
+                address + "','" + father + "','" + mother + "','" + aadhaar + "','" + gender + "');");
+
+        showMessage("Success", "Registration Completed");
+        clearFields();
+    }
+
+    private void viewAll() {
+        Cursor c = db.rawQuery("SELECT * FROM passport", null);
+        if (c.getCount() == 0) {
+            showMessage("Error", "No records found");
+            return;
+        }
+        StringBuilder buffer = new StringBuilder();
+        while (c.moveToNext()) {
+            buffer.append("Name: ").append(c.getString(0)).append("\n");
+            buffer.append("Phone: ").append(c.getString(1)).append("\n");
+            buffer.append("Email: ").append(c.getString(2)).append("\n");
+            buffer.append("Address: ").append(c.getString(3)).append("\n");
+            buffer.append("Father: ").append(c.getString(4)).append("\n");
+            buffer.append("Mother: ").append(c.getString(5)).append("\n");
+            buffer.append("Aadhaar: ").append(c.getString(6)).append("\n");
+            buffer.append("Gender: ").append(c.getString(7)).append("\n\n");
+        }
+        showMessage("Passport Records", buffer.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etName.setText("");
+        etPhone.setText("");
+        etEmail.setText("");
+        etAddress.setText("");
+        etFather.setText("");
+        etMother.setText("");
+        etAadhaar.setText("");
+        radioGender.clearCheck();
+    }
+}
+
+

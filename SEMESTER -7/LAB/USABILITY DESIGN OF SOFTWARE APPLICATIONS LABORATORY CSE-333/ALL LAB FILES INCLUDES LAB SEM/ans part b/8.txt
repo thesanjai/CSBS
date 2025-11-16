@@ -1,0 +1,283 @@
+Set-8
+Part-A - Design a simple Calculator Application with two input boxes and buttons for Add, Subtract, Multiply, Divide. Display the result in a TextView.
+Part-B - Design a Train Ticket Booking Application with the following fields:
+Passenger Name: varchar(30), Age: int, Source: varchar(20), Destination: varchar(20), Number of Tickets: int.
+Store booking details in an SQL table and display the confirmation with passenger details.
+Great! Let’s solve Set-8 step by step in the same pattern as your previous sets. I’ll provide full XML + Java code for both Part-A and Part-B.
+
+Part-A: Simple Calculator Application
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/etNum1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter first number"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:id="@+id/etNum2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter second number"
+        android:inputType="numberDecimal"
+        android:layout_marginTop="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"/>
+        <Button
+            android:id="@+id/btnSubtract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Subtract"
+            android:layout_marginStart="10dp"/>
+        <Button
+            android:id="@+id/btnMultiply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Multiply"
+            android:layout_marginStart="10dp"/>
+        <Button
+            android:id="@+id/btnDivide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Divide"
+            android:layout_marginStart="10dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Result: "
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set8parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etNum1, etNum2;
+    Button btnAdd, btnSubtract, btnMultiply, btnDivide;
+    TextView tvResult;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etNum1 = findViewById(R.id.etNum1);
+        etNum2 = findViewById(R.id.etNum2);
+        btnAdd = findViewById(R.id.btnAdd);
+        btnSubtract = findViewById(R.id.btnSubtract);
+        btnMultiply = findViewById(R.id.btnMultiply);
+        btnDivide = findViewById(R.id.btnDivide);
+        tvResult = findViewById(R.id.tvResult);
+
+        btnAdd.setOnClickListener(v -> calculate("+"));
+        btnSubtract.setOnClickListener(v -> calculate("-"));
+        btnMultiply.setOnClickListener(v -> calculate("*"));
+        btnDivide.setOnClickListener(v -> calculate("/"));
+    }
+
+    private void calculate(String operation) {
+        String num1Str = etNum1.getText().toString().trim();
+        String num2Str = etNum2.getText().toString().trim();
+
+        if(num1Str.isEmpty() || num2Str.isEmpty()) {
+            Toast.makeText(this, "Enter both numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double num1 = Double.parseDouble(num1Str);
+        double num2 = Double.parseDouble(num2Str);
+        double result = 0;
+
+        switch(operation) {
+            case "+": result = num1 + num2; break;
+            case "-": result = num1 - num2; break;
+            case "*": result = num1 * num2; break;
+            case "/": 
+                if(num2 == 0) {
+                    Toast.makeText(this, "Cannot divide by zero", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                result = num1 / num2; break;
+        }
+        tvResult.setText("Result: " + result);
+    }
+}
+✅ Logic:
+Two number inputs.
+Buttons perform operations using a single calculate() method.
+Division by zero handled.
+
+Part-B: Train Ticket Booking Application with SQLite
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etPassengerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Passenger Name"
+            android:inputType="textPersonName"/>
+
+        <EditText
+            android:id="@+id/etAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Age"
+            android:inputType="number"/>
+
+        <EditText
+            android:id="@+id/etSource"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Source"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/etDestination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Destination"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/etNumTickets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Number of Tickets"
+            android:inputType="number"/>
+
+        <Button
+            android:id="@+id/btnBook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Book Ticket"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Bookings"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set8partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etPassengerName, etAge, etSource, etDestination, etNumTickets;
+    Button btnBook, btnViewAll;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etPassengerName = findViewById(R.id.etPassengerName);
+        etAge = findViewById(R.id.etAge);
+        etSource = findViewById(R.id.etSource);
+        etDestination = findViewById(R.id.etDestination);
+        etNumTickets = findViewById(R.id.etNumTickets);
+        btnBook = findViewById(R.id.btnBook);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        db = openOrCreateDatabase("TrainDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS bookings(" +
+                "passengerName VARCHAR(30), age INT, source VARCHAR(20), destination VARCHAR(20), numTickets INT);");
+
+        btnBook.setOnClickListener(v -> bookTicket());
+        btnViewAll.setOnClickListener(v -> viewAllBookings());
+    }
+
+    private void bookTicket() {
+        String name = etPassengerName.getText().toString().trim();
+        String ageStr = etAge.getText().toString().trim();
+        String source = etSource.getText().toString().trim();
+        String destination = etDestination.getText().toString().trim();
+        String numTicketsStr = etNumTickets.getText().toString().trim();
+
+        if(name.isEmpty() || ageStr.isEmpty() || source.isEmpty() || destination.isEmpty() || numTicketsStr.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int age = Integer.parseInt(ageStr);
+        int numTickets = Integer.parseInt(numTicketsStr);
+
+        db.execSQL("INSERT INTO bookings VALUES('" + name + "'," + age + ",'" + source + "','" + destination + "'," + numTickets + ");");
+        showMessage("Success", "Ticket Booked Successfully for " + name);
+        clearFields();
+    }
+
+    private void viewAllBookings() {
+        Cursor c = db.rawQuery("SELECT * FROM bookings", null);
+        if(c.getCount() == 0) {
+            showMessage("Error", "No bookings found");
+            return;
+        }
+
+        StringBuilder buffer = new StringBuilder();
+        while(c.moveToNext()) {
+            buffer.append("Passenger: ").append(c.getString(0)).append("\n");
+            buffer.append("Age: ").append(c.getInt(1)).append("\n");
+            buffer.append("From: ").append(c.getString(2)).append(" To: ").append(c.getString(3)).append("\n");
+            buffer.append("Tickets: ").append(c.getInt(4)).append("\n\n");
+        }
+        showMessage("All Bookings", buffer.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+
+

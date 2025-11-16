@@ -1,0 +1,262 @@
+Set-5
+Part-A - Design an application with a Button that changes the background color of the layout and text when clicked.
+Part-B - Design a Passport Application with the following fields:
+Name: varchar(30), Gender: varchar(10), Address: varchar(100), Nationality: varchar(20), Mobile Number: int.
+Store these details in an SQL table and display the stored passport applications on the screen.
+Perfect! Let’s solve Set-5 step by step using the same logic as your previous sets. I’ll provide full XML + Java codefor both Part-A and Part-B.
+
+Part-A: Change Background and Text Color on Button Click
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello! Click the button to change colors"
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/btnChangeColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Colors"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set5parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout mainLayout;
+    TextView tvMessage;
+    Button btnChangeColor;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mainLayout = findViewById(R.id.mainLayout);
+        tvMessage = findViewById(R.id.tvMessage);
+        btnChangeColor = findViewById(R.id.btnChangeColor);
+
+        btnChangeColor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Change background color randomly
+                mainLayout.setBackgroundColor(Color.parseColor("#FFBB86FC"));
+                // Change text color
+                tvMessage.setTextColor(Color.parseColor("#FF6200EE"));
+            }
+        });
+    }
+}
+✅ Logic:
+Simple Button click listener.
+On click, background and text colors are changed using setBackgroundColor() and setTextColor().
+
+Part-B: Passport Application with SQLite Database
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:inputType="textPersonName"/>
+
+        <Spinner
+            android:id="@+id/spinnerGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/genders"/>
+
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:inputType="textMultiLine"/>
+
+        <EditText
+            android:id="@+id/etNationality"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nationality"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/etMobile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mobile Number"
+            android:inputType="number"/>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Application"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Applications"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>
+res/values/strings.xml
+<resources>
+    <string name="app_name">PassportApp</string>
+    <string-array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+</resources>
+MainActivity.java
+package com.kasinadhuni.passportapp;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etAddress, etNationality, etMobile;
+    Spinner spinnerGender;
+    Button btnSubmit, btnViewAll;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etAddress = findViewById(R.id.etAddress);
+        etNationality = findViewById(R.id.etNationality);
+        etMobile = findViewById(R.id.etMobile);
+        spinnerGender = findViewById(R.id.spinnerGender);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        db = openOrCreateDatabase("PassportDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS passport(" +
+                "name VARCHAR(30), gender VARCHAR(10), address VARCHAR(100), " +
+                "nationality VARCHAR(20), mobile INT);");
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submitApplication();
+            }
+        });
+
+        btnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewAllApplications();
+            }
+        });
+    }
+
+    private void submitApplication() {
+        String name = etName.getText().toString().trim();
+        String gender = spinnerGender.getSelectedItem().toString();
+        String address = etAddress.getText().toString().trim();
+        String nationality = etNationality.getText().toString().trim();
+        String mobile = etMobile.getText().toString().trim();
+
+        if(name.isEmpty() || address.isEmpty() || nationality.isEmpty() || mobile.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        db.execSQL("INSERT INTO passport VALUES('" + name + "','" + gender + "','" +
+                address + "','" + nationality + "'," + mobile + ");");
+
+        showMessage("Success", "Passport Application Submitted");
+        clearFields();
+    }
+
+    private void viewAllApplications() {
+        Cursor c = db.rawQuery("SELECT * FROM passport", null);
+        if(c.getCount() == 0) {
+            showMessage("Error", "No records found");
+            return;
+        }
+
+        StringBuilder buffer = new StringBuilder();
+        while(c.moveToNext()) {
+            buffer.append("Name: ").append(c.getString(0)).append("\n");
+            buffer.append("Gender: ").append(c.getString(1)).append("\n");
+            buffer.append("Address: ").append(c.getString(2)).append("\n");
+            buffer.append("Nationality: ").append(c.getString(3)).append("\n");
+            buffer.append("Mobile: ").append(c.getInt(4)).append("\n\n");
+        }
+        showMessage("Passport Applications", buffer.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etName.setText("");
+        etAddress.setText("");
+        etNationality.setText("");
+        etMobile.setText("");
+        spinnerGender.setSelection(0);
+    }
+}
+✅ Logic:
+Follows the same form + SQLite + AlertDialog pattern as your leave application.
+Spinner used for Gender.
+Validation to ensure all fields are filled.
+Displays all stored applications via AlertDialog.
+
+I can also make a ListView version for Part-B instead of AlertDialog if you want a scrollable list on the screen itself like your tax app.
+Do you want me to do that?
+
+

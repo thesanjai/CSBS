@@ -1,0 +1,287 @@
+Set-10
+Part A – Create an Android app with two Buttons: one to increase a counter and one to decrease it. Display the counter value in a TextView.
+Part B – Design a Hospital Patient Registration Application with the following fields:
+ Patient ID: int, Name: varchar(30), Age: int, Gender: varchar(10), Phone Number: int, Address: varchar(50).
+ Store these details in an SQL table and display the list of registered patients.
+Perfect! Let’s solve Set-10 in the same step-by-step, full code style as before.
+
+Part-A: Counter App (Increase/Decrease)
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/tvCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Counter: 0"
+        android:textSize="24sp"
+        android:layout_marginBottom="30dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnIncrease"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Increase"/>
+
+        <Button
+            android:id="@+id/btnDecrease"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Decrease"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set10parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    TextView tvCounter;
+    Button btnIncrease, btnDecrease;
+    int counter = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvCounter = findViewById(R.id.tvCounter);
+        btnIncrease = findViewById(R.id.btnIncrease);
+        btnDecrease = findViewById(R.id.btnDecrease);
+
+        btnIncrease.setOnClickListener(v -> {
+            counter++;
+            tvCounter.setText("Counter: " + counter);
+        });
+
+        btnDecrease.setOnClickListener(v -> {
+            counter--;
+            tvCounter.setText("Counter: " + counter);
+        });
+    }
+}
+✅ Logic:
+counter variable stores current value.
+Buttons update the counter and display it dynamically in the TextView.
+
+Part-B: Hospital Patient Registration App
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etPatientID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Patient ID"
+            android:inputType="number"/>
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:inputType="textPersonName"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Age"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Gender"
+            android:inputType="text"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:inputType="textMultiLine"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btnAddPatient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Patient"
+            android:layout_marginTop="15dp"/>
+
+        <Button
+            android:id="@+id/btnViewPatients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Patients"
+            android:layout_marginTop="10dp"/>
+
+        <ListView
+            android:id="@+id/listViewPatients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set10partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etPatientID, etName, etAge, etGender, etPhone, etAddress;
+    Button btnAddPatient, btnViewPatients;
+    ListView listViewPatients;
+    SQLiteDatabase db;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> patientList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etPatientID = findViewById(R.id.etPatientID);
+        etName = findViewById(R.id.etName);
+        etAge = findViewById(R.id.etAge);
+        etGender = findViewById(R.id.etGender);
+        etPhone = findViewById(R.id.etPhone);
+        etAddress = findViewById(R.id.etAddress);
+        btnAddPatient = findViewById(R.id.btnAddPatient);
+        btnViewPatients = findViewById(R.id.btnViewPatients);
+        listViewPatients = findViewById(R.id.listViewPatients);
+
+        patientList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, patientList);
+        listViewPatients.setAdapter(adapter);
+
+        db = openOrCreateDatabase("HospitalDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS patients(" +
+                "patientID INT, name VARCHAR(30), age INT, gender VARCHAR(10), phone INT, address VARCHAR(50));");
+
+        btnAddPatient.setOnClickListener(v -> addPatient());
+        btnViewPatients.setOnClickListener(v -> viewPatients());
+    }
+
+    private void addPatient() {
+        String idStr = etPatientID.getText().toString().trim();
+        String name = etName.getText().toString().trim();
+        String ageStr = etAge.getText().toString().trim();
+        String gender = etGender.getText().toString().trim();
+        String phoneStr = etPhone.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+
+        if(idStr.isEmpty() || name.isEmpty() || ageStr.isEmpty() || gender.isEmpty() || phoneStr.isEmpty() || address.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int id = Integer.parseInt(idStr);
+        int age = Integer.parseInt(ageStr);
+        int phone = Integer.parseInt(phoneStr);
+
+        db.execSQL("INSERT INTO patients VALUES(" + id + ",'" + name + "'," + age + ",'" + gender + "'," + phone + ",'" + address + "');");
+        showMessage("Success", "Patient added successfully");
+        clearFields();
+    }
+
+    private void viewPatients() {
+        patientList.clear();
+        Cursor c = db.rawQuery("SELECT * FROM patients", null);
+        if(c.getCount() == 0) {
+            showMessage("Error", "No patients found");
+            adapter.notifyDataSetChanged();
+            return;
+        }
+
+        while(c.moveToNext()) {
+            String patient = "ID: " + c.getInt(0) +
+                    "\nName: " + c.getString(1) +
+                    "\nAge: " + c.getInt(2) +
+                    "\nGender: " + c.getString(3) +
+                    "\nPhone: " + c.getInt(4) +
+                    "\nAddress: " + c.getString(5);
+            patientList.add(patient);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etPatientID.setText("");
+        etName.setText("");
+        etAge.setText("");
+        etGender.setText("");
+        etPhone.setText("");
+        etAddress.setText("");
+    }
+}
+
+✅ Logic:
+Counter app: Simple int variable updated on button clicks.
+Patient Registration:
+Inputs validated before insertion.
+patients table stores all records.
+ListView displays patients dynamically.
+
+If you want, I can compile all Sets 1–10 in a single summarized Android project plan showing UI logic + SQLite structure for easy reference.
+Do you want me to do that?
+
+

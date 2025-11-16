@@ -1,0 +1,357 @@
+This is another great lab question! This time, the new field is an int (Roll Number), so we have to make sure we handle that correctly when saving to the database.
+
+We'll follow the same pattern and add this "Event Registration" feature as a new, separate part of your existing passportapp project.
+
+First, let's add a button to your existing MainActivity.xml to open this new feature.
+
+1. Modify app/src/main/res/layout/activity_main.xml
+Where to paste: Open your existing activity_main.xml file.
+
+Why: To add a button that opens your new "Event Registration" form.
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Passport Registration"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Phone Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:maxLength="10" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Email Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email ID"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Address Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Father's Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_father_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Father's Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_father_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Mother's Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_mother_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mother's Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_mother_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Aadhaar Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_aadhaar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Aadhaar Number"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_aadhaar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="12" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Gender -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gender"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
+
+        <RadioGroup
+            android:id="@+id/rg_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/rb_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/rb_other"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tv_gender_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please select a gender"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+
+        <!-- Buttons -->
+        <Button
+            android:id="@+id/btn_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/btn_view_records"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Passport Records"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginTop="8dp"/>
+
+        <!-- ADD THIS BUTTON -->
+        <Button
+            android:id="@+id/btn_goto_tax_filing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to IT Return Filing"
+            android:layout_marginTop="16dp"/>
+
+        <!-- ADD THIS NEW BUTTON -->
+        <Button
+            android:id="@+id/btn_goto_leave_app"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to Leave Application"
+            android:layout_marginTop="16dp"/>
+
+        <!-- ADD THIS NEW BUTTON -->
+        <Button
+            android:id="@+id/btn_goto_event_reg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to Event Registration"
+            android:layout_marginTop="16dp"/>
+
+    </LinearLayout>
+</ScrollView>
+2. Modify app/src/main/java/com/example/passportapp/MainActivity.java
+Where to paste: Open your existing MainActivity.java file.
+
+Why: To make the new "Event Registration" button work.
+
+3. Modify app/src/main/AndroidManifest.xml
+Where to paste: Open your existing AndroidManifest.xml.
+
+Why: To declare your three new "Event" screens to the Android system.
+
+Now, let's create all the NEW files for the Event Registration feature.
+
+4. app/src/main/java/com/example/passportapp/EventDatabaseHelper.java (NEW FILE)
+Where to paste:
+
+Right-click your package name (com.example.passportapp).
+
+Select New -> Java Class.
+
+Name it EventDatabaseHelper and paste this code.
+
+Why: This is the dedicated SQLite helper for event registrations. It stores student name, roll number (as an INTEGER), department, and event name.
+EventDatabaseHelper.java
+7 Nov, 7:28 am
+
+Open
+
+5. app/src/main/res/layout/activity_event_registration.xml (NEW FILE)
+Where to paste:
+
+Right-click the app/src/main/res/layout folder.
+
+Select New -> Layout Resource File.
+
+Name it activity_event_registration and paste this code.
+
+Why: This is the UI for the event registration form. Notice et_roll_number has android:inputType="number".
+activity_event_registration.xml
+7 Nov, 7:28 am
+
+Open
+
+6. app/src/main/java/com/example/passportapp/EventRegistrationActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it EventRegistrationActivity and paste this code.
+
+Why: This is the Java code for the form. It validates the fields and converts the Roll Number from a String to an int before saving.
+EventRegistrationActivity.java
+7 Nov, 7:28 am
+
+Open
+
+7. app/src/main/res/layout/activity_event_list.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it activity_event_list and paste this code.
+
+Why: The UI for the screen that shows all student registrations.
+activity_event_list.xml
+7 Nov, 7:28 am
+
+Open
+
+8. app/src/main/res/layout/list_item_event.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it list_item_event and paste this code.
+
+Why: The UI for a single row in your list (shows Student Name and Roll Number).
+list_item_event.xml
+7 Nov, 7:28 am
+
+Open
+
+9. app/src/main/java/com/example/passportapp/EventListActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it EventListActivity and paste this code.
+
+Why: The Java code for the list screen. It Reads (All) records from EventDatabaseHelper and populates the list.
+EventListActivity.java
+7 Nov, 7:28 am
+
+Open
+
+10. app/src/main/res/layout/activity_event_details.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it activity_event_details and paste this code.
+
+Why: The UI for the "Details" screen, which looks like the form but with "Update" and "Delete" buttons.
+activity_event_details.xml
+7 Nov, 7:28 am
+
+Open
+
+11. app/src/main/java/com/example/passportapp/EventDetailsActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it EventDetailsActivity and paste this code.
+
+Why: The Java code for the details screen. It Reads (One) record, fills the form, and handles Update and Delete. Note how it converts the int Roll Number to a String to set the text.
+EventDetailsActivity.java
+7 Nov, 7:28 am
+
+Open
+
+You're all set! This adds the fourth complete CRUD feature to your app, correctly handling the int value for the Roll Number.
+
+Good luck!

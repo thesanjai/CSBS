@@ -1,0 +1,91 @@
+⚙️ Step 1: Create new project
+
+Name → ColorChangerApp
+Language → Java
+Template → Empty Activity
+
+🧩 Step 2: activity_main.xml
+
+Paste this inside your res/layout/activity_main.xml 👇
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:id="@+id/mainLayout"
+    android:background="#FFFDE7"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello, tap the button!"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/btnChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Color & Text"
+        android:backgroundTint="#6200EE"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:textSize="16sp"/>
+
+</LinearLayout>
+
+💻 Step 3: MainActivity.java
+
+Paste this code 👇
+
+package com.example.colorchangerapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout mainLayout;
+    TextView tvMessage;
+    Button btnChange;
+    Random random = new Random();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mainLayout = findViewById(R.id.mainLayout);
+        tvMessage = findViewById(R.id.tvMessage);
+        btnChange = findViewById(R.id.btnChange);
+
+        btnChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Random color generator
+                int color = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+                mainLayout.setBackgroundColor(color);
+
+                // Change text message
+                tvMessage.setText("Background Changed!");
+                tvMessage.setTextColor(Color.WHITE);
+            }
+        });
+    }
+}
+
+🧾 Step 4: Run it
+
+✅ When you tap the button → background color changes randomly 🎨
+✅ Text changes to “Background Changed!”

@@ -1,0 +1,1004 @@
+employee leave application
+Hello! Building a full Android app with a database involves several different files working together. I understand it's confusing to know where to put everything, so I'll guide you step-by-step.
+
+I will provide you with all the files you need. For each file, I'll give you the exact file path and name. You will need to create these files in your Android Studio project.
+
+First, create a new Project in Android Studio:
+
+Open Android Studio.
+
+Choose "New Project...".
+
+Select "Empty Views Activity".
+
+Click "Next".
+
+Name your application something like "LeaveTracker".
+
+Choose "Java" as the language.
+
+Click "Finish".
+
+Now, let's create the files. I'll use the package name com.example.leavetracker. If yours is different, just make sure to create the .java files inside your main package folder.
+
+Here are the files you'll need to create or edit:
+
+1. The Database Helper (The "SQLite" part)
+This class creates the database, the table, and manages all the CRUD (Create, Read, Update, Delete) operations.
+
+Create a new Java class for this. File Path: app/src/main/java/com/example/leavetracker/DatabaseHelper.java
+DatabaseHelper.java
+7 Nov, 7:43 am
+
+Open
+package com.example.leavetracker;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // Database Info
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "leaveManager.db";
+
+    // Table Name
+    private static final String TABLE_LEAVES = "leaves";
+
+    // Table Columns
+    private static final String KEY_ID = "id";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_EMP_ID = "emp_id";
+    private static final String KEY_FROM_DATE = "from_date";
+    private static final String KEY_TO_DATE = "to_date";
+    private static final String KEY_LEAVE_TYPE = "leave_type";
+    private static final String KEY_REASON = "reason";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // This is called when the database is created for the first time.
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String CREATE_LEAVES_TABLE = "CREATE TABLE " + TABLE_LEAVES + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + KEY_NAME + " TEXT,"
+                + KEY_EMP_ID + " TEXT,"
+                + KEY_FROM_DATE + " TEXT,"
+                + KEY_TO_DATE + " TEXT,"
+                + KEY_LEAVE_TYPE + " TEXT,"
+                + KEY_REASON + " TEXT" + ")";
+        db.execSQL(CREATE_LEAVES_TABLE);
+    }
+
+    // This is called when the database needs to be upgraded.
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Drop older table if existed
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LEAVES);
+        // Create tables again
+        onCreate(db);
+    }
+
+    // --- CRUD Operations ---
+
+    /**
+     * CREATE: Add a new leave request
+     */
+    public void addLeave(LeaveRequest leave) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, leave.getName());
+        values.put(KEY_EMP_ID, leave.getEmpId());
+        values.put(KEY_FROM_DATE, leave.getFromDate());
+        values.put(KEY_TO_DATE, leave.getToDate());
+        values.put(KEY_LEAVE_TYPE, leave.getLeaveType());
+        values.put(KEY_REASON, leave.getReason());
+
+        // Inserting Row
+        db.insert(TABLE_LEAVES, null, values);
+        db.close(); // Closing database connection
+    }
+
+    /**
+     * READ (One): Get a single leave request by ID
+     */
+    public LeaveRequest getLeave(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_LEAVES, new String[]{KEY_ID,
+                        KEY_NAME, KEY_EMP_ID, KEY_FROM_DATE, KEY_TO_DATE, KEY_LEAVE_TYPE, KEY_REASON},
+                KEY_ID + "=?",
+                new String[]{String.valueOf(id)}, null, null, null, null);
+
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        LeaveRequest leave = new LeaveRequest(
+                Integer.parseInt(cursor.getString(0)), // id
+                cursor.getString(1), // name
+                cursor.getString(2), // empId
+                cursor.getString(3), // fromDate
+                cursor.getString(4), // toDate
+                cursor.getString(5), // leaveType
+                cursor.getString(6)  // reason
+        );
+        cursor.close();
+        db.close();
+        return leave;
+    }
+
+    /**
+     * READ (All): Get all leave requests
+     */
+    public List<LeaveRequest> getAllLeaves() {
+        List<LeaveRequest> leaveList = new ArrayList<>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_LEAVES;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                LeaveRequest leave = new LeaveRequest();
+                leave.setId(Integer.parseInt(cursor.getString(0)));
+                leave.setName(cursor.getString(1));
+                leave.setEmpId(cursor.getString(2));
+                leave.setFromDate(cursor.getString(3));
+                leave.setToDate(cursor.getString(4));
+                leave.setLeaveType(cursor.getString(5));
+                leave.setReason(cursor.getString(6));
+                // Adding leave to list
+                leaveList.add(leave);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        // return leave list
+        return leaveList;
+    }
+
+    /**
+     * UPDATE: Update a leave request
+     */
+    public int updateLeave(LeaveRequest leave) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, leave.getName());
+        values.put(KEY_EMP_ID, leave.getEmpId());
+        values.put(KEY_FROM_DATE, leave.getFromDate());
+        values.put(KEY_TO_DATE, leave.getToDate());
+        values.put(KEY_LEAVE_TYPE, leave.getLeaveType());
+        values.put(KEY_REASON, leave.getReason());
+
+        // updating row
+        int result = db.update(TABLE_LEAVES, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(leave.getId())});
+        db.close();
+        return result;
+    }
+
+    /**
+     * DELETE: Delete a leave request
+     */
+    public void deleteLeave(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_LEAVES, KEY_ID + " = ?",
+                new String[]{String.valueOf(id)});
+        db.close();
+    }
+}
+2. The Data Model Class
+This is a simple Java class to hold the data for a single leave request.
+
+Create a new Java class for this. File Path: app/src/main/java/com/example/leavetracker/LeaveRequest.java
+LeaveRequest.java
+7 Nov, 7:43 am
+
+Open
+package com.example.leavetracker;
+
+public class LeaveRequest {
+
+    // Fields
+    int id;
+    String name;
+    String empId;
+    String fromDate;
+    String toDate;
+    String leaveType;
+    String reason;
+
+    // Constructors
+    public LeaveRequest() {
+    }
+
+    public LeaveRequest(int id, String name, String empId, String fromDate, String toDate, String leaveType, String reason) {
+        this.id = id;
+        this.name = name;
+        this.empId = empId;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.leaveType = leaveType;
+        this.reason = reason;
+    }
+
+    public LeaveRequest(String name, String empId, String fromDate, String toDate, String leaveType, String reason) {
+        this.name = name;
+        this.empId = empId;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.leaveType = leaveType;
+        this.reason = reason;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmpId() {
+        return empId;
+    }
+
+    public void setEmpId(String empId) {
+        this.empId = empId;
+    }
+
+    public String getFromDate() {
+        return fromDate;
+    }
+
+    public void setFromDate(String fromDate) {
+        this.fromDate = fromDate;
+    }
+
+    public String getToDate() {
+        return toDate;
+    }
+
+    public void setToDate(String toDate) {
+        this.toDate = toDate;
+    }
+
+    public String getLeaveType() {
+        return leaveType;
+    }
+
+    public void setLeaveType(String leaveType) {
+        this.leaveType = leaveType;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    // This is important for the ListView to display the name
+    @Override
+    public String toString() {
+        return name + " (" + fromDate + " to " + toDate + ")";
+    }
+}
+3. Resources for the Leave Type Spinner
+It's good practice to store the list of leave types in your resource files.
+
+File Path: app/src/main/res/values/strings.xml (This file already exists, just add the <string-array> part)
+strings.xml
+7 Nov, 7:43 am
+
+Open
+<resources>
+    <string name="app_name">LeaveTracker</string>
+
+    <!-- Add this array for the spinner -->
+    <string-array name="leave_types_array">
+        <item>OD</item>
+        <item>Sick Leave</item>
+        <item>Casual Leave</item>
+        <item>Annual Leave</item>
+    </string-array>
+</resources>
+4. Main Activity Layout (The Form)
+This is the XML layout for your main screen, which will have the form.
+
+File Path: app/src/main/res/layout/activity_main.xml (This file already exists, replace its content)
+activity_main.xml
+7 Nov, 7:43 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Employee Leave Application"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp"/>
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:inputType="textPersonName"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etEmpId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee ID"
+            android:inputType="text"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etFromDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="From Date (YYYY-MM-DD)"
+            android:inputType="date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etToDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="To Date (YYYY-MM-DD)"
+            android:inputType="date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leave Type:"/>
+        <Spinner
+            android:id="@+id/spinnerLeaveType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Reason for Leave"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:gravity="top"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Application"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Applications"
+            style="@style/Widget.AppCompat.Button.OutlinedButton"/>
+
+    </LinearLayout>
+</ScrollView>
+5. Main Activity Java (The Form Logic)
+This is the Java code that controls the form, handles button clicks, and saves data.
+
+File Path: app/src/main/java/com/example/leavetracker/MainActivity.java (This file exists, replace its content)
+MainActivity.java
+7 Nov, 7:43 am
+
+Open
+package com.example.leavetracker;
+
+import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etEmpId, etFromDate, etToDate, etReason;
+    Spinner spinnerLeaveType;
+    Button btnSubmit, btnViewAll;
+    DatabaseHelper dbHelper;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize views
+        etName = findViewById(R.id.etName);
+        etEmpId = findViewById(R.id.etEmpId);
+        etFromDate = findViewById(R.id.etFromDate);
+        etToDate = findViewById(R.id.etToDate);
+        etReason = findViewById(R.id.etReason);
+        spinnerLeaveType = findViewById(R.id.spinnerLeaveType);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        // Initialize Database Helper
+        dbHelper = new DatabaseHelper(this);
+
+        // --- Setup Spinner ---
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.leave_types_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinnerLeaveType.setAdapter(adapter);
+
+        // --- Setup Date Pickers ---
+        etFromDate.setOnClickListener(v -> showDatePickerDialog(etFromDate));
+        etToDate.setOnClickListener(v -> showDatePickerDialog(etToDate));
+
+        // --- Setup Button Listeners ---
+        btnSubmit.setOnClickListener(v -> submitLeaveApplication());
+        btnViewAll.setOnClickListener(v -> viewAllApplications());
+    }
+
+    private void showDatePickerDialog(EditText dateEditText) {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog.OnDateSetListener dateSetListener = (view, year1, monthOfYear, dayOfMonth) -> {
+            // Format the date as YYYY-MM-DD
+            String date = String.format("%04d-%02d-%02d", year1, (monthOfYear + 1), dayOfMonth);
+            dateEditText.setText(date);
+        };
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                dateSetListener, year, month, day);
+        datePickerDialog.show();
+    }
+
+    private void submitLeaveApplication() {
+        // Get all values from the form
+        String name = etName.getText().toString().trim();
+        String empId = etEmpId.getText().toString().trim();
+        String fromDate = etFromDate.getText().toString().trim();
+        String toDate = etToDate.getText().toString().trim();
+        String reason = etReason.getText().toString().trim();
+        String leaveType = spinnerLeaveType.getSelectedItem().toString();
+
+        // Validate the fields
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(empId) ||
+                TextUtils.isEmpty(fromDate) || TextUtils.isEmpty(toDate) || TextUtils.isEmpty(reason)) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // --- CREATE operation ---
+        // Create a new LeaveRequest object
+        LeaveRequest newLeave = new LeaveRequest(name, empId, fromDate, toDate, leaveType, reason);
+        // Add to database
+        dbHelper.addLeave(newLeave);
+
+        // Show success message and clear fields
+        Toast.makeText(this, "Leave application submitted!", Toast.LENGTH_SHORT).show();
+        clearForm();
+    }
+
+    private void clearForm() {
+        etName.setText("");
+        etEmpId.setText("");
+        etFromDate.setText("");
+        etToDate.setText("");
+        etReason.setText("");
+        spinnerLeaveType.setSelection(0);
+    }
+
+    private void viewAllApplications() {
+        // Start the new Activity to show the list
+        Intent intent = new Intent(MainActivity.this, LeaveListActivity.class);
+        startActivity(intent);
+    }
+}
+6. List Activity Layout (To show all records)
+Now we need a new screen (Activity) to show the list of all leaves.
+
+First, create the new Activity:
+
+In Android Studio, right-click your package folder (e.g., com.example.leavetracker)
+
+Go to New > Activity > Empty Views Activity.
+
+Name it LeaveListActivity.
+
+Click Finish.
+
+This will create two files: LeaveListActivity.java and activity_leave_list.xml.
+
+File Path: app/src/main/res/layout/activity_leave_list.xml (Paste this content)
+activity_leave_list.xml
+7 Nov, 7:43 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp"
+    tools:context=".LeaveListActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All Leave Applications"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <ListView
+        android:id="@+id/listViewLeaves"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tvEmptyList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No leave applications found."
+        android:gravity="center"
+        android:visibility="gone"/>
+
+</LinearLayout>
+7. List Activity Java (The List Logic)
+This is the code for your new LeaveListActivity. It reads all records from the database and displays them.
+
+File Path: app/src/main/java/com/example/leavetracker/LeaveListActivity.java (Paste this content)
+LeaveListActivity.java
+7 Nov, 7:43 am
+
+Open
+package com.example.leavetracker;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.List;
+
+public class LeaveListActivity extends AppCompatActivity {
+
+    ListView listViewLeaves;
+    TextView tvEmptyList;
+    DatabaseHelper dbHelper;
+    List<LeaveRequest> allLeaves;
+    ArrayAdapter<LeaveRequest> adapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_leave_list);
+
+        listViewLeaves = findViewById(R.id.listViewLeaves);
+        tvEmptyList = findViewById(R.id.tvEmptyList);
+        dbHelper = new DatabaseHelper(this);
+
+        // This is the click listener for when you tap a specific item in the list
+        listViewLeaves.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the leave request that was clicked
+                LeaveRequest clickedLeave = allLeaves.get(position);
+
+                // Start the Detail activity, passing the ID of the clicked leave
+                Intent intent = new Intent(LeaveListActivity.this, LeaveDetailActivity.class);
+                intent.putExtra("LEAVE_ID", clickedLeave.getId());
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // We load the list here so it refreshes every time we come back to this screen
+        loadLeaveList();
+    }
+
+    private void loadLeaveList() {
+        // --- READ (All) operation ---
+        allLeaves = dbHelper.getAllLeaves();
+
+        if (allLeaves.isEmpty()) {
+            tvEmptyList.setVisibility(View.VISIBLE);
+            listViewLeaves.setVisibility(View.GONE);
+        } else {
+            tvEmptyList.setVisibility(View.GONE);
+            listViewLeaves.setVisibility(View.VISIBLE);
+
+            // The adapter will use the toString() method of LeaveRequest to display text
+            adapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_list_item_1,
+                    allLeaves);
+            listViewLeaves.setAdapter(adapter);
+        }
+    }
+}
+8. Detail Activity Layout (To Read, Update, Delete)
+This is the final screen to show the details of one record and allow updating or deleting.
+
+Create another new Activity:
+
+Right-click your package folder (com.example.leavetracker)
+
+Go to New > Activity > Empty Views Activity.
+
+Name it LeaveDetailActivity.
+
+Click Finish.
+
+File Path: app/src/main/res/layout/activity_leave_detail.xml (Paste this content) (Note: It looks just like the main form, but with "Update" and "Delete" buttons)
+activity_leave_detail.xml
+7 Nov, 7:43 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LeaveDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leave Details"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp"/>
+
+        <EditText
+            android:id="@+id/etDetailName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:inputType="textPersonName"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etDetailEmpId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee ID"
+            android:inputType="text"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etDetailFromDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="From Date (YYYY-MM-DD)"
+            android:inputType="date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etDetailToDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="To Date (YYYY-MM-DD)"
+            android:inputType="date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leave Type:"/>
+        <Spinner
+            android:id="@+id/spinnerDetailLeaveType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/etDetailReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Reason for Leave"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:gravity="top"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update Application"/>
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Application"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#D32F2F"/> <!-- Red color for delete -->
+
+    </LinearLayout>
+</ScrollView>
+9. Detail Activity Java (The R-U-D Logic)
+This is the code for LeaveDetailActivity. It will Read the data for one item, Update it, or Delete it.
+
+File Path: app/src/main/java/com/example/leavetracker/LeaveDetailActivity.java (Paste this content)
+LeaveDetailActivity.java
+7 Nov, 7:43 am
+
+Open
+package com.example.leavetracker;
+
+import android.app.DatePickerDialog;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Calendar;
+
+public class LeaveDetailActivity extends AppCompatActivity {
+
+    EditText etName, etEmpId, etFromDate, etToDate, etReason;
+    Spinner spinnerLeaveType;
+    Button btnUpdate, btnDelete;
+    DatabaseHelper dbHelper;
+    int leaveId;
+    ArrayAdapter<CharSequence> spinnerAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_leave_detail);
+
+        // Get the ID from the Intent
+        leaveId = getIntent().getIntExtra("LEAVE_ID", -1);
+        if (leaveId == -1) {
+            // Error: No ID was passed
+            Toast.makeText(this, "Error: Could not load leave details.", Toast.LENGTH_SHORT).show();
+            finish(); // Close the activity
+            return;
+        }
+
+        // Initialize views
+        etName = findViewById(R.id.etDetailName);
+        etEmpId = findViewById(R.id.etDetailEmpId);
+        etFromDate = findViewById(R.id.etDetailFromDate);
+        etToDate = findViewById(R.id.etDetailToDate);
+        etReason = findViewById(R.id.etDetailReason);
+        spinnerLeaveType = findViewById(R.id.spinnerDetailLeaveType);
+        btnUpdate = findViewById(R.id.btnUpdate);
+        btnDelete = findViewById(R.id.btnDelete);
+
+        dbHelper = new DatabaseHelper(this);
+
+        // --- Setup Spinner ---
+        spinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.leave_types_array, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerLeaveType.setAdapter(spinnerAdapter);
+
+        // --- Setup Date Pickers ---
+        etFromDate.setOnClickListener(v -> showDatePickerDialog(etFromDate));
+        etToDate.setOnClickListener(v -> showDatePickerDialog(etToDate));
+
+        // Load the data for this leave
+        loadLeaveDetails();
+
+        // --- Setup Button Listeners ---
+        btnUpdate.setOnClickListener(v -> updateLeave());
+        btnDelete.setOnClickListener(v -> deleteLeave());
+    }
+
+    private void loadLeaveDetails() {
+        // --- READ (One) operation ---
+        LeaveRequest leave = dbHelper.getLeave(leaveId);
+
+        if (leave != null) {
+            etName.setText(leave.getName());
+            etEmpId.setText(leave.getEmpId());
+            etFromDate.setText(leave.getFromDate());
+            etToDate.setText(leave.getToDate());
+            etReason.setText(leave.getReason());
+            // Set spinner selection
+            int spinnerPosition = spinnerAdapter.getPosition(leave.getLeaveType());
+            spinnerLeaveType.setSelection(spinnerPosition);
+        } else {
+            Toast.makeText(this, "Could not find leave details.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateLeave() {
+        // Get all values from the form
+        String name = etName.getText().toString().trim();
+        String empId = etEmpId.getText().toString().trim();
+        String fromDate = etFromDate.getText().toString().trim();
+        String toDate = etToDate.getText().toString().trim();
+        String reason = etReason.getText().toString().trim();
+        String leaveType = spinnerLeaveType.getSelectedItem().toString();
+
+        // Validate
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(empId) ||
+                TextUtils.isEmpty(fromDate) || TextUtils.isEmpty(toDate) || TextUtils.isEmpty(reason)) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // --- UPDATE operation ---
+        LeaveRequest updatedLeave = new LeaveRequest(leaveId, name, empId, fromDate, toDate, leaveType, reason);
+        dbHelper.updateLeave(updatedLeave);
+
+        Toast.makeText(this, "Leave updated!", Toast.LENGTH_SHORT).show();
+        finish(); // Go back to the list
+    }
+
+    private void deleteLeave() {
+        // --- DELETE operation ---
+        dbHelper.deleteLeave(leaveId);
+        Toast.makeText(this, "Leave deleted!", Toast.LENGTH_SHORT).show();
+        finish(); // Go back to the list
+    }
+
+    private void showDatePickerDialog(EditText dateEditText) {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog.OnDateSetListener dateSetListener = (view, year1, monthOfYear, dayOfMonth) -> {
+            String date = String.format("%04d-%02d-%02d", year1, (monthOfYear + 1), dayOfMonth);
+            dateEditText.setText(date);
+        };
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                dateSetListener, year, month, day);
+        datePickerDialog.show();
+    }
+}
+10. Final Step: The Manifest
+Android needs to know about your new Activities. When you created them using the New -> Activity menu, Android Studio should have done this automatically. But just in case, check this file.
+
+File Path: app/src/main/AndroidManifest.xml
+
+Make sure the <application> tag contains entries for LeaveListActivity and LeaveDetailActivity, like this:
+AndroidManifest.xml
+7 Nov, 7:43 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.leavetracker">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.LeaveTracker"
+        tools:targetApi="31">
+
+        <!-- This is your main form screen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ADD THIS - Your List Screen -->
+        <activity android:name=".LeaveListActivity" />
+
+        <!-- ADD THIS - Your Detail Screen -->
+        <activity android:name=".LeaveDetailActivity" />
+
+    </application>
+
+</manifest>
+That's it! You now have a complete app that performs all CRUD operations.
+
+How it works:
+
+MainActivity.java (the form) Creates records and saves them using DatabaseHelper.
+
+The "View All" button opens LeaveListActivity.java.
+
+LeaveListActivity.java Reads (All) records from DatabaseHelper and shows them in a list.
+
+Clicking a list item opens LeaveDetailActivity.java, passing the item's ID.
+
+LeaveDetailActivity.java uses the ID to Read (One) record from DatabaseHelper and fills the form.
+
+You can then Update (which saves changes) or Delete (which removes the record).
+
+After Updating or Deleting, the app goes back to the LeaveListActivity, which refreshes to show the changes.

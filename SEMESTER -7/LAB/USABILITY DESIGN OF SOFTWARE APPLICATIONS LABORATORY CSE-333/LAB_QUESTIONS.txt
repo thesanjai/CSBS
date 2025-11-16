@@ -1,0 +1,49 @@
+Ex1: Prepare the SRS document for your project.
+The Document Should consist of :
+Tittle of the project
+1-Introduction (Purpose, Intended Audience, Project Scope)
+2-Overall description of the project  (User Needs, Assumptions and development functions)
+3- System Requirments ( h/w, s/w, any other devices)
+4-Sytem Features ( Functional, data, UI, reports)
+5-Design Constraints
+6-Development modules
+7-Conclusion
+ and submit it in word / notepad format
+ 
+ -----------------------------------------
+ Ex2: Design an app using menus, lists and layouts
+ 
+ -----------------------------------------
+ Ex3: Change background color and image
+
+-----------------------------------------
+Ex 4 - Login Layout
+
+-----------------------------------------
+Ex5: Count on ENTER being pressed.
+
+----------------------------------------
+Ex6: A: Change the image on button click
+
+Ex6: B: Employee Form
+
+---------------------------------------
+Ex7: Employee Database 
+	Employment Form with SQL
+	
+---------------------------------------
+Ex 8: Design of registration form to open a bank account
+
+------------------------------------
+Ex 9: An Android app to collect and print a student's profile.
+
+-----------------------------------
+Ex10: Design an android application to Send SMS via Internet
+
+-----------------------------------
+Ex 11: Create an android application using Fragments
+
+-----------------------------------
+Ex12: Android application for online Exam login and registration
+
+

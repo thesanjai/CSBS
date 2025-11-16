@@ -1,0 +1,269 @@
+Set-3
+Part-A - Create an Android app to count the number of times the character “A” was typed in a textfield.
+Part-B - Create a form for employee leave application with fields such as Name, Employee ID, from date to date, leave type – OD, sick leave, leave reason. Store this information in a SQLite database.
+
+
+Part-A: Count the number of times character “A” is typed
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/etInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Type here"
+        android:inputType="textMultiLine" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Count of 'A': 0"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp" />
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set3parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etInput;
+    TextView tvCount;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etInput = findViewById(R.id.etInput);
+        tvCount = findViewById(R.id.tvCount);
+
+        etInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int aCount = 0;
+                for (int i = 0; i < s.length(); i++) {
+                    if (s.charAt(i) == 'A' || s.charAt(i) == 'a') {
+                        aCount++;
+                    }
+                }
+                tvCount.setText("Count of 'A': " + aCount);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+}
+Part-B: Employee Leave Application with SQLite
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee Name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/etEmpId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee ID"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etFromDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="From Date (dd/mm/yyyy)"
+            android:inputType="date" />
+
+        <EditText
+            android:id="@+id/etToDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="To Date (dd/mm/yyyy)"
+            android:inputType="date" />
+
+        <Spinner
+            android:id="@+id/spinnerLeaveType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/leave_types" />
+
+        <EditText
+            android:id="@+id/etReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Leave Reason"
+            android:inputType="textMultiLine" />
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Leave Application"
+            android:layout_marginTop="20dp" />
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Applications"
+            android:layout_marginTop="10dp" />
+
+    </LinearLayout>
+</ScrollView>
+res/values/strings.xml
+ (add leave types)
+
+<resources>
+    <string name="app_name">LeaveApp</string>
+    <string-array name="leave_types">
+        <item>OD</item>
+        <item>Sick Leave</item>
+        <item>Casual Leave</item>
+        <item>Earned Leave</item>
+    </string-array>
+</resources>
+
+
+
+
+MainActivity.java
+
+package com.kasinadhuni.leaveapp;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etEmpId, etFromDate, etToDate, etReason;
+    Spinner spinnerLeaveType;
+    Button btnSubmit, btnViewAll;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etEmpId = findViewById(R.id.etEmpId);
+        etFromDate = findViewById(R.id.etFromDate);
+        etToDate = findViewById(R.id.etToDate);
+        spinnerLeaveType = findViewById(R.id.spinnerLeaveType);
+        etReason = findViewById(R.id.etReason);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        db = openOrCreateDatabase("LeaveDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS leaveapp(" +
+                "name VARCHAR, empid VARCHAR, fromdate VARCHAR, todate VARCHAR, " +
+                "leavetype VARCHAR, reason VARCHAR);");
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveLeave();
+            }
+        });
+
+        btnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewAll();
+            }
+        });
+    }
+
+    private void saveLeave() {
+        String name = etName.getText().toString().trim();
+        String empId = etEmpId.getText().toString().trim();
+        String fromDate = etFromDate.getText().toString().trim();
+        String toDate = etToDate.getText().toString().trim();
+        String leaveType = spinnerLeaveType.getSelectedItem().toString();
+        String reason = etReason.getText().toString().trim();
+
+        if (name.isEmpty() || empId.isEmpty() || fromDate.isEmpty() || toDate.isEmpty() || reason.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        db.execSQL("INSERT INTO leaveapp VALUES('" + name + "','" + empId + "','" +
+                fromDate + "','" + toDate + "','" + leaveType + "','" + reason + "');");
+
+        showMessage("Success", "Leave Application Submitted");
+        clearFields();
+    }
+
+    private void viewAll() {
+        Cursor c = db.rawQuery("SELECT * FROM leaveapp", null);
+        if (c.getCount() == 0) {
+            showMessage("Error", "No records found");
+            return;
+        }
+        StringBuilder buffer = new StringBuilder();
+        while (c.moveToNext()) {
+            buffer.append("Name: ").append(c.getString(0)).append("\n");
+            buffer.append("Employee ID: ").append(c.getString(1)).append("\n");
+            buffer.append("From: ").append(c.getString(2)).append(" To: ").append(c.getString(3)).append("\n");
+            buffer.append("Type: ").append(c.getString(4)).append("\n");
+            buffer.append("Reason: ").append(c.getString(5)).append("\n\n");
+        }
+        showMessage("Leave Applications", buffer.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etName.setText("");
+        etEmpId.setText("");
+        etFromDate.setText("");
+        etToDate.setText("");
+        etReason.setText("");
+        spinnerLeaveType.setSelection(0);
+    }
+}
+
+

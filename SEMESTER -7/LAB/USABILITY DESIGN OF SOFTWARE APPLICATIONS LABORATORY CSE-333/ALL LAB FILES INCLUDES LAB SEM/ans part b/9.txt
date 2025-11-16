@@ -1,0 +1,301 @@
+Set-9
+Part-A - Create a Login Screen with username and password. Allow only 5 attempts:
+Show "Login Successful" on correct login.
+Disable login button after 5 failed attempts.
+Perfect! Let’s solve Set-9 Part-A: Login Screen with limited attempts in full, following the same style as your previous sets.
+
+Part-A: Login Screen with 5 Attempt Limit
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Username"
+        android:inputType="textPersonName"/>
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/tvAttempts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Attempts remaining: 5"
+        android:textSize="16sp"
+        android:layout_marginTop="15dp"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set9parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etUsername, etPassword;
+    Button btnLogin;
+    TextView tvAttempts;
+
+    int attemptsRemaining = 5;
+
+    // Predefined credentials
+    String correctUsername = "admin";
+    String correctPassword = "1234";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etUsername = findViewById(R.id.etUsername);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        tvAttempts = findViewById(R.id.tvAttempts);
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login();
+            }
+        });
+    }
+
+    private void login() {
+        String username = etUsername.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+
+        if(username.equals(correctUsername) && password.equals(correctPassword)) {
+            Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
+            // Optionally disable button after success
+            btnLogin.setEnabled(false);
+        } else {
+            attemptsRemaining--;
+            tvAttempts.setText("Attempts remaining: " + attemptsRemaining);
+            Toast.makeText(this, "Incorrect Username or Password", Toast.LENGTH_SHORT).show();
+
+            if(attemptsRemaining == 0) {
+                btnLogin.setEnabled(false);
+                Toast.makeText(this, "Login Disabled. Maximum attempts reached.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+}
+✅ Logic:
+Username and password fields are validated against predefined credentials (admin / 1234).
+Attempts counter decreases on every failed login.
+Login button is disabled after 5 failed attempts.
+Remaining attempts are displayed dynamically.
+
+If you want, I can immediately provide Set-9 Part-B (Passport Renewal/Booking style SQLite app) in the same full structure for consistency.
+Do you want me to do that?
+Part-B - Design a Library Book Management Application with the following fields: Book Title: varchar(30), Author: varchar(30), Genre: varchar(20), Price: int, Availability: varchar(5).
+Store the books in an SQL table and display the list of available books.
+Perfect! Let’s solve Set-9 Part-B: Library Book Management Application using SQLite + ListView like your previous sets.
+
+Part-B: Library Book Management Application
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etBookTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Book Title"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/etAuthor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Author"
+        android:inputType="text"
+        android:layout_marginTop="10dp"/>
+
+    <EditText
+        android:id="@+id/etGenre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Genre"
+        android:inputType="text"
+        android:layout_marginTop="10dp"/>
+
+    <EditText
+        android:id="@+id/etPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Price"
+        android:inputType="number"
+        android:layout_marginTop="10dp"/>
+
+    <EditText
+        android:id="@+id/etAvailability"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Availability (Yes/No)"
+        android:inputType="text"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btnAddBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Book"
+        android:layout_marginTop="15dp"/>
+
+    <Button
+        android:id="@+id/btnViewBooks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View All Books"
+        android:layout_marginTop="10dp"/>
+
+    <ListView
+        android:id="@+id/listViewBooks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"/>
+</LinearLayout>
+
+MainActivity.java
+package com.kasinadhuni.set9partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etBookTitle, etAuthor, etGenre, etPrice, etAvailability;
+    Button btnAddBook, btnViewBooks;
+    ListView listViewBooks;
+    SQLiteDatabase db;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> bookList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etBookTitle = findViewById(R.id.etBookTitle);
+        etAuthor = findViewById(R.id.etAuthor);
+        etGenre = findViewById(R.id.etGenre);
+        etPrice = findViewById(R.id.etPrice);
+        etAvailability = findViewById(R.id.etAvailability);
+        btnAddBook = findViewById(R.id.btnAddBook);
+        btnViewBooks = findViewById(R.id.btnViewBooks);
+        listViewBooks = findViewById(R.id.listViewBooks);
+
+        bookList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, bookList);
+        listViewBooks.setAdapter(adapter);
+
+        db = openOrCreateDatabase("LibraryDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS books(" +
+                "title VARCHAR(30), author VARCHAR(30), genre VARCHAR(20), price INT, availability VARCHAR(5));");
+
+        btnAddBook.setOnClickListener(v -> addBook());
+        btnViewBooks.setOnClickListener(v -> viewBooks());
+    }
+
+    private void addBook() {
+        String title = etBookTitle.getText().toString().trim();
+        String author = etAuthor.getText().toString().trim();
+        String genre = etGenre.getText().toString().trim();
+        String priceStr = etPrice.getText().toString().trim();
+        String availability = etAvailability.getText().toString().trim();
+
+        if(title.isEmpty() || author.isEmpty() || genre.isEmpty() || priceStr.isEmpty() || availability.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int price = Integer.parseInt(priceStr);
+
+        db.execSQL("INSERT INTO books VALUES('" + title + "','" + author + "','" + genre + "'," + price + ",'" + availability + "');");
+        showMessage("Success", "Book added successfully");
+        clearFields();
+    }
+
+    private void viewBooks() {
+        bookList.clear();
+        Cursor c = db.rawQuery("SELECT * FROM books", null);
+        if(c.getCount() == 0) {
+            showMessage("Error", "No books found");
+            adapter.notifyDataSetChanged();
+            return;
+        }
+
+        while(c.moveToNext()) {
+            String book = "Title: " + c.getString(0) +
+                    "\nAuthor: " + c.getString(1) +
+                    "\nGenre: " + c.getString(2) +
+                    "\nPrice: " + c.getInt(3) +
+                    "\nAvailable: " + c.getString(4);
+            bookList.add(book);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etBookTitle.setText("");
+        etAuthor.setText("");
+        etGenre.setText("");
+        etPrice.setText("");
+        etAvailability.setText("");
+    }
+}
+
+✅ Logic:
+SQLite table books stores all book records.
+Input validation before inserting.
+ListView shows all books dynamically.
+Can filter later by availability if needed.
+
+If you want, I can continue with Set-10 Part-A & Part-B next, keeping the same UI + SQLite logic pattern.
+Do you want me to do that?
+
+

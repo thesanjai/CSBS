@@ -1,0 +1,257 @@
+Set-12
+Part A – Create an Android app to display a random motivational quote every time a Button is pressed.
+Part B – Design a Cinema Ticket Booking Application with the following fields:
+ Customer Name: varchar(30), Age: int, Movie Name: varchar(30), Number of Tickets: int, Seat Number: int.
+ Store booking details in an SQL table and display the booking confirmation.
+Perfect! Let’s solve Set-12 in full, following the same pattern you’ve been using.
+
+Part-A: Random Motivational Quote App
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tvQuote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Press the button for a quote"
+        android:textSize="20sp"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"/>
+
+    <Button
+        android:id="@+id/btnQuote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Quote"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set12parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    TextView tvQuote;
+    Button btnQuote;
+    String[] quotes = {
+            "Believe in yourself!",
+            "Every day is a new beginning.",
+            "Dream big and dare to fail.",
+            "Stay positive, work hard, make it happen.",
+            "Success is not final, failure is not fatal."
+    };
+    Random random = new Random();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvQuote = findViewById(R.id.tvQuote);
+        btnQuote = findViewById(R.id.btnQuote);
+
+        btnQuote.setOnClickListener(v -> {
+            int index = random.nextInt(quotes.length);
+            tvQuote.setText(quotes[index]);
+        });
+    }
+}
+✅ Logic:
+quotes[] stores motivational quotes.
+Button click generates a random index and updates the TextView.
+
+Part-B: Cinema Ticket Booking Application
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etCustomerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Customer Name"
+            android:inputType="textPersonName"/>
+
+        <EditText
+            android:id="@+id/etAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Age"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etMovieName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Movie Name"
+            android:inputType="text"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etTickets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Number of Tickets"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etSeatNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Seat Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btnBook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Book Ticket"
+            android:layout_marginTop="15dp"/>
+
+        <Button
+            android:id="@+id/btnViewBookings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Bookings"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set12partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.widget.*;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etCustomerName, etAge, etMovieName, etTickets, etSeatNumber;
+    Button btnBook, btnViewBookings;
+    SQLiteDatabase db;
+    ArrayList<String> bookings;
+    ArrayAdapter<String> adapter;
+    ListView listViewBookings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etCustomerName = findViewById(R.id.etCustomerName);
+        etAge = findViewById(R.id.etAge);
+        etMovieName = findViewById(R.id.etMovieName);
+        etTickets = findViewById(R.id.etTickets);
+        etSeatNumber = findViewById(R.id.etSeatNumber);
+        btnBook = findViewById(R.id.btnBook);
+        btnViewBookings = findViewById(R.id.btnViewBookings);
+
+        bookings = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, bookings);
+
+        db = openOrCreateDatabase("CinemaDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS bookings(" +
+                "customerName VARCHAR(30), age INT, movieName VARCHAR(30), tickets INT, seatNumber INT);");
+
+        btnBook.setOnClickListener(v -> bookTicket());
+        btnViewBookings.setOnClickListener(v -> viewBookings());
+    }
+
+    private void bookTicket() {
+        String name = etCustomerName.getText().toString().trim();
+        String ageStr = etAge.getText().toString().trim();
+        String movieName = etMovieName.getText().toString().trim();
+        String ticketsStr = etTickets.getText().toString().trim();
+        String seatStr = etSeatNumber.getText().toString().trim();
+
+        if(name.isEmpty() || ageStr.isEmpty() || movieName.isEmpty() || ticketsStr.isEmpty() || seatStr.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int age = Integer.parseInt(ageStr);
+        int tickets = Integer.parseInt(ticketsStr);
+        int seat = Integer.parseInt(seatStr);
+
+        db.execSQL("INSERT INTO bookings VALUES('" + name + "'," + age + ",'" + movieName + "'," + tickets + "," + seat + ");");
+        showMessage("Success", "Ticket booked successfully!");
+        clearFields();
+    }
+
+    private void viewBookings() {
+        bookings.clear();
+        Cursor c = db.rawQuery("SELECT * FROM bookings", null);
+        if(c.getCount() == 0) {
+            showMessage("Info", "No bookings found");
+            return;
+        }
+
+        while(c.moveToNext()) {
+            String record = "Customer: " + c.getString(0) +
+                    "\nAge: " + c.getInt(1) +
+                    "\nMovie: " + c.getString(2) +
+                    "\nTickets: " + c.getInt(3) +
+                    "\nSeat: " + c.getInt(4);
+            bookings.add(record);
+        }
+
+        // Display using AlertDialog
+        StringBuilder sb = new StringBuilder();
+        for(String s: bookings) sb.append(s).append("\n\n");
+        showMessage("All Bookings", sb.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etCustomerName.setText("");
+        etAge.setText("");
+        etMovieName.setText("");
+        etTickets.setText("");
+        etSeatNumber.setText("");
+    }
+}
+
+✅ Logic:
+Part-A: Array of quotes, random selection on button click.
+Part-B:
+Input validation and SQLite insertion.
+Bookings displayed in an AlertDialog for confirmation.
+
+I can continue and prepare Sets 1–12 in a single organized reference document showing all app logic, layouts, and SQLite structure for quick study.
+Do you want me to do that next?
+
+

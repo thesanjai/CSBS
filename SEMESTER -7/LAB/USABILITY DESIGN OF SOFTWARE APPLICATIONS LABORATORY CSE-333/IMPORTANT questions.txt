@@ -1,0 +1,83 @@
+Set - 1
+Part A - Create a menu for a chat app with options to create a new group, new message and view starred messages (only the menu options)
+Part B - Create a form backed by a SQLite database to procure IT return information for Tax filing in Android with fields such as Name, PAN, Income from salary, Income from capital returns, Income from other sources, Financial Year (last 3 years as option), etc. with the necessary validations for each field.
+
+Set-2 
+Part-A - Create an Android app to display various images (one at a time) and switch between them when a button is clicked.
+Part-B - Create a passport registration form with SQLite DB to collect information such as Name, Phone number, mail ID, address, Father’s name, Mother’s name, Aadhaar number, Gender, etc. with the necessary validations for each field.
+
+Set-3
+Part-A - Create an Android app to count the number of times the character “A” was typed in a textfield.
+Part-B - Create a form for employee leave application with fields such as Name, Employee ID, from date, to date, leave type – OD, sick leave, leave reason. Store this information in a SQLite database.
+
+Set-4
+Part-A -Design a Java application that counts how many times the Enter key is pressed and displays the count in a TextView. 
+Part-B - Design a Tax Filing Application with the following fields:
+Name: varchar(30), PAN Number: int, Income: int, Tax Amount: int.
+Store these details in an SQL table and display all records in a list view.
+
+Set-5
+Part-A - Design an application with a Button that changes the background color of the layout and text when clicked.
+Part-B - Design a Passport Application with the following fields:
+Name: varchar(30), Gender: varchar(10), Address: varchar(100), Nationality: varchar(20), Mobile Number: int.
+Store these details in an SQL table and display the stored passport applications on the screen.
+
+
+Set-6
+Part-A - Create an app with a Button that shows a text in an AlertDialog when clicked.
+Part-B- Design a Student Event Registration Application with the following fields:
+Student Name: varchar(30), Roll Number: int, Department: varchar(20), Event Name: varchar(30).
+Store the registration details in an SQL table and display the list of registered students.
+
+Set-7
+Part-A - Create an app that switches the image in an ImageView when a button is pressed.
+Part-B - Design an Employee Leave Application with the following fields:
+Employee ID: int, Name: varchar(30), Department: varchar(20), Leave Type: varchar(15), Reason: varchar(50).
+Store the leave applications in an SQL table and display all leave requests in a list.
+
+Set-8
+Part-A - Design a simple Calculator Application with two input boxes and buttons for Add, Subtract, Multiply, Divide. Display the result in a TextView.
+Part-B - Design a Train Ticket Booking Application with the following fields:
+Passenger Name: varchar(30), Age: int, Source: varchar(20), Destination: varchar(20), Number of Tickets: int.
+Store booking details in an SQL table and display the confirmation with passenger details.
+
+Set-9
+Part-A - Create a Login Screen with username and password. Allow only 5 attempts:
+Show "Login Successful" on correct login.
+Disable login button after 5 failed attempts.
+
+Part-B - Design a Library Book Management Application with the following fields: Book Title: varchar(30), Author: varchar(30), Genre: varchar(20), Price: int, Availability: varchar(5).
+Store the books in an SQL table and display the list of available books.
+
+Set-10
+Part A – Create an Android app with two Buttons: one to increase a counter and one to decrease it. Display the counter value in a TextView.
+Part B – Design a Hospital Patient Registration Application with the following fields:
+ Patient ID: int, Name: varchar(30), Age: int, Gender: varchar(10), Phone Number: int, Address: varchar(50).
+ Store these details in an SQL table and display the list of registered patients.
+Set-11
+Part A – Create an app where clicking a button changes the background color and text.
+Part B – Design an Online Shopping Product Entry Application with the following fields:
+ Product ID: int, Product Name: varchar(30), Price: int, Quantity: int, Category: varchar(20).
+ Store these details in an SQL table and display the list of available products.
+Set-12
+Part A – Create an Android app to display a random motivational quote every time a Button is pressed.
+Part B – Design a Cinema Ticket Booking Application with the following fields:
+ Customer Name: varchar(30), Age: int, Movie Name: varchar(30), Number of Tickets: int, Seat Number: int.
+ Store booking details in an SQL table and display the booking confirmation.
+Set-13
+Part A – Create an Android app that accepts two numbers from the user and displays the larger number when a Button is pressed.
+Part B – Design a Banking Application with the following fields:
+ Account Number: int, Account Holder Name: varchar(30), Account Type: varchar(20), Balance: int.
+ Store these details in an SQL table and display the list of accounts with their balances.
+Set-14
+Part A – Create an app with a Toggle Button that switches the layout background between two colors.
+Part B – Design a College Admission Application with the following fields:
+ Student Name: varchar(30), Roll Number: int, Department: varchar(20), Contact Number: int, Address: varchar(50).
+ Store admission details in an SQL table and display the list of admitted students.
+Set-15
+Part A – Create an app where clicking a Button shows a Toast message saying “Welcome to Android Programming”.
+Part B – Design a Vehicle Registration Application with the following fields:
+ Vehicle Number: varchar(20), Owner Name: varchar(30), Model: varchar(20), Engine Number: int, Mobile Number: int.
+ Store the details in an SQL table and display all registered vehicles.
+
+

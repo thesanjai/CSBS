@@ -1,0 +1,66 @@
+🧩 1. activity_main.xml (UI Design)
+
+👉 Path: app > res > layout > activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#FAFAFA">
+
+    <Button
+        android:id="@+id/btnShowDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Message"
+        android:textSize="18sp"
+        android:padding="12dp"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFFFFF" />
+</LinearLayout>
+
+⚙️ 2. MainActivity.java
+
+👉 Path: app > java > com.example.alertapp > MainActivity.java
+
+package com.example.alertapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import android.os.Bundle;
+import android.widget.Button;
+
+public class MainActivity extends AppCompatActivity {
+
+    Button btnShowDialog;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        btnShowDialog = findViewById(R.id.btnShowDialog);
+
+        btnShowDialog.setOnClickListener(v -> {
+            // Create an AlertDialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Hello Bro!");
+            builder.setMessage("This is a simple AlertDialog example.");
+            builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+            builder.setCancelable(true);
+            builder.show();
+        });
+    }
+}
+
+🚀 3. How to Run
+
+Create a new project → Empty Activity.
+
+Replace your XML and Java with the code above.
+
+Run the app.
+

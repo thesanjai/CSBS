@@ -1,0 +1,893 @@
+2 — Display text "Hello World"
+
+Files to replace
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvHello"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World"
+        android:textSize="28sp"
+        android:textStyle="bold"/>
+</LinearLayout>
+
+
+java/com/example/helloworld/MainActivity.java
+
+package com.example.helloworld;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+}
+
+3 — Change background color and image on button click
+
+Add an image file bg_image.png into res/drawable/
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btnToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Background"
+        android:layout_centerInParent="true"/>
+</RelativeLayout>
+
+
+java/com/example/bgchange/MainActivity.java
+
+package com.example.bgchange;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.Button;
+
+public class MainActivity extends AppCompatActivity {
+    RelativeLayout root;
+    Button btnToggle;
+    boolean state = false;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+        root = findViewById(R.id.root);
+        btnToggle = findViewById(R.id.btnToggle);
+
+        btnToggle.setOnClickListener(v -> {
+            if (!state) {
+                // show image background (ensure drawable exists)
+                root.setBackgroundResource(R.drawable.bg_image);
+            } else {
+                // show plain color
+                root.setBackgroundColor(Color.parseColor("#FFEB3B")); // yellow
+            }
+            state = !state;
+        });
+    }
+}
+
+4 — Count number of times Enter key is pressed
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/etInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Type and press Enter"
+        android:imeOptions="actionDone"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Key Pressed: 0 times"
+        android:layout_marginTop="20dp"
+        android:textSize="18sp" />
+</LinearLayout>
+
+
+java/com/example/entercounter/MainActivity.java
+
+package com.example.entercounter;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.KeyEvent;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etInput;
+    TextView tvCount;
+    int enterCount = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etInput = findViewById(R.id.etInput);
+        tvCount = findViewById(R.id.tvCount);
+
+        etInput.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                enterCount++;
+                tvCount.setText("Enter Key Pressed: " + enterCount + " times");
+                return true; // consume event
+            }
+            return false;
+        });
+    }
+}
+
+5 — Add 5 images and change image on button click (cycle)
+
+Add img1..img5.png to res/drawable/
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:src="@drawable/img1"
+        android:scaleType="centerCrop" />
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next Image"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
+
+
+java/com/example/imagecycler/MainActivity.java
+
+package com.example.imagecycler;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageView;
+
+public class MainActivity extends AppCompatActivity {
+
+    ImageView imageView;
+    Button btnNext;
+    int[] images = {R.drawable.img1, R.drawable.img2, R.drawable.img3, R.drawable.img4, R.drawable.img5};
+    int current = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        imageView = findViewById(R.id.imageView);
+        btnNext = findViewById(R.id.btnNext);
+
+        btnNext.setOnClickListener(v -> {
+            current = (current + 1) % images.length;
+            imageView.setImageResource(images[current]);
+        });
+    }
+}
+
+6 — Canteen App using menus, lists and layouts (minimal demo)
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Canteen Menu"
+        android:textSize="22sp"
+        android:padding="12dp"/>
+
+    <ListView
+        android:id="@+id/listMenu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>
+
+
+res/menu/menu_main.xml (create res/menu folder)
+
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/filter_all" android:title="All"/>
+    <item android:id="@+id/filter_snacks" android:title="Snacks"/>
+    <item android:id="@+id/filter_meals" android:title="Meals"/>
+</menu>
+
+
+java/com/example/canteen/MainActivity.java
+
+package com.example.canteen;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    ListView listMenu;
+    ArrayList<String> items;
+    ArrayAdapter<String> adapter;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+
+        listMenu = findViewById(R.id.listMenu);
+
+        items = new ArrayList<>();
+        // sample items with category tags in name
+        items.add("Tea - ₹10 (snack)");
+        items.add("Samosa - ₹20 (snack)");
+        items.add("Idli - ₹30 (meal)");
+        items.add("Veg Biryani - ₹80 (meal)");
+        items.add("Coffee - ₹15 (snack)");
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        listMenu.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String id = item.getTitle().toString();
+        ArrayList<String> filtered = new ArrayList<>();
+        if (id.equals("All")) {
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        } else if (id.equals("Snacks")) {
+            for (String s : items) if (s.contains("(snack)")) filtered.add(s);
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, filtered);
+        } else if (id.equals("Meals")) {
+            for (String s : items) if (s.contains("(meal)")) filtered.add(s);
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, filtered);
+        }
+        listMenu.setAdapter(adapter);
+        return super.onOptionsItemSelected(item);
+    }
+}
+
+7 — Registration form to open a bank account (simple, prints summary)
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/etName" android:hint="Full Name"/>
+        <EditText android:id="@+id/etEmail" android:hint="Email" android:inputType="textEmailAddress"/>
+        <EditText android:id="@+id/etPhone" android:hint="Phone" android:inputType="phone"/>
+        <EditText android:id="@+id/etAadhar" android:hint="Aadhar Number" android:inputType="number"/>
+        <EditText android:id="@+id/etAddress" android:hint="Address" android:inputType="textMultiLine" android:minLines="3"/>
+        <Button android:id="@+id/btnSubmit" android:text="Submit" android:layout_marginTop="12dp"/>
+        <TextView android:id="@+id/tvResult" android:layout_marginTop="12dp" android:textSize="16sp"/>
+    </LinearLayout>
+</ScrollView>
+
+
+java/com/example/bankreg/MainActivity.java
+
+package com.example.bankreg;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etEmail, etPhone, etAadhar, etAddress;
+    Button btnSubmit;
+    TextView tvResult;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etEmail = findViewById(R.id.etEmail);
+        etPhone = findViewById(R.id.etPhone);
+        etAadhar = findViewById(R.id.etAadhar);
+        etAddress = findViewById(R.id.etAddress);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        tvResult = findViewById(R.id.tvResult);
+
+        btnSubmit.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String phone = etPhone.getText().toString().trim();
+            String aadhar = etAadhar.getText().toString().trim();
+            String addr = etAddress.getText().toString().trim();
+
+            if (name.isEmpty() || phone.length() < 10) {
+                Toast.makeText(this, "Enter valid name and phone", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String summary = "Name: " + name + "\nEmail: " + email + "\nPhone: " + phone +
+                    "\nAadhar: " + aadhar + "\nAddress: " + addr;
+            tvResult.setText(summary);
+        });
+    }
+}
+
+8 — Input boxes: User Name, Password, Address, Gender (radio), Age, Submit → print below
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="16dp" android:layout_width="match_parent">
+
+        <EditText android:id="@+id/etUser" android:hint="User Name"/>
+        <EditText android:id="@+id/etPass" android:hint="Password" android:inputType="textPassword"/>
+        <EditText android:id="@+id/etAddress" android:hint="Address" android:inputType="textMultiLine"/>
+        <RadioGroup android:id="@+id/rgGender" android:orientation="horizontal">
+            <RadioButton android:id="@+id/rbMale" android:text="Male"/>
+            <RadioButton android:id="@+id/rbFemale" android:text="Female"/>
+        </RadioGroup>
+        <EditText android:id="@+id/etAge" android:hint="Age" android:inputType="number"/>
+        <Button android:id="@+id/btnSubmit" android:text="Submit" android:layout_marginTop="12dp"/>
+        <TextView android:id="@+id/tvOutput" android:layout_marginTop="12dp"/>
+    </LinearLayout>
+</ScrollView>
+
+
+java/com/example/form/MainActivity.java
+
+package com.example.form;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etUser, etPass, etAddress, etAge;
+    RadioGroup rgGender;
+    Button btnSubmit;
+    TextView tvOutput;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+
+        etUser = findViewById(R.id.etUser);
+        etPass = findViewById(R.id.etPass);
+        etAddress = findViewById(R.id.etAddress);
+        etAge = findViewById(R.id.etAge);
+        rgGender = findViewById(R.id.rgGender);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        tvOutput = findViewById(R.id.tvOutput);
+
+        btnSubmit.setOnClickListener(v -> {
+            String user = etUser.getText().toString();
+            String pass = etPass.getText().toString();
+            String addr = etAddress.getText().toString();
+            String age = etAge.getText().toString();
+            int gid = rgGender.getCheckedRadioButtonId();
+            String gender = (gid == R.id.rbMale) ? "Male" : (gid == R.id.rbFemale) ? "Female" : "Not selected";
+
+            String out = "User: " + user + "\nPassword: " + pass + "\nAddress: " + addr +
+                    "\nGender: " + gender + "\nAge: " + age;
+            tvOutput.setText(out);
+        });
+    }
+}
+
+9 — Pass values using Intent from Activity A → Activity B
+
+Activity A
+
+res/layout/activity_main.xml
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent">
+    <EditText android:id="@+id/etName" android:hint="Name"/>
+    <EditText android:id="@+id/etAge" android:hint="Age" android:inputType="number"/>
+    <Button android:id="@+id/btnSend" android:text="Send to Second Activity"/>
+</LinearLayout>
+
+
+java/com/example/passintent/MainActivity.java
+
+package com.example.passintent;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.content.Intent;
+import android.widget.Button;
+import android.widget.EditText;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etAge;
+    Button btnSend;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etAge = findViewById(R.id.etAge);
+        btnSend = findViewById(R.id.btnSend);
+
+        btnSend.setOnClickListener(v -> {
+            Intent i = new Intent(MainActivity.this, SecondActivity.class);
+            i.putExtra("name", etName.getText().toString());
+            i.putExtra("age", etAge.getText().toString());
+            startActivity(i);
+        });
+    }
+}
+
+
+Activity B (SecondActivity)
+
+res/layout/activity_second.xml
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent">
+    <TextView android:id="@+id/tvData" android:textSize="18sp"/>
+</LinearLayout>
+
+
+java/com/example/passintent/SecondActivity.java
+
+package com.example.passintent;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class SecondActivity extends AppCompatActivity {
+
+    TextView tvData;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_second);
+
+        tvData = findViewById(R.id.tvData);
+        String name = getIntent().getStringExtra("name");
+        String age = getIntent().getStringExtra("age");
+        tvData.setText("Name: " + name + "\nAge: " + age);
+    }
+}
+
+
+Don’t forget to declare SecondActivity in AndroidManifest.xml:
+
+<activity android:name=".SecondActivity" />
+
+10 — Send SMS via Internet
+
+Quick demo uses device SMS Intent (no permissions) — Internet-based SMS requires third-party API & server; skeleton for that provided below.
+
+SMS via device (Intent)
+
+res/layout/activity_main.xml
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:padding="16dp">
+    <EditText android:id="@+id/etPhone" android:hint="Phone number" android:inputType="phone"/>
+    <EditText android:id="@+id/etMsg" android:hint="Message"/>
+    <Button android:id="@+id/btnSend" android:text="Send SMS via device"/>
+</LinearLayout>
+
+
+java/com/example/smsdemo/MainActivity.java
+
+package com.example.smsdemo;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.content.Intent;
+import android.net.Uri;
+import android.widget.Button;
+import android.widget.EditText;
+
+public class MainActivity extends AppCompatActivity {
+    EditText etPhone, etMsg;
+    Button btnSend;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+        etPhone = findViewById(R.id.etPhone);
+        etMsg = findViewById(R.id.etMsg);
+        btnSend = findViewById(R.id.btnSend);
+
+        btnSend.setOnClickListener(v -> {
+            String phone = etPhone.getText().toString();
+            String msg = etMsg.getText().toString();
+            Intent intent = new Intent(Intent.ACTION_SENDTO);
+            intent.setData(Uri.parse("smsto:" + Uri.encode(phone)));
+            intent.putExtra("sms_body", msg);
+            startActivity(intent);
+        });
+    }
+}
+
+
+SMS via Internet (skeleton) — must run network call on background thread and use a provider (example: Twilio)
+
+// Pseudo: Do in background (AsyncTask / Executor)
+String url = "https://api.example-sms.com/send";
+String payload = "api_key=KEY&to=9198xxxx&message=Hello";
+
+
+For exams: explain need for service, API key, HTTPS, server-side auth. Don’t hardcode keys.
+
+11 — Create an app using Fragments (one Activity + two fragments)
+
+res/layout/activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <FrameLayout android:id="@+id/fragment_container" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <Button android:id="@+id/btnOne" android:text="Fragment One" android:layout_weight="1" android:layout_width="0dp"/>
+        <Button android:id="@+id/btnTwo" android:text="Fragment Two" android:layout_weight="1" android:layout_width="0dp"/>
+    </LinearLayout>
+</LinearLayout>
+
+
+res/layout/fragment_one.xml
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center" android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView android:text="This is Fragment One" android:textSize="20sp"/>
+</LinearLayout>
+
+
+res/layout/fragment_two.xml
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center" android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView android:text="This is Fragment Two" android:textSize="20sp"/>
+</LinearLayout>
+
+
+java/com/example/fragments/MainActivity.java
+
+package com.example.fragments;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import android.os.Bundle;
+import android.widget.Button;
+
+public class MainActivity extends AppCompatActivity {
+
+    Button btnOne, btnTwo;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+
+        btnOne = findViewById(R.id.btnOne);
+        btnTwo = findViewById(R.id.btnTwo);
+
+        // load default fragment
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new FragmentOne())
+                .commit();
+
+        btnOne.setOnClickListener(v -> replace(new FragmentOne()));
+        btnTwo.setOnClickListener(v -> replace(new FragmentTwo()));
+    }
+
+    void replace(Fragment f) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, f)
+                .commit();
+    }
+}
+
+
+java/com/example/fragments/FragmentOne.java
+
+package com.example.fragments;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.fragment.app.Fragment;
+
+public class FragmentOne extends Fragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_one, container, false);
+    }
+}
+
+
+java/com/example/fragments/FragmentTwo.java
+
+package com.example.fragments;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.fragment.app.Fragment;
+
+public class FragmentTwo extends Fragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_two, container, false);
+    }
+}
+
+12 — Login & Registration page connecting to SQLite DB
+
+This project includes DatabaseHelper, MainActivity (login) and RegisterActivity.
+
+res/layout/activity_main.xml (Login)
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent">
+
+    <EditText android:id="@+id/etUsername" android:hint="Username"/>
+    <EditText android:id="@+id/etPassword" android:hint="Password" android:inputType="textPassword"/>
+    <Button android:id="@+id/btnLogin" android:text="Login"/>
+    <Button android:id="@+id/btnRegister" android:text="Register" android:layout_marginTop="8dp"/>
+    <TextView android:id="@+id/tvStatus" android:layout_marginTop="12dp"/>
+</LinearLayout>
+
+
+res/layout/activity_register.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent">
+
+    <EditText android:id="@+id/etNewUser" android:hint="Username"/>
+    <EditText android:id="@+id/etNewPass" android:hint="Password" android:inputType="textPassword"/>
+    <Button android:id="@+id/btnCreate" android:text="Create Account"/>
+    <TextView android:id="@+id/tvRegStatus" android:layout_marginTop="12dp"/>
+</LinearLayout>
+
+
+java/com/example/loginsqlite/DatabaseHelper.java
+
+package com.example.loginsqlite;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.*;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String DB_NAME = "LoginDB.db";
+    private static final int DB_VER = 1;
+    private static final String TABLE_USERS = "users";
+
+    public DatabaseHelper(Context c) {
+        super(c, DB_NAME, null, DB_VER);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_USERS + " (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT)");
+        // demo user
+        ContentValues cv = new ContentValues();
+        cv.put("username", "admin");
+        cv.put("password", "1234");
+        db.insert(TABLE_USERS, null, cv);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        onCreate(db);
+    }
+
+    public boolean insertUser(String username, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("username", username);
+        cv.put("password", password);
+        long r = db.insert(TABLE_USERS, null, cv);
+        return r != -1;
+    }
+
+    public boolean checkUser(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE username=? AND password=?", new String[]{username, password});
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        return exists;
+    }
+}
+
+
+java/com/example/loginsqlite/MainActivity.java (Login)
+
+package com.example.loginsqlite;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etUsername, etPassword;
+    Button btnLogin, btnRegister;
+    TextView tvStatus;
+    DatabaseHelper db;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+
+        etUsername = findViewById(R.id.etUsername);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnRegister = findViewById(R.id.btnRegister);
+        tvStatus = findViewById(R.id.tvStatus);
+
+        db = new DatabaseHelper(this);
+
+        btnLogin.setOnClickListener(v -> {
+            String u = etUsername.getText().toString().trim();
+            String p = etPassword.getText().toString().trim();
+            if (u.isEmpty() || p.isEmpty()) {
+                tvStatus.setText("Enter credentials");
+                return;
+            }
+            if (db.checkUser(u, p)) {
+                tvStatus.setText("Login Successful");
+            } else {
+                tvStatus.setText("Invalid credentials");
+            }
+        });
+
+        btnRegister.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, RegisterActivity.class)));
+    }
+}
+
+
+java/com/example/loginsqlite/RegisterActivity.java
+
+package com.example.loginsqlite;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.*;
+
+public class RegisterActivity extends AppCompatActivity {
+
+    EditText etNewUser, etNewPass;
+    Button btnCreate;
+    TextView tvRegStatus;
+    DatabaseHelper db;
+
+    @Override
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
+        setContentView(R.layout.activity_register);
+
+        etNewUser = findViewById(R.id.etNewUser);
+        etNewPass = findViewById(R.id.etNewPass);
+        btnCreate = findViewById(R.id.btnCreate);
+        tvRegStatus = findViewById(R.id.tvRegStatus);
+
+        db = new DatabaseHelper(this);
+
+        btnCreate.setOnClickListener(v -> {
+            String u = etNewUser.getText().toString().trim();
+            String p = etNewPass.getText().toString().trim();
+            if (u.isEmpty() || p.isEmpty()) {
+                tvRegStatus.setText("Enter details");
+                return;
+            }
+            boolean inserted = db.insertUser(u, p);
+            tvRegStatus.setText(inserted ? "Registered successfully" : "Error: username may already exist");
+        });
+    }
+}
+
+
+Don’t forget to declare RegisterActivity in AndroidManifest.xml:
+
+<activity android:name=".RegisterActivity" />
+
+Quick tips for all apps
+
+Replace package com.example.xxx; with your actual package if different.
+
+Put image files into app/src/main/res/drawable/.
+
+For activities other than MainActivity, declare them inside AndroidManifest.xml.
+
+Clean & Rebuild project if you get resource errors.
+
+If you use runtime permissions (e.g., actual SMS send), request them properly — sample apps above use Intent which avoids SMS permission.

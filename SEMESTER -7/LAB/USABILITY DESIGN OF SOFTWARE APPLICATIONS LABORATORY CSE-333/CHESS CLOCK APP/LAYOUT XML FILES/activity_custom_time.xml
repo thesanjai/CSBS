@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    tools:context=".CustomTimeActivity">
+
+    <!-- 1. Toolbar -->
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/white"
+            android:padding="16dp"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_custom_time"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <!-- 2. Content Area -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/toolbar"
+        android:padding="16dp">
+
+        <!-- Name Input -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_name"
+            android:textColor="@color/text_moves"
+            android:textSize="14sp"/>
+
+        <EditText
+            android:id="@+id/et_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_name"
+            android:maxLines="1"
+            android:inputType="textCapWords"
+            android:theme="@style/App.EditText"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Time Picker -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_time"
+            android:textColor="@color/text_moves"
+            android:textSize="14sp"
+            android:layout_marginTop="24dp"/>
+
+        <TextView
+            android:id="@+id/tv_time_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/initial_picker_time"
+            android:textColor="@color/white"
+            android:textSize="34sp"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"/>
+
+        <!-- Increment Picker -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_increment"
+            android:textColor="@color/text_moves"
+            android:textSize="14sp"
+            android:layout_marginTop="24dp"/>
+
+        <TextView
+            android:id="@+id/tv_increment_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/initial_picker_time"
+            android:textColor="@color/white"
+            android:textSize="34sp"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"/>
+
+    </LinearLayout>
+
+
+    <!-- 3. "Save" Button -->
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/color_accent_green"
+        android:text="@string/dialog_button_save_simple"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
+
+</RelativeLayout>

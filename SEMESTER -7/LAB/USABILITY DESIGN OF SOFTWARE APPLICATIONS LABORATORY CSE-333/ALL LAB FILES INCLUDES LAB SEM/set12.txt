@@ -1,0 +1,98 @@
+⚙️ Step 1: Create a new project
+
+Name → MotivationApp
+Language → Java
+Template → Empty Activity
+
+🧩 Step 2: activity_main.xml
+
+Paste this inside res/layout/activity_main.xml 👇
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#FFF8E1">
+
+    <TextView
+        android:id="@+id/tvQuote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tap below for a motivational quote!"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:textAlignment="center"
+        android:padding="20dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:layout_marginBottom="30dp" />
+
+    <Button
+        android:id="@+id/btnNewQuote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Quote"
+        android:backgroundTint="#6200EE"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:padding="12dp"/>
+</LinearLayout>
+
+💻 Step 3: MainActivity.java
+
+Paste this inside MainActivity.java 👇
+
+package com.example.motivationapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    TextView tvQuote;
+    Button btnNewQuote;
+
+    String[] quotes = {
+            "Believe you can and you’re halfway there.",
+            "Push yourself, because no one else is going to do it for you.",
+            "Success doesn’t just find you. You have to go out and get it.",
+            "Dream bigger. Do bigger.",
+            "Don’t stop when you’re tired. Stop when you’re done.",
+            "The harder you work for something, the greater you’ll feel when you achieve it.",
+            "Wake up with determination. Go to bed with satisfaction.",
+            "It always seems impossible until it’s done.",
+            "Don’t watch the clock; do what it does. Keep going.",
+            "Doubt kills more dreams than failure ever will."
+    };
+
+    Random random = new Random();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvQuote = findViewById(R.id.tvQuote);
+        btnNewQuote = findViewById(R.id.btnNewQuote);
+
+        btnNewQuote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int index = random.nextInt(quotes.length);
+                tvQuote.setText(quotes[index]);
+            }
+        });
+    }
+}
+
+🧾 Step 4: Run it
+
+✅ Launch the app.
+✅ Tap “Show Quote” — a random motivational line appears each time 💪

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="16dp"
+    android:background="?attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/tv_preset_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1 min | 2 sec"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"/>
+
+    <ImageView
+        android:id="@+id/iv_radio_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_radio_button_unchecked"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:tint="@color/color_accent_green"/>
+
+</RelativeLayout>

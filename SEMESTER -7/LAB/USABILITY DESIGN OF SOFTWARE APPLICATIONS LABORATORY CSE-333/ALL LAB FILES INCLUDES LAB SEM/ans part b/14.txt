@@ -1,0 +1,457 @@
+Set-14
+Part A – Create an app with a Toggle Button that switches the layout background between two colors.
+Part B – Design a College Admission Application with the following fields:
+ Student Name: varchar(30), Roll Number: int, Department: varchar(20), Contact Number: int, Address: varchar(50).
+ Store admission details in an SQL table and display the list of admitted students.
+
+
+
+
+Great! Let’s solve Set-14 step by step using the same approach as previous sets.
+
+Part-A: Toggle Button to Switch Background Color
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#FFFFFF">
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="Switch to Color 2"
+        android:textOff="Switch to Color 1"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set14parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.ToggleButton;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout layoutMain;
+    ToggleButton toggleButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        layoutMain = findViewById(R.id.layoutMain);
+        toggleButton = findViewById(R.id.toggleButton);
+
+        toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                layoutMain.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            } else {
+                layoutMain.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            }
+        });
+    }
+}
+✅ Logic:
+ToggleButton switches between two background colors on state change.
+
+Part-B: College Admission Application
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etStudentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Student Name"
+            android:inputType="textPersonName"/>
+
+        <EditText
+            android:id="@+id/etRollNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Roll Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etDepartment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Department"
+            android:inputType="text"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Contact Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:inputType="textMultiLine"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Admission"
+            android:layout_marginTop="15dp"/>
+
+        <Button
+            android:id="@+id/btnViewAdmissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Admissions"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set14partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etStudentName, etRollNumber, etDepartment, etContact, etAddress;
+    Button btnSubmit, btnViewAdmissions;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etStudentName = findViewById(R.id.etStudentName);
+        etRollNumber = findViewById(R.id.etRollNumber);
+        etDepartment = findViewById(R.id.etDepartment);
+        etContact = findViewById(R.id.etContact);
+        etAddress = findViewById(R.id.etAddress);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAdmissions = findViewById(R.id.btnViewAdmissions);
+
+        db = openOrCreateDatabase("CollegeDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS admissions(" +
+                "studentName VARCHAR(30), rollNumber INT, department VARCHAR(20), contact INT, address VARCHAR(50));");
+
+        btnSubmit.setOnClickListener(v -> submitAdmission());
+        btnViewAdmissions.setOnClickListener(v -> viewAdmissions());
+    }
+
+    private void submitAdmission() {
+        String name = etStudentName.getText().toString().trim();
+        String rollStr = etRollNumber.getText().toString().trim();
+        String dept = etDepartment.getText().toString().trim();
+        String contactStr = etContact.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+
+        if(name.isEmpty() || rollStr.isEmpty() || dept.isEmpty() || contactStr.isEmpty() || address.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int roll = Integer.parseInt(rollStr);
+        int contact = Integer.parseInt(contactStr);
+
+        db.execSQL("INSERT INTO admissions VALUES('" + name + "'," + roll + ",'" + dept + "'," + contact + ",'" + address + "');");
+        showMessage("Success", "Admission submitted successfully!");
+        clearFields();
+    }
+
+    private void viewAdmissions() {
+        Cursor c = db.rawQuery("SELECT * FROM admissions", null);
+        if(c.getCount() == 0) {
+            showMessage("Info", "No admissions found");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        while(c.moveToNext()) {
+            sb.append("Name: ").append(c.getString(0)).append("\n")
+              .append("Roll Number: ").append(c.getInt(1)).append("\n")
+              .append("Department: ").append(c.getString(2)).append("\n")
+              .append("Contact: ").append(c.getInt(3)).append("\n")
+              .append("Address: ").append(c.getString(4)).append("\n\n");
+        }
+
+        showMessage("All Admissions", sb.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etStudentName.setText("");
+        etRollNumber.setText("");
+        etDepartment.setText("");
+        etContact.setText("");
+        etAddress.setText("");
+    }
+}
+
+✅ Logic:
+Part-A: ToggleButton switches the LinearLayout background between two colors.
+Part-B:
+Collects admission details and stores them in SQLite table admissions.
+Displays all records in an AlertDialog.
+
+I can continue and create Set-15 next, or if you want, I can compile all Sets 1–14 in a single master Android reference document with ready-to-use code for each Part-A and Part-B.
+Do you want me to compile all sets now?
+
+Set-15
+Part A – Create an app where clicking a Button shows a Toast message saying “Welcome to Android Programming”.
+Part B – Design a Vehicle Registration Application with the following fields:
+ Vehicle Number: varchar(20), Owner Name: varchar(30), Model: varchar(20), Engine Number: int, Mobile Number: int.
+ Store the details in an SQL table and display all registered vehicles.
+
+
+Perfect! Let’s solve Set-15 step by step, following the same approach as your previous sets.
+
+Part-A: Button Showing a Toast Message
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <Button
+        android:id="@+id/btnWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Click Me"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set15parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    Button btnWelcome;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        btnWelcome = findViewById(R.id.btnWelcome);
+
+        btnWelcome.setOnClickListener(v -> 
+            Toast.makeText(MainActivity.this, "Welcome to Android Programming", Toast.LENGTH_SHORT).show()
+        );
+    }
+}
+✅ Logic:
+Button click triggers a Toast message.
+
+Part-B: Vehicle Registration Application
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etVehicleNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Vehicle Number"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/etOwnerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Owner Name"
+            android:inputType="textPersonName"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etModel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Model"
+            android:inputType="text"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etEngineNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Engine Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etMobileNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mobile Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register Vehicle"
+            android:layout_marginTop="15dp"/>
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Registered Vehicles"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set15partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etVehicleNumber, etOwnerName, etModel, etEngineNumber, etMobileNumber;
+    Button btnSubmit, btnViewAll;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etVehicleNumber = findViewById(R.id.etVehicleNumber);
+        etOwnerName = findViewById(R.id.etOwnerName);
+        etModel = findViewById(R.id.etModel);
+        etEngineNumber = findViewById(R.id.etEngineNumber);
+        etMobileNumber = findViewById(R.id.etMobileNumber);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        db = openOrCreateDatabase("VehicleDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS vehicles(" +
+                "vehicleNumber VARCHAR(20), ownerName VARCHAR(30), model VARCHAR(20), engineNumber INT, mobileNumber INT);");
+
+        btnSubmit.setOnClickListener(v -> registerVehicle());
+        btnViewAll.setOnClickListener(v -> viewVehicles());
+    }
+
+    private void registerVehicle() {
+        String vehicleNumber = etVehicleNumber.getText().toString().trim();
+        String ownerName = etOwnerName.getText().toString().trim();
+        String model = etModel.getText().toString().trim();
+        String engineStr = etEngineNumber.getText().toString().trim();
+        String mobileStr = etMobileNumber.getText().toString().trim();
+
+        if(vehicleNumber.isEmpty() || ownerName.isEmpty() || model.isEmpty() || engineStr.isEmpty() || mobileStr.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int engineNumber = Integer.parseInt(engineStr);
+        int mobileNumber = Integer.parseInt(mobileStr);
+
+        db.execSQL("INSERT INTO vehicles VALUES('" + vehicleNumber + "','" + ownerName + "','" + model + "'," + engineNumber + "," + mobileNumber + ");");
+        showMessage("Success", "Vehicle Registered Successfully");
+        clearFields();
+    }
+
+    private void viewVehicles() {
+        Cursor c = db.rawQuery("SELECT * FROM vehicles", null);
+        if(c.getCount() == 0) {
+            showMessage("Info", "No vehicles registered");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        while(c.moveToNext()) {
+            sb.append("Vehicle Number: ").append(c.getString(0)).append("\n")
+              .append("Owner Name: ").append(c.getString(1)).append("\n")
+              .append("Model: ").append(c.getString(2)).append("\n")
+              .append("Engine Number: ").append(c.getInt(3)).append("\n")
+              .append("Mobile Number: ").append(c.getInt(4)).append("\n\n");
+        }
+
+        showMessage("Registered Vehicles", sb.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etVehicleNumber.setText("");
+        etOwnerName.setText("");
+        etModel.setText("");
+        etEngineNumber.setText("");
+        etMobileNumber.setText("");
+    }
+}
+
+✅ Logic:
+Part-A: Button click triggers a Toast message.
+Part-B:
+Input validation for vehicle details.
+Stores details in SQLite table vehicles.
+AlertDialog displays all registered vehicles.
+
+If you want, I can now compile Sets 1–15 into a single master document with all Part-A and Part-B codes ready to copy-paste for your projects.
+Do you want me to do that?
+
+

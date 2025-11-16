@@ -1,0 +1,1573 @@
+PART A
+
+Step 2: Create a Menu XML file
+
+Now go to:
+app > res > menu
+(if menu folder not there, create it manually)
+
+Then create a new file → menu_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_new_group"
+        android:title="New Group"
+        android:icon="@android:drawable/ic_menu_add"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_new_message"
+        android:title="New Message"
+        android:icon="@android:drawable/ic_dialog_email"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_starred"
+        android:title="View Starred Messages"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:showAsAction="never" />
+
+</menu>
+--Step 3: Inflate the Menu in MainActivity.java
+
+Open your MainActivity.java and replace it with:
+package com.example.chatmenuapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_new_group:
+                Toast.makeText(this, "New Group selected", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.menu_new_message:
+                Toast.makeText(this, "New Message selected", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.menu_starred:
+                Toast.makeText(this, "View Starred Messages selected", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+}
+--
+Step 4: Design a Simple UI (optional)
+
+Just to make it look clean, go to
+activity_main.xml → and paste this:
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="#FAFAFA">
+
+    <TextView
+        android:text="Chat Menu App"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
+Step 5: Run It
+
+Now run your app and click the three-dot menu (⋮) at the top-right corner —
+you’ll see:
+
+✅ New Group
+✅ New Message
+✅ View Starred Messages
+
+Each will show a Toast message when tapped.
+
+
+part b
+1. Modify app/src/main/res/layout/activity_main.xml
+Where to paste: Open your existing activity_main.xml file.
+
+Why: To add a button that opens your new "IT Return" form.
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Passport Registration"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Phone Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:maxLength="10" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Email Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email ID"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Address Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Father's Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_father_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Father's Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_father_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Mother's Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_mother_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mother's Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_mother_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Aadhaar Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_aadhaar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Aadhaar Number"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_aadhaar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="12" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Gender -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gender"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
+
+        <RadioGroup
+            android:id="@+id/rg_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/rb_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/rb_other"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tv_gender_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please select a gender"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+
+        <!-- Buttons -->
+        <Button
+            android:id="@+id/btn_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/btn_view_records"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Passport Records"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginTop="8dp"/>
+
+        <!-- ADD THIS BUTTON -->
+        <Button
+            android:id="@+id/btn_goto_tax_filing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to IT Return Filing"
+            android:layout_marginTop="16dp"/>
+
+    </LinearLayout>
+</ScrollView>
+2. Modify app/src/main/java/com/example/passportapp/MainActivity.java
+Where to paste: Open your existing MainActivity.java file.
+
+Why: To make the new button you just added actually work.
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Patterns;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+public class MainActivity extends AppCompatActivity {
+
+    // Database
+    private DatabaseHelper dbHelper;
+
+    // UI Views
+    private TextInputLayout tilName, tilPhone, tilEmail, tilAddress, tilFatherName, tilMotherName, tilAadhaar;
+    private TextInputEditText etName, etPhone, etEmail, etAddress, etFatherName, etMotherName, etAadhaar;
+    private RadioGroup rgGender;
+    private TextView tvGenderError;
+    private Button btnRegister, btnViewRecords;
+    
+    // ADD THIS
+    private Button btnGotoTaxFiling;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize Database Helper
+        dbHelper = new DatabaseHelper(this);
+
+        // Initialize Views
+        tilName = findViewById(R.id.til_name);
+        etName = findViewById(R.id.et_name);
+        tilPhone = findViewById(R.id.til_phone);
+        etPhone = findViewById(R.id.et_phone);
+        tilEmail = findViewById(R.id.til_email);
+        etEmail = findViewById(R.id.et_email);
+        tilAddress = findViewById(R.id.til_address);
+        etAddress = findViewById(R.id.et_address);
+        tilFatherName = findViewById(R.id.til_father_name);
+        etFatherName = findViewById(R.id.et_father_name);
+        tilMotherName = findViewById(R.id.til_mother_name);
+        etMotherName = findViewById(R.id.et_mother_name);
+        tilAadhaar = findViewById(R.id.til_aadhaar);
+        etAadhaar = findViewById(R.id.et_aadhaar);
+        rgGender = findViewById(R.id.rg_gender);
+        tvGenderError = findViewById(R.id.tv_gender_error);
+        btnRegister = findViewById(R.id.btn_register);
+        btnViewRecords = findViewById(R.id.btn_view_records);
+
+        // ADD THESE 2 LINES
+        btnGotoTaxFiling = findViewById(R.id.btn_goto_tax_filing);
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateForm()) {
+                    // All validations passed, add user to database
+                    String name = etName.getText().toString();
+                    String phone = etPhone.getText().toString();
+                    String email = etEmail.getText().toString();
+                    String address = etAddress.getText().toString();
+                    String father = etFatherName.getText().toString();
+                    String mother = etMotherName.getText().toString();
+                    String aadhaar = etAadhaar.getText().toString();
+
+                    int selectedGenderId = rgGender.getCheckedRadioButtonId();
+                    RadioButton selectedGender = findViewById(selectedGenderId);
+                    String gender = selectedGender.getText().toString();
+
+                    long newRowId = dbHelper.addUser(name, phone, email, address, father, mother, aadhaar, gender);
+
+                    if (newRowId != -1) {
+                        Toast.makeText(MainActivity.this, "Registration Successful! ID: " + newRowId, Toast.LENGTH_LONG).show();
+                        clearForm();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Registration Failed!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        // View Records Button Click Listener
+        btnViewRecords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the UserListActivity
+                Intent intent = new Intent(MainActivity.this, UserListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // ADD THIS CLICK LISTENER
+        btnGotoTaxFiling.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the new TaxFilingActivity
+                Intent intent = new Intent(MainActivity.this, TaxFilingActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    /**
+     * Validates all form fields
+     * @return true if all fields are valid, false otherwise
+     */
+    private boolean validateForm() {
+        boolean isValid = true;
+
+        // Clear previous errors
+        tilName.setError(null);
+        tilPhone.setError(null);
+        tilEmail.setError(null);
+        tilAddress.setError(null);
+        tilFatherName.setError(null);
+        tilMotherName.setError(null);
+        tilAadhaar.setError(null);
+        tvGenderError.setVisibility(View.GONE);
+
+        // 1. Name Validation
+        if (etName.getText().toString().isEmpty()) {
+            tilName.setError("Name cannot be empty");
+            isValid = false;
+        }
+
+        // 2. Phone Validation
+        String phone = etPhone.getText().toString();
+        if (phone.isEmpty()) {
+            tilPhone.setError("Phone number cannot be empty");
+            isValid = false;
+        } else if (phone.length() != 10) {
+            tilPhone.setError("Must be 10 digits");
+            isValid = false;
+        }
+
+        // 3. Email Validation
+        String email = etEmail.getText().toString();
+        if (email.isEmpty()) {
+            tilEmail.setError("Email cannot be empty");
+            isValid = false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Enter a valid Email ID");
+            isValid = false;
+        }
+
+        // 4. Address Validation
+        if (etAddress.getText().toString().isEmpty()) {
+            tilAddress.setError("Address cannot be empty");
+            isValid = false;
+        }
+
+        // 5. Father's Name Validation
+        if (etFatherName.getText().toString().isEmpty()) {
+            tilFatherName.setError("Father's Name cannot be empty");
+            isValid = false;
+        }
+
+        // 6. Mother's Name Validation
+        if (etMotherName.getText().toString().isEmpty()) {
+            tilMotherName.setError("Mother's Name cannot be empty");
+            isValid = false;
+        }
+
+        // 7. Aadhaar Validation
+        String aadhaar = etAadhaar.getText().toString();
+        if (aadhaar.isEmpty()) {
+            tilAadhaar.setError("Aadhaar number cannot be empty");
+            isValid = false;
+        } else if (aadhaar.length() != 12) {
+            tilAadhaar.setError("Must be 12 digits");
+            isValid = false;
+        }
+
+        // 8. Gender Validation
+        if (rgGender.getCheckedRadioButtonId() == -1) {
+            tvGenderError.setVisibility(View.VISIBLE);
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private void clearForm() {
+        etName.setText("");
+        etPhone.setText("");
+        etEmail.setText("");
+        etAddress.setText("");
+        etFatherName.setText("");
+        etMotherName.setText("");
+        etAadhaar.setText("");
+        rgGender.clearCheck();
+        
+        // Clear errors
+        tilName.setError(null);
+        tilPhone.setError(null);
+        tilEmail.setError(null);
+        tilAddress.setError(null);
+        tilFatherName.setError(null);
+        tilMotherName.setError(null);
+        tilAadhaar.setError(null);
+        tvGenderError.setVisibility(View.GONE);
+
+        etName.requestFocus(); // Move cursor back to the first field
+    }
+}
+3. Modify app/src/main/AndroidManifest.xml
+Where to paste: Open your existing AndroidManifest.xml.
+
+Why: To tell Android that your three new screens (Tax Form, Tax List, Tax Details) exist.
+
+Now, let's create all the NEW files for the IT Return feature.
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Make sure your <application> tag has android:theme set to a Material theme -->
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Material3.DayNight"
+        tools:targetApi="31">
+
+        <!-- This is your main registration form screen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"> <!-- This helps the keyboard not hide fields -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ADD THIS: Declares your new screen for the list of users -->
+        <activity
+            android:name=".UserListActivity"
+            android:label="Registered Passports" />
+
+        <!-- ADD THIS: Declares your new screen for seeing/editing details -->
+        <activity
+            android:name=".UserDetailsActivity"
+            android:label="Passport Details"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <!-- ADD THESE 3 NEW ACTIVITY DECLARATIONS -->
+        <activity
+            android:name=".TaxFilingActivity"
+            android:label="IT Return Filing"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <activity
+            android:name=".RecordsListActivity"
+            android:label="Filed IT Records" />
+
+        <activity
+            android:name=".RecordDetailsActivity"
+            android:label="IT Record Details"
+            android:windowSoftInputMode="adjustResize"/>
+
+    </application>
+</manifest>
+4. app/src/main/java/com/example/passportapp/TaxDatabaseHelper.java (NEW FILE)
+Where to paste:
+
+Right-click your package name (com.example.passportapp).
+
+Select New -> Java Class.
+
+Name it TaxDatabaseHelper and paste this code.
+
+Why: This is the separate SQLite database helper for your tax information. It handles all CRUD operations for tax records.
+TaxDatabaseHelper.java
+7 Nov, 6:32 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class TaxDatabaseHelper extends SQLiteOpenHelper {
+
+    // Database Info
+    private static final String DATABASE_NAME = "TaxDB";
+    private static final int DATABASE_VERSION = 1;
+
+    // Table Info
+    public static final String TABLE_RECORDS = "tax_records";
+    public static final String KEY_ID = "_id";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_PAN = "pan";
+    public static final String KEY_INCOME_SALARY = "income_salary";
+    public static final String KEY_INCOME_CAPITAL = "income_capital";
+    public static final String KEY_INCOME_OTHER = "income_other";
+    public static final String KEY_FINANCIAL_YEAR = "financial_year";
+
+    // Create Table Query
+    private static final String CREATE_TABLE_RECORDS =
+            "CREATE TABLE " + TABLE_RECORDS + "(" +
+                    KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    KEY_NAME + " TEXT," +
+                    KEY_PAN + " TEXT," +
+                    KEY_INCOME_SALARY + " REAL," + // Use REAL for money
+                    KEY_INCOME_CAPITAL + " REAL," +
+                    KEY_INCOME_OTHER + " REAL," +
+                    KEY_FINANCIAL_YEAR + " TEXT" +
+                    ")";
+
+    public TaxDatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_TABLE_RECORDS);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECORDS);
+        onCreate(db);
+    }
+
+    // --- CRUD Operations ---
+
+    /**
+     * CREATE - Add a new record
+     */
+    public long addRecord(String name, String pan, double salary, double capital, double other, String finYear) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, name);
+        values.put(KEY_PAN, pan);
+        values.put(KEY_INCOME_SALARY, salary);
+        values.put(KEY_INCOME_CAPITAL, capital);
+        values.put(KEY_INCOME_OTHER, other);
+        values.put(KEY_FINANCIAL_YEAR, finYear);
+
+        long id = db.insert(TABLE_RECORDS, null, values);
+        db.close();
+        return id;
+    }
+
+    /**
+     * READ (All) - Get all records
+     */
+    public Cursor getAllRecords() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_RECORDS, null, null, null, null, null, KEY_NAME + " ASC");
+    }
+
+    /**
+     * READ (One) - Get a single record by ID
+     */
+    public Cursor getRecordDetails(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_RECORDS, null, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+    }
+
+    /**
+     * UPDATE - Update an existing record
+     */
+    public int updateRecord(long id, String name, String pan, double salary, double capital, double other, String finYear) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, name);
+        values.put(KEY_PAN, pan);
+        values.put(KEY_INCOME_SALARY, salary);
+        values.put(KEY_INCOME_CAPITAL, capital);
+        values.put(KEY_INCOME_OTHER, other);
+        values.put(KEY_FINANCIAL_YEAR, finYear);
+
+        return db.update(TABLE_RECORDS, values, KEY_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
+    /**
+     * DELETE - Delete a record by ID
+     */
+    public void deleteRecord(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_RECORDS, KEY_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+}
+5. app/src/main/res/layout/activity_tax_filing.xml (NEW FILE)
+Where to paste:
+
+Right-click the app/src/main/res/layout folder.
+
+Select New -> Layout Resource File.
+
+Name it activity_tax_filing and paste this code.
+
+Why: This is the beautiful UI for your tax form.
+activity_tax_filing.xml
+7 Nov, 6:32 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TaxFilingActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="IT Return Filing"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- PAN Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_pan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="PAN Number (e.g. ABCDE1234F)"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_pan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapCharacters"
+                android:maxLength="10" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Income from Salary -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_salary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Salary"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_salary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Income from Capital Returns -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_capital"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Capital Returns"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_capital"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Income from Other Sources -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_other"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Other Sources"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_other"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Financial Year -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Financial Year"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
+        <RadioGroup
+            android:id="@+id/rg_tax_fy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RadioButton android:id="@+id/rb_fy_1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2023-24" />
+            <RadioButton android:id="@+id/rb_fy_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2022-23" />
+            <RadioButton android:id="@+id/rb_fy_3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2021-22" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tv_tax_fy_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please select a financial year"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+        <!-- Buttons -->
+        <Button
+            android:id="@+id/btn_tax_submit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Record"
+            android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/btn_tax_view_records"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Records"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</ScrollView>
+6. app/src/main/java/com/example/passportapp/TaxFilingActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it TaxFilingActivity and paste this code.
+
+Why: This is the Java code for the tax form. It handles validation (including for PAN) and Creates the new record in your TaxDatabaseHelper.
+TaxFilingActivity.java
+7 Nov, 6:32 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.regex.Pattern;
+
+public class TaxFilingActivity extends AppCompatActivity {
+
+    // PAN Regex: 5 letters, 4 numbers, 1 letter
+    private static final Pattern PAN_PATTERN = Pattern.compile("[A-Z]{5}[0-9]{4}[A-Z]{1}");
+
+    private TaxDatabaseHelper dbHelper;
+
+    private TextInputLayout tilName, tilPan, tilSalary, tilCapital, tilOther;
+    private TextInputEditText etName, etPan, etSalary, etCapital, etOther;
+    private RadioGroup rgFinYear;
+    private TextView tvFinYearError;
+    private Button btnSubmit, btnViewRecords;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tax_filing);
+
+        dbHelper = new TaxDatabaseHelper(this);
+
+        // Initialize Views
+        tilName = findViewById(R.id.til_tax_name);
+        etName = findViewById(R.id.et_tax_name);
+        tilPan = findViewById(R.id.til_tax_pan);
+        etPan = findViewById(R.id.et_tax_pan);
+        tilSalary = findViewById(R.id.til_tax_salary);
+        etSalary = findViewById(R.id.et_tax_salary);
+        tilCapital = findViewById(R.id.til_tax_capital);
+        etCapital = findViewById(R.id.et_tax_capital);
+        tilOther = findViewById(R.id.til_tax_other);
+        etOther = findViewById(R.id.et_tax_other);
+        rgFinYear = findViewById(R.id.rg_tax_fy);
+        tvFinYearError = findViewById(R.id.tv_tax_fy_error);
+        btnSubmit = findViewById(R.id.btn_tax_submit);
+        btnViewRecords = findViewById(R.id.btn_tax_view_records);
+
+        // Submit Button Click
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateForm()) {
+                    // Get all values
+                    String name = etName.getText().toString();
+                    String pan = etPan.getText().toString();
+                    // Use Double.parseDouble, use 0 if empty
+                    double salary = etSalary.getText().toString().isEmpty() ? 0.0 : Double.parseDouble(etSalary.getText().toString());
+                    double capital = etCapital.getText().toString().isEmpty() ? 0.0 : Double.parseDouble(etCapital.getText().toString());
+                    double other = etOther.getText().toString().isEmpty() ? 0.0 : Double.parseDouble(etOther.getText().toString());
+
+                    int selectedFyId = rgFinYear.getCheckedRadioButtonId();
+                    RadioButton selectedFy = findViewById(selectedFyId);
+                    String finYear = selectedFy.getText().toString();
+
+                    // Add to database
+                    long newRowId = dbHelper.addRecord(name, pan, salary, capital, other, finYear);
+                    if (newRowId != -1) {
+                        Toast.makeText(TaxFilingActivity.this, "Record Submitted! ID: " + newRowId, Toast.LENGTH_LONG).show();
+                        clearForm();
+                    } else {
+                        Toast.makeText(TaxFilingActivity.this, "Submission Failed!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        // View Records Button Click
+        btnViewRecords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TaxFilingActivity.this, RecordsListActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private boolean validateForm() {
+        boolean isValid = true;
+
+        // Clear previous errors
+        tilName.setError(null);
+        tilPan.setError(null);
+        tilSalary.setError(null);
+        tilCapital.setError(null);
+        tilOther.setError(null);
+        tvFinYearError.setVisibility(View.GONE);
+
+        // 1. Name
+        if (etName.getText().toString().isEmpty()) {
+            tilName.setError("Name cannot be empty");
+            isValid = false;
+        }
+
+        // 2. PAN
+        String pan = etPan.getText().toString();
+        if (pan.isEmpty()) {
+            tilPan.setError("PAN cannot be empty");
+            isValid = false;
+        } else if (!PAN_PATTERN.matcher(pan).matches()) {
+            tilPan.setError("Invalid PAN format (e.g., ABCDE1234F)");
+            isValid = false;
+        }
+
+        // 3. Salary (must not be empty)
+        if (etSalary.getText().toString().isEmpty()) {
+            tilSalary.setError("Please enter 0 if no income");
+            isValid = false;
+        }
+        // 4. Capital (must not be empty)
+        if (etCapital.getText().toString().isEmpty()) {
+            tilCapital.setError("Please enter 0 if no income");
+            isValid = false;
+        }
+        // 5. Other (must not be empty)
+        if (etOther.getText().toString().isEmpty()) {
+            tilOther.setError("Please enter 0 if no income");
+            isValid = false;
+        }
+
+        // 6. Financial Year
+        if (rgFinYear.getCheckedRadioButtonId() == -1) {
+            tvFinYearError.setVisibility(View.VISIBLE);
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private void clearForm() {
+        etName.setText("");
+        etPan.setText("");
+        etSalary.setText("");
+        etCapital.setText("");
+        etOther.setText("");
+        rgFinYear.clearCheck();
+
+        tilName.setError(null);
+        tilPan.setError(null);
+        tilSalary.setError(null);
+        tilCapital.setError(null);
+        tilOther.setError(null);
+        tvFinYearError.setVisibility(View.GONE);
+
+        etName.requestFocus();
+    }
+}
+
+7. app/src/main/res/layout/activity_records_list.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it activity_records_list and paste this code.
+
+Why: The UI for the screen that shows all submitted tax records.
+activity_records_list.xml
+7 Nov, 6:32 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ListView
+        android:id="@+id/list_view_records"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_no_records_tax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No records found."
+        android:visibility="gone"
+        android:layout_gravity="center"/>
+
+</LinearLayout>
+
+8. app/src/main/res/layout/list_item_record.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it list_item_record and paste this code.
+
+Why: The UI for a single row in your tax list (shows Name and PAN).
+list_item_record.xml
+7 Nov, 6:32 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_item_tax_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full Name"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+    <TextView
+        android:id="@+id/tv_item_tax_pan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PAN Number"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="?android:attr/textColorSecondary" />
+
+</LinearLayout>
+
+9. app/src/main/java/com/example/passportapp/RecordsListActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it RecordsListActivity and paste this code.
+
+Why: The Java code for the list screen. It Reads (All) records from TaxDatabaseHelper and handles clicks on each item.
+RecordsListActivity.java
+7 Nov, 6:32 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class RecordsListActivity extends AppCompatActivity {
+
+    private TaxDatabaseHelper dbHelper;
+    private ListView listView;
+    private TextView tvNoRecords;
+    private SimpleCursorAdapter adapter;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_records_list);
+
+        dbHelper = new TaxDatabaseHelper(this);
+        listView = findViewById(R.id.list_view_records);
+        tvNoRecords = findViewById(R.id.tv_no_records_tax);
+
+        // Click listener for list items
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 'id' is the database row ID
+                Intent intent = new Intent(RecordsListActivity.this, RecordDetailsActivity.class);
+                intent.putExtra(TaxDatabaseHelper.KEY_ID, id); // Pass the ID
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadRecords(); // Refresh list every time we return
+    }
+
+    private void loadRecords() {
+        Cursor cursor = dbHelper.getAllRecords();
+
+        if (cursor.getCount() == 0) {
+            tvNoRecords.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+        } else {
+            tvNoRecords.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
+
+            // Columns from DB
+            String[] fromColumns = {
+                    TaxDatabaseHelper.KEY_NAME,
+                    TaxDatabaseHelper.KEY_PAN
+            };
+
+            // Views in list_item_record.xml
+            int[] toViews = {
+                    R.id.tv_item_tax_name,
+                    R.id.tv_item_tax_pan
+            };
+
+            adapter = new SimpleCursorAdapter(
+                    this,
+                    R.layout.list_item_record, // Row layout
+                    cursor,
+                    fromColumns,
+                    toViews,
+                    0
+            );
+
+            listView.setAdapter(adapter);
+        }
+    }
+}
+10. app/src/main/res/layout/activity_record_details.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it activity_record_details and paste this code.
+
+Why: The UI for the "Details" screen. It's the same as the tax form, but with "Update" and "Delete" buttons.
+activity_record_details.xml
+7 Nov, 6:32 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecordDetailsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="View / Edit Record"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- PAN Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_pan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="PAN Number (e.g. ABCDE1234F)"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_pan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapCharacters"
+                android:maxLength="10" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Income from Salary -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_salary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Salary"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_salary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Income from Capital Returns -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_capital"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Capital Returns"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_capital"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Income from Other Sources -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_tax_other"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Other Sources"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_tax_other"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Financial Year -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Financial Year"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
+        <RadioGroup
+            android:id="@+id/rg_tax_fy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RadioButton android:id="@+id/rb_fy_1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2023-24" />
+            <RadioButton android:id="@+id/rb_fy_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2022-23" />
+            <RadioButton android:id="@+id/rb_fy_3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2021-22" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tv_tax_fy_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please select a financial year"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+        <!-- UPDATE AND DELETE BUTTONS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp">
+
+            <Button
+                android:id="@+id/btn_tax_update"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Update"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btn_tax_delete"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                app:backgroundTint="@android:color/holo_red_light"
+                android:layout_marginStart="8dp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+11. app/src/main/java/com/example/passportapp/RecordDetailsActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it RecordDetailsActivity and paste this code.
+
+Why: The Java code for the details screen. It Reads (One) record to fill the form, and handles the Update and Delete button clicks.
+RecordDetailsActivity.java
+7 Nov, 6:32 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.regex.Pattern;
+
+public class RecordDetailsActivity extends AppCompatActivity {
+
+    private static final Pattern PAN_PATTERN = Pattern.compile("[A-Z]{5}[0-9]{4}[A-Z]{1}");
+
+    private TaxDatabaseHelper dbHelper;
+    private long recordId;
+
+    private TextInputLayout tilName, tilPan, tilSalary, tilCapital, tilOther;
+    private TextInputEditText etName, etPan, etSalary, etCapital, etOther;
+    private RadioGroup rgFinYear;
+    private RadioButton rbFy1, rbFy2, rbFy3;
+    private TextView tvFinYearError;
+    private Button btnUpdate, btnDelete;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_record_details);
+
+        dbHelper = new TaxDatabaseHelper(this);
+
+        // Get the ID from the Intent
+        recordId = getIntent().getLongExtra(TaxDatabaseHelper.KEY_ID, -1);
+        if (recordId == -1) {
+            Toast.makeText(this, "Error: Record ID not found.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Initialize Views
+        tilName = findViewById(R.id.til_tax_name);
+        etName = findViewById(R.id.et_tax_name);
+        tilPan = findViewById(R.id.til_tax_pan);
+        etPan = findViewById(R.id.et_tax_pan);
+        tilSalary = findViewById(R.id.til_tax_salary);
+        etSalary = findViewById(R.id.et_tax_salary);
+        tilCapital = findViewById(R.id.til_tax_capital);
+        etCapital = findViewById(R.id.et_tax_capital);
+        tilOther = findViewById(R.id.til_tax_other);
+        etOther = findViewById(R.id.et_tax_other);
+        rgFinYear = findViewById(R.id.rg_tax_fy);
+        rbFy1 = findViewById(R.id.rb_fy_1); // 2023-24
+        rbFy2 = findViewById(R.id.rb_fy_2); // 2022-23
+        rbFy3 = findViewById(R.id.rb_fy_3); // 2021-22
+        tvFinYearError = findViewById(R.id.tv_tax_fy_error);
+        btnUpdate = findViewById(R.id.btn_tax_update);
+        btnDelete = findViewById(R.id.btn_tax_delete);
+
+        // Load data into fields
+        loadRecordData();
+
+        // Update Button
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateForm()) {
+                    String name = etName.getText().toString();
+                    String pan = etPan.getText().toString();
+                    double salary = Double.parseDouble(etSalary.getText().toString());
+                    double capital = Double.parseDouble(etCapital.getText().toString());
+                    double other = Double.parseDouble(etOther.getText().toString());
+
+                    int selectedFyId = rgFinYear.getCheckedRadioButtonId();
+                    RadioButton selectedFy = findViewById(selectedFyId);
+                    String finYear = selectedFy.getText().toString();
+
+                    int rows = dbHelper.updateRecord(recordId, name, pan, salary, capital, other, finYear);
+                    if (rows > 0) {
+                        Toast.makeText(RecordDetailsActivity.this, "Record Updated", Toast.SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(RecordDetailsActivity.this, "Update Failed", Toast.SHORT).show();
+                    }
+                }
+            }
+        });
+
+        // Delete Button
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbHelper.deleteRecord(recordId);
+                Toast.makeText(RecordDetailsActivity.this, "Record Deleted", Toast.SHORT).show();
+                finish(); // Go back to the list
+            }
+        });
+    }
+
+    /**
+     * READ (One) - Fetches data and populates the form
+     */
+    private void loadRecordData() {
+        Cursor cursor = dbHelper.getRecordDetails(recordId);
+        if (cursor != null && cursor.moveToFirst()) {
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(TaxDatabaseHelper.KEY_NAME));
+            String pan = cursor.getString(cursor.getColumnIndexOrThrow(TaxDatabaseHelper.KEY_PAN));
+            double salary = cursor.getDouble(cursor.getColumnIndexOrThrow(TaxDatabaseHelper.KEY_INCOME_SALARY));
+            double capital = cursor.getDouble(cursor.getColumnIndexOrThrow(TaxDatabaseHelper.KEY_INCOME_CAPITAL));
+            double other = cursor.getDouble(cursor.getColumnIndexOrThrow(TaxDatabaseHelper.KEY_INCOME_OTHER));
+            String finYear = cursor.getString(cursor.getColumnIndexOrThrow(TaxDatabaseHelper.KEY_FINANCIAL_YEAR));
+
+            // Set text
+            etName.setText(name);
+            etPan.setText(pan);
+            etSalary.setText(String.valueOf(salary));
+            etCapital.setText(String.valueOf(capital));
+            etOther.setText(String.valueOf(other));
+
+            // Set radio button
+            if (finYear.equals("2023-24")) {
+                rbFy1.setChecked(true);
+            } else if (finYear.equals("2022-23")) {
+                rbFy2.setChecked(true);
+            } else if (finYear.equals("2021-22")) {
+                rbFy3.setChecked(true);
+            }
+            
+            cursor.close();
+        }
+    }
+
+    /**
+     * Re-uses the same validation logic from TaxFilingActivity
+     */
+    private boolean validateForm() {
+        boolean isValid = true;
+        // (Validation logic is identical to TaxFilingActivity)
+        tilName.setError(null);
+        tilPan.setError(null);
+        tilSalary.setError(null);
+        tilCapital.setError(null);
+        tilOther.setError(null);
+        tvFinYearError.setVisibility(View.GONE);
+
+        if (etName.getText().toString().isEmpty()) {
+            tilName.setError("Name cannot be empty");
+            isValid = false;
+        }
+        String pan = etPan.getText().toString();
+        if (pan.isEmpty()) {
+            tilPan.setError("PAN cannot be empty");
+            isValid = false;
+        } else if (!PAN_PATTERN.matcher(pan).matches()) {
+            tilPan.setError("Invalid PAN format (e.g., ABCDE1234F)");
+            isValid = false;
+        }
+        if (etSalary.getText().toString().isEmpty()) {
+            tilSalary.setError("Please enter 0 if no income");
+            isValid = false;
+        }
+        if (etCapital.getText().toString().isEmpty()) {
+            tilCapital.setError("Please enter 0 if no income");
+            isValid = false;
+        }
+        if (etOther.getText().toString().isEmpty()) {
+            tilOther.setError("Please enter 0 if no income");
+            isValid = false;
+        }
+        if (rgFinYear.getCheckedRadioButtonId() == -1) {
+            tvFinYearError.setVisibility(View.VISIBLE);
+            isValid = false;
+        }
+        return isValid;
+    }
+}
+That's everything! You have now added a complete, new feature to your application that performs all CRUD operations for a different database table, all launched from your main screen.
+
+Good luck!

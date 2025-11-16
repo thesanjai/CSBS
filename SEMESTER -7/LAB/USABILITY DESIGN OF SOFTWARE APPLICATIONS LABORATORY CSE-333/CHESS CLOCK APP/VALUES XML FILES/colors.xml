@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Our App Colors -->
+    <color name="color_background">#1C1C1E</color> <!-- Dark background -->
+    <color name="color_inactive">#3A3A3C</color> <!-- Inactive timer bg -->
+    <color name="color_active">#FFFFFF</color> <!-- Active timer bg (White) -->
+
+    <color name="text_active">#000000</color> <!-- Text for active timer (Black) -->
+    <color name="text_inactive">#FFFFFF</color> <!-- Text for inactive timer (White) -->
+    <color name="text_moves">#AFAFAF</color> <!-- Grey for move counter -->
+
+    <color name="middle_bar">#2C2C2E</color> <!-- Dark grey for middle bar -->
+    <color name="icon_tint">#FFFFFF</color> <!-- White for icons -->
+
+    <!-- New Dialog Colors -->
+    <color name="color_accent_green">#90C850</color> <!-- A nice green for "Save" -->
+</resources>
+

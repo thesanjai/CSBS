@@ -1,0 +1,71 @@
+🧩 Step 1: activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#2196F3"
+    android:padding="20dp">
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="Green Background"
+        android:textOff="Blue Background"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+</LinearLayout>
+
+🧠 Step 2: MainActivity.java
+package com.example.togglebackground;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.ToggleButton;
+import android.widget.CompoundButton;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout layoutMain;
+    ToggleButton toggleButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        layoutMain = findViewById(R.id.layoutMain);
+        toggleButton = findViewById(R.id.toggleButton);
+
+        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // When toggle is ON → Change to Green
+                    layoutMain.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+                } else {
+                    // When toggle is OFF → Change to Blue
+                    layoutMain.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+                }
+            }
+        });
+    }
+}
+
+⚙️ Step 3: Instructions to Run
+
+Create a new Android Studio project → “Empty Activity”.
+
+Replace the code in
+
+activity_main.xml with the XML above.
+
+MainActivity.java with the Java code above.
+
+Run the app on the emulator or device.
+
+Toggle the button → watch the background color change instantly 🎨

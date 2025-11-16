@@ -1,0 +1,1590 @@
+We will add this "Leave Application" feature as a third, separate part of your existing passportapp project.
+
+First, let's add a button to your existing MainActivity.xml to open this new feature.
+
+1. Modify app/src/main/res/layout/activity_main.xml
+Where to paste: Open your existing activity_main.xml file.
+
+Why: To add a button that opens your new "Leave Application" form.
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Passport Registration"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Phone Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:maxLength="10" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Email Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email ID"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Address Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Father's Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_father_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Father's Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_father_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Mother's Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_mother_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mother's Name"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_mother_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Aadhaar Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_aadhaar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Aadhaar Number"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_aadhaar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="12" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Gender -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gender"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
+
+        <RadioGroup
+            android:id="@+id/rg_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/rb_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/rb_other"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tv_gender_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please select a gender"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+
+        <!-- Buttons -->
+        <Button
+            android:id="@+id/btn_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/btn_view_records"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Passport Records"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginTop="8dp"/>
+
+        <!-- ADD THIS BUTTON -->
+        <Button
+            android:id="@+id/btn_goto_tax_filing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to IT Return Filing"
+            android:layout_marginTop="16dp"/>
+
+        <!-- ADD THIS NEW BUTTON -->
+        <Button
+            android:id="@+id/btn_goto_leave_app"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to Leave Application"
+            android:layout_marginTop="16dp"/>
+
+    </LinearLayout>
+</ScrollView>
+2. Modify app/src/main/java/com/example/passportapp/MainActivity.java
+Where to paste: Open your existing MainActivity.java file.
+
+Why: To make the new "Leave Application" button work.
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Patterns;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+public class MainActivity extends AppCompatActivity {
+
+    // Database
+    private DatabaseHelper dbHelper;
+
+    // UI Views
+    private TextInputLayout tilName, tilPhone, tilEmail, tilAddress, tilFatherName, tilMotherName, tilAadhaar;
+    private TextInputEditText etName, etPhone, etEmail, etAddress, etFatherName, etMotherName, etAadhaar;
+    private RadioGroup rgGender;
+    private TextView tvGenderError;
+    private Button btnRegister, btnViewRecords;
+    
+    // ADD THIS
+    private Button btnGotoTaxFiling;
+
+    // ADD THIS
+    private Button btnGotoLeaveApp;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize Database Helper
+        dbHelper = new DatabaseHelper(this);
+
+        // Initialize Views
+        tilName = findViewById(R.id.til_name);
+        etName = findViewById(R.id.et_name);
+        tilPhone = findViewById(R.id.til_phone);
+        etPhone = findViewById(R.id.et_phone);
+        tilEmail = findViewById(R.id.til_email);
+        etEmail = findViewById(R.id.et_email);
+        tilAddress = findViewById(R.id.til_address);
+        etAddress = findViewById(R.id.et_address);
+        tilFatherName = findViewById(R.id.til_father_name);
+        etFatherName = findViewById(R.id.et_father_name);
+        tilMotherName = findViewById(R.id.til_mother_name);
+        etMotherName = findViewById(R.id.et_mother_name);
+        tilAadhaar = findViewById(R.id.til_aadhaar);
+        etAadhaar = findViewById(R.id.et_aadhaar);
+        rgGender = findViewById(R.id.rg_gender);
+        tvGenderError = findViewById(R.id.tv_gender_error);
+        btnRegister = findViewById(R.id.btn_register);
+        btnViewRecords = findViewById(R.id.btn_view_records);
+
+        // ADD THESE 2 LINES
+        btnGotoTaxFiling = findViewById(R.id.btn_goto_tax_filing);
+
+        // ADD THESE 2 LINES
+        btnGotoLeaveApp = findViewById(R.id.btn_goto_leave_app);
+
+            @Override
+            public void onClick(View v) {
+                if (validateForm()) {
+                    // All validations passed, add user to database
+                    String name = etName.getText().toString();
+                    String phone = etPhone.getText().toString();
+                    String email = etEmail.getText().toString();
+                    String address = etAddress.getText().toString();
+                    String father = etFatherName.getText().toString();
+                    String mother = etMotherName.getText().toString();
+                    String aadhaar = etAadhaar.getText().toString();
+
+                    int selectedGenderId = rgGender.getCheckedRadioButtonId();
+                    RadioButton selectedGender = findViewById(selectedGenderId);
+                    String gender = selectedGender.getText().toString();
+
+                    long newRowId = dbHelper.addUser(name, phone, email, address, father, mother, aadhaar, gender);
+
+                    if (newRowId != -1) {
+                        Toast.makeText(MainActivity.this, "Registration Successful! ID: " + newRowId, Toast.LENGTH_LONG).show();
+                        clearForm();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Registration Failed!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        // View Records Button Click Listener
+        btnViewRecords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the UserListActivity
+                Intent intent = new Intent(MainActivity.this, UserListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // ADD THIS CLICK LISTENER
+        btnGotoTaxFiling.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the new TaxFilingActivity
+                Intent intent = new Intent(MainActivity.this, TaxFilingActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // ADD THIS NEW CLICK LISTENER
+        btnGotoLeaveApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the new LeaveApplyActivity
+                Intent intent = new Intent(MainActivity.this, LeaveApplyActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    /**
+     * Validates all form fields
+     * @return true if all fields are valid, false otherwise
+     */
+    private boolean validateForm() {
+        boolean isValid = true;
+
+        // Clear previous errors
+        tilName.setError(null);
+        tilPhone.setError(null);
+        tilEmail.setError(null);
+        tilAddress.setError(null);
+        tilFatherName.setError(null);
+        tilMotherName.setError(null);
+        tilAadhaar.setError(null);
+        tvGenderError.setVisibility(View.GONE);
+
+        // 1. Name Validation
+        if (etName.getText().toString().isEmpty()) {
+            tilName.setError("Name cannot be empty");
+            isValid = false;
+        }
+
+        // 2. Phone Validation
+        String phone = etPhone.getText().toString();
+        if (phone.isEmpty()) {
+            tilPhone.setError("Phone number cannot be empty");
+            isValid = false;
+        } else if (phone.length() != 10) {
+            tilPhone.setError("Must be 10 digits");
+            isValid = false;
+        }
+
+        // 3. Email Validation
+        String email = etEmail.getText().toString();
+        if (email.isEmpty()) {
+            tilEmail.setError("Email cannot be empty");
+            isValid = false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Enter a valid Email ID");
+            isValid = false;
+        }
+
+        // 4. Address Validation
+        if (etAddress.getText().toString().isEmpty()) {
+            tilAddress.setError("Address cannot be empty");
+            isValid = false;
+        }
+
+        // 5. Father's Name Validation
+        if (etFatherName.getText().toString().isEmpty()) {
+            tilFatherName.setError("Father's Name cannot be empty");
+            isValid = false;
+        }
+
+        // 6. Mother's Name Validation
+        if (etMotherName.getText().toString().isEmpty()) {
+            tilMotherName.setError("Mother's Name cannot be empty");
+            isValid = false;
+        }
+
+        // 7. Aadhaar Validation
+        String aadhaar = etAadhaar.getText().toString();
+        if (aadhaar.isEmpty()) {
+            tilAadhaar.setError("Aadhaar number cannot be empty");
+            isValid = false;
+        } else if (aadhaar.length() != 12) {
+            tilAadhaar.setError("Must be 12 digits");
+            isValid = false;
+        }
+
+        // 8. Gender Validation
+        if (rgGender.getCheckedRadioButtonId() == -1) {
+            tvGenderError.setVisibility(View.VISIBLE);
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private void clearForm() {
+        etName.setText("");
+        etPhone.setText("");
+        etEmail.setText("");
+        etAddress.setText("");
+        etFatherName.setText("");
+        etMotherName.setText("");
+        etAadhaar.setText("");
+        rgGender.clearCheck();
+        
+        // Clear errors
+        tilName.setError(null);
+        tilPhone.setError(null);
+        tilEmail.setError(null);
+        tilAddress.setError(null);
+        tilFatherName.setError(null);
+        tilMotherName.setError(null);
+        tilAadhaar.setError(null);
+        tvGenderError.setVisibility(View.GONE);
+
+        etName.requestFocus(); // Move cursor back to the first field
+    }
+}
+3. Modify app/src/main/AndroidManifest.xml
+Where to paste: Open your existing AndroidManifest.xml.
+
+Why: To declare your three new "Leave" screens to the Android system.
+
+Now, we will create all the NEW files for the Leave Application feature.
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Make sure your <application> tag has android:theme set to a Material theme -->
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Material3.DayNight"
+        tools:targetApi="31">
+
+        <!-- This is your main registration form screen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"> <!-- This helps the keyboard not hide fields -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ADD THIS: Declares your new screen for the list of users -->
+        <activity
+            android:name=".UserListActivity"
+            android:label="Registered Passports" />
+
+        <!-- ADD THIS: Declares your new screen for seeing/editing details -->
+        <activity
+            android:name=".UserDetailsActivity"
+            android:label="Passport Details"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <!-- ADD THESE 3 NEW ACTIVITY DECLARATIONS -->
+        <activity
+            android:name=".TaxFilingActivity"
+            android:label="IT Return Filing"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <activity
+            android:name=".RecordsListActivity"
+            android:label="Filed IT Records" />
+
+        <activity
+            android:name=".RecordDetailsActivity"
+            android:label="IT Record Details"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <!-- ADD THESE 3 NEW ACTIVITY DECLARATIONS FOR LEAVE APP -->
+        <activity
+            android:name=".LeaveApplyActivity"
+            android:label="Apply for Leave"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <activity
+            android:name=".LeaveListActivity"
+            android:label="Filed Leave Records" />
+
+        <activity
+            android:name=".LeaveDetailsActivity"
+            android:label="Leave Record Details"
+            android:windowSoftInputMode="adjustResize"/>
+
+    </application>
+</manifest>
+4. app/src/main/java/com/example/passportapp/LeaveDatabaseHelper.java (NEW FILE)
+Where to paste:
+
+Right-click your package name (com.example.passportapp).
+
+Select New -> Java Class.
+
+Name it LeaveDatabaseHelper and paste this code.
+
+Why: This is the dedicated SQLite helper for managing leave records. It handles all CRUD operations for leave applications.
+LeaveDatabaseHelper.java
+7 Nov, 7:16 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class LeaveDatabaseHelper extends SQLiteOpenHelper {
+
+    // Database Info
+    private static final String DATABASE_NAME = "LeaveDB";
+    private static final int DATABASE_VERSION = 1;
+
+    // Table Info
+    public static final String TABLE_LEAVES = "leave_records";
+    public static final String KEY_ID = "_id";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_EMP_ID = "employee_id";
+    public static final String KEY_FROM_DATE = "from_date";
+    public static final String KEY_TO_DATE = "to_date";
+    public static final String KEY_LEAVE_TYPE = "leave_type";
+    public static final String KEY_REASON = "reason";
+
+    // Create Table Query
+    private static final String CREATE_TABLE_LEAVES =
+            "CREATE TABLE " + TABLE_LEAVES + "(" +
+                    KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    KEY_NAME + " TEXT," +
+                    KEY_EMP_ID + " TEXT," +
+                    KEY_FROM_DATE + " TEXT," + // Store dates as text (e.g., "dd/MM/yyyy")
+                    KEY_TO_DATE + " TEXT," +
+                    KEY_LEAVE_TYPE + " TEXT," +
+                    KEY_REASON + " TEXT" +
+                    ")";
+
+    public LeaveDatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_TABLE_LEAVES);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LEAVES);
+        onCreate(db);
+    }
+
+    // --- CRUD Operations ---
+
+    /**
+     * CREATE - Add a new leave application
+     */
+    public long addLeave(String name, String empId, String fromDate, String toDate, String leaveType, String reason) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, name);
+        values.put(KEY_EMP_ID, empId);
+        values.put(KEY_FROM_DATE, fromDate);
+        values.put(KEY_TO_DATE, toDate);
+        values.put(KEY_LEAVE_TYPE, leaveType);
+        values.put(KEY_REASON, reason);
+
+        long id = db.insert(TABLE_LEAVES, null, values);
+        db.close();
+        return id;
+    }
+
+    /**
+     * READ (All) - Get all leave records
+     */
+    public Cursor getAllLeaves() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_LEAVES, null, null, null, null, null, KEY_NAME + " ASC");
+    }
+
+    /**
+     * READ (One) - Get a single leave record by ID
+     */
+    public Cursor getLeaveDetails(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_LEAVES, null, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+    }
+
+    /**
+     * UPDATE - Update an existing leave record
+     */
+    public int updateLeave(long id, String name, String empId, String fromDate, String toDate, String leaveType, String reason) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, name);
+        values.put(KEY_EMP_ID, empId);
+        values.put(KEY_FROM_DATE, fromDate);
+        values.put(KEY_TO_DATE, toDate);
+        values.put(KEY_LEAVE_TYPE, leaveType);
+        values.put(KEY_REASON, reason);
+
+        return db.update(TABLE_LEAVES, values, KEY_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
+    /**
+     * DELETE - Delete a leave record by ID
+     */
+    public void deleteLeave(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_LEAVES, KEY_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+}
+5. app/src/main/res/layout/activity_leave_apply.xml (NEW FILE)
+Where to paste:
+
+Right-click the app/src/main/res/layout folder.
+
+Select New -> Layout Resource File.
+
+Name it activity_leave_apply and paste this code.
+
+Why: This is the UI for your leave application form. It includes non-editable EditText fields for dates, which we will use to trigger Date Pickers.
+activity_leave_apply.xml
+7 Nov, 7:16 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LeaveApplyActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Leave Application"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_leave_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee Name"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_leave_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Employee ID Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_leave_emp_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee ID (e.g. E1001)"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_leave_emp_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Date Fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- From Date -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_from_date"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="From Date"
+                app:errorEnabled="true"
+                android:layout_marginEnd="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_from_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- To Date -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_to_date"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="To Date"
+                app:errorEnabled="true"
+                android:layout_marginStart="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_to_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Leave Type -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leave Type"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
+        <RadioGroup
+            android:id="@+id/rg_leave_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/rb_leave_od" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OD" />
+            <RadioButton android:id="@+id/rb_leave_sick" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sick Leave" />
+            <RadioButton android:id="@+id/rb_leave_casual" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Casual Leave" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tv_leave_type_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please select a leave type"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+        <!-- Leave Reason -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_leave_reason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Reason for Leave"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_leave_reason"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:gravity="top"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Buttons -->
+        <Button
+            android:id="@+id/btn_leave_submit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Application"
+            android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/btn_view_leave_records"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Applications"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</ScrollView>
+6. app/src/main/java/com/example/passportapp/LeaveApplyActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it LeaveApplyActivity and paste this code.
+
+Why: This is the Java code for the leave form. It includes the logic to show a DatePickerDialog when the date fields are clicked.
+LeaveApplyActivity.java
+7 Nov, 7:16 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
+public class LeaveApplyActivity extends AppCompatActivity {
+
+    private LeaveDatabaseHelper dbHelper;
+    private Calendar myCalendar = Calendar.getInstance();
+
+    private TextInputLayout tilName, tilEmpId, tilFromDate, tilToDate, tilReason;
+    private TextInputEditText etName, etEmpId, etFromDate, etToDate, etReason;
+    private RadioGroup rgLeaveType;
+    private TextView tvLeaveTypeError;
+    private Button btnSubmit, btnViewRecords;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_leave_apply);
+
+        dbHelper = new LeaveDatabaseHelper(this);
+
+        // Initialize Views
+        tilName = findViewById(R.id.til_leave_name);
+        etName = findViewById(R.id.et_leave_name);
+        tilEmpId = findViewById(R.id.til_leave_emp_id);
+        etEmpId = findViewById(R.id.et_leave_emp_id);
+        tilFromDate = findViewById(R.id.til_from_date);
+        etFromDate = findViewById(R.id.et_from_date);
+        tilToDate = findViewById(R.id.til_to_date);
+        etToDate = findViewById(R.id.et_to_date);
+        tilReason = findViewById(R.id.til_leave_reason);
+        etReason = findViewById(R.id.et_leave_reason);
+        rgLeaveType = findViewById(R.id.rg_leave_type);
+        tvLeaveTypeError = findViewById(R.id.tv_leave_type_error);
+        btnSubmit = findViewById(R.id.btn_leave_submit);
+        btnViewRecords = findViewById(R.id.btn_view_leave_records);
+
+        // --- Date Picker Logic ---
+        etFromDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(etFromDate, tilFromDate);
+            }
+        });
+
+        etToDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(etToDate, tilToDate);
+            }
+        });
+
+        // --- Button Click Listeners ---
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateForm()) {
+                    String name = etName.getText().toString();
+                    String empId = etEmpId.getText().toString();
+                    String fromDate = etFromDate.getText().toString();
+                    String toDate = etToDate.getText().toString();
+                    String reason = etReason.getText().toString();
+
+                    int selectedTypeId = rgLeaveType.getCheckedRadioButtonId();
+                    RadioButton selectedType = findViewById(selectedTypeId);
+                    String leaveType = selectedType.getText().toString();
+
+                    long newRowId = dbHelper.addLeave(name, empId, fromDate, toDate, leaveType, reason);
+                    if (newRowId != -1) {
+                        Toast.makeText(LeaveApplyActivity.this, "Leave Application Submitted!", Toast.LENGTH_LONG).show();
+                        clearForm();
+                    } else {
+                        Toast.makeText(LeaveApplyActivity.this, "Submission Failed!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        btnViewRecords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LeaveApplyActivity.this, LeaveListActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    /**
+     * Shows a DatePickerDialog and sets the date to the provided EditText
+     */
+    private void showDatePickerDialog(final EditText dateField, final TextInputLayout til) {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                
+                String myFormat = "dd/MM/yyyy"; // Date format
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+                dateField.setText(sdf.format(myCalendar.getTime()));
+                til.setError(null); // Clear error on successful selection
+            }
+        };
+
+        new DatePickerDialog(LeaveApplyActivity.this, dateSetListener,
+                myCalendar.get(Calendar.YEAR),
+                myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private boolean validateForm() {
+        boolean isValid = true;
+
+        // Clear errors
+        tilName.setError(null);
+        tilEmpId.setError(null);
+        tilFromDate.setError(null);
+        tilToDate.setError(null);
+        tilReason.setError(null);
+        tvLeaveTypeError.setVisibility(View.GONE);
+
+        if (etName.getText().toString().isEmpty()) {
+            tilName.setError("Name cannot be empty");
+            isValid = false;
+        }
+        if (etEmpId.getText().toString().isEmpty()) {
+            tilEmpId.setError("Employee ID cannot be empty");
+            isValid = false;
+        }
+        if (etFromDate.getText().toString().isEmpty()) {
+            tilFromDate.setError("Please select a 'From' date");
+            isValid = false;
+        }
+        if (etToDate.getText().toString().isEmpty()) {
+            tilToDate.setError("Please select a 'To' date");
+            isValid = false;
+        }
+        if (rgLeaveType.getCheckedRadioButtonId() == -1) {
+            tvLeaveTypeError.setVisibility(View.VISIBLE);
+            isValid = false;
+        }
+        if (etReason.getText().toString().isEmpty()) {
+            tilReason.setError("Reason cannot be empty");
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+
+    private void clearForm() {
+        etName.setText("");
+        etEmpId.setText("");
+        etFromDate.setText("");
+        etToDate.setText("");
+        etReason.setText("");
+        rgLeaveType.clearCheck();
+        
+        // Clear errors
+        tilName.setError(null);
+        tilEmpId.setError(null);
+        tilFromDate.setError(null);
+        tilToDate.setError(null);
+        tilReason.setError(null);
+        tvLeaveTypeError.setVisibility(View.GONE);
+
+        etName.requestFocus();
+    }
+}
+7. app/src/main/res/layout/activity_leave_list.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it activity_leave_list and paste this code.
+
+Why: The UI for the screen that shows all submitted leave applications.
+activity_leave_list.xml
+7 Nov, 7:16 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ListView
+        android:id="@+id/list_view_leaves"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_no_records_leave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No leave records found."
+        android:visibility="gone"
+        android:layout_gravity="center"/>
+
+</LinearLayout>
+8. app/src/main/res/layout/list_item_leave.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it list_item_leave and paste this code.
+
+Why: The UI for a single row in your leave list (shows Name and Leave Type).
+list_item_leave.xml
+7 Nov, 7:16 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_item_leave_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Employee Name"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+    <TextView
+        android:id="@+id/tv_item_leave_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leave Type"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="?android:attr/textColorSecondary" />
+
+</LinearLayout>
+9. app/src/main/java/com/example/passportapp/LeaveListActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it LeaveListActivity and paste this code.
+
+Why: The Java code for the list screen. It Reads (All) records from LeaveDatabaseHelper and handles clicks.
+LeaveListActivity.java
+7 Nov, 7:16 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class LeaveListActivity extends AppCompatActivity {
+
+    private LeaveDatabaseHelper dbHelper;
+    private ListView listView;
+    private TextView tvNoRecords;
+    private SimpleCursorAdapter adapter;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_leave_list);
+
+        dbHelper = new LeaveDatabaseHelper(this);
+        listView = findViewById(R.id.list_view_leaves);
+        tvNoRecords = findViewById(R.id.tv_no_records_leave);
+
+        // Click listener for list items
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 'id' is the database row ID
+                Intent intent = new Intent(LeaveListActivity.this, LeaveDetailsActivity.class);
+                intent.putExtra(LeaveDatabaseHelper.KEY_ID, id); // Pass the ID
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadLeaves(); // Refresh list
+    }
+
+    private void loadLeaves() {
+        Cursor cursor = dbHelper.getAllLeaves();
+
+        if (cursor.getCount() == 0) {
+            tvNoRecords.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+        } else {
+            tvNoRecords.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
+
+            // Columns from DB
+            String[] fromColumns = {
+                    LeaveDatabaseHelper.KEY_NAME,
+                    LeaveDatabaseHelper.KEY_LEAVE_TYPE
+            };
+
+            // Views in list_item_leave.xml
+            int[] toViews = {
+                    R.id.tv_item_leave_name,
+                    R.id.tv_item_leave_type
+            };
+
+            adapter = new SimpleCursorAdapter(
+                    this,
+                    R.layout.list_item_leave, // Row layout
+                    cursor,
+                    fromColumns,
+                    toViews,
+                    0
+            );
+
+            listView.setAdapter(adapter);
+        }
+    }
+}
+10. app/src/main/res/layout/activity_leave_details.xml (NEW FILE)
+Where to paste:
+
+Right-click app/src/main/res/layout.
+
+Select New -> Layout Resource File.
+
+Name it activity_leave_details and paste this code.
+
+Why: The UI for the "Details" screen. It's a copy of the application form, but with "Update" and "Delete" buttons.
+activity_leave_details.xml
+7 Nov, 7:16 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LeaveDetailsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="View / Edit Leave"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Name Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_leave_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee Name"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_leave_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Employee ID Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_leave_emp_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Employee ID (e.g. E1001)"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_leave_emp_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Date Fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_from_date"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="From Date"
+                app:errorEnabled="true"
+                android:layout_marginEnd="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_from_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_to_date"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="To Date"
+                app:errorEnabled="true"
+                android:layout_marginStart="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_to_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Leave Type -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leave Type"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"/>
+        <RadioGroup
+            android:id="@+id/rg_leave_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/rb_leave_od" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OD" />
+            <RadioButton android:id="@+id/rb_leave_sick" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sick Leave" />
+            <RadioButton android:id="@+id/rb_leave_casual" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Casual Leave" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tv_leave_type_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please select a leave type"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+        <!-- Leave Reason -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_leave_reason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Reason for Leave"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_leave_reason"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:gravity="top"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- UPDATE AND DELETE BUTTONS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp">
+            <Button
+                android:id="@+id/btn_leave_update"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Update"
+                android:layout_marginEnd="8dp"/>
+            <Button
+                android:id="@+id/btn_leave_delete"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                app:backgroundTint="@android:color/holo_red_light"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+11. app/src/main/java/com/example/passportapp/LeaveDetailsActivity.java (NEW FILE)
+Where to paste:
+
+Right-click your package name.
+
+Select New -> Java Class.
+
+Name it LeaveDetailsActivity and paste this code.
+
+Why: The Java code for the details screen. It Reads (One) record, fills the form, and handles the Update and Delete buttons.
+LeaveDetailsActivity.java
+7 Nov, 7:16 am
+
+Open
+package com.example.passportapp; // Make sure this matches your package name
+
+import android.app.DatePickerDialog;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
+public class LeaveDetailsActivity extends AppCompatActivity {
+
+    private LeaveDatabaseHelper dbHelper;
+    private long leaveId;
+    private Calendar myCalendar = Calendar.getInstance();
+
+    private TextInputLayout tilName, tilEmpId, tilFromDate, tilToDate, tilReason;
+    private TextInputEditText etName, etEmpId, etFromDate, etToDate, etReason;
+    private RadioGroup rgLeaveType;
+    private RadioButton rbOd, rbSick, rbCasual;
+    private TextView tvLeaveTypeError;
+    private Button btnUpdate, btnDelete;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_leave_details);
+
+        dbHelper = new LeaveDatabaseHelper(this);
+
+        // Get ID from Intent
+        leaveId = getIntent().getLongExtra(LeaveDatabaseHelper.KEY_ID, -1);
+        if (leaveId == -1) {
+            Toast.makeText(this, "Error: Leave ID not found.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Initialize Views
+        tilName = findViewById(R.id.til_leave_name);
+        etName = findViewById(R.id.et_leave_name);
+        tilEmpId = findViewById(R.id.til_leave_emp_id);
+        etEmpId = findViewById(R.id.et_leave_emp_id);
+        tilFromDate = findViewById(R.id.til_from_date);
+        etFromDate = findViewById(R.id.et_from_date);
+        tilToDate = findViewById(R.id.til_to_date);
+        etToDate = findViewById(R.id.et_to_date);
+        tilReason = findViewById(R.id.til_leave_reason);
+        etReason = findViewById(R.id.et_leave_reason);
+        rgLeaveType = findViewById(R.id.rg_leave_type);
+        rbOd = findViewById(R.id.rb_leave_od);
+        rbSick = findViewById(R.id.rb_leave_sick);
+        rbCasual = findViewById(R.id.rb_leave_casual);
+        tvLeaveTypeError = findViewById(R.id.tv_leave_type_error);
+        btnUpdate = findViewById(R.id.btn_leave_update);
+        btnDelete = findViewById(R.id.btn_leave_delete);
+
+        // Load existing data
+        loadLeaveData();
+
+        // --- Date Picker Logic ---
+        etFromDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(etFromDate, tilFromDate);
+            }
+        });
+        etToDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(etToDate, tilToDate);
+            }
+        });
+
+        // --- Button Click Listeners ---
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateForm()) {
+                    String name = etName.getText().toString();
+                    String empId = etEmpId.getText().toString();
+                    String fromDate = etFromDate.getText().toString();
+                    String toDate = etToDate.getText().toString();
+                    String reason = etReason.getText().toString();
+
+                    int selectedTypeId = rgLeaveType.getCheckedRadioButtonId();
+                    RadioButton selectedType = findViewById(selectedTypeId);
+                    String leaveType = selectedType.getText().toString();
+
+                    int rows = dbHelper.updateLeave(leaveId, name, empId, fromDate, toDate, leaveType, reason);
+                    if (rows > 0) {
+                        Toast.makeText(LeaveDetailsActivity.this, "Leave Record Updated", Toast.SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(LeaveDetailsActivity.this, "Update Failed", Toast.SHORT).show();
+                    }
+                }
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbHelper.deleteLeave(leaveId);
+                Toast.makeText(LeaveDetailsActivity.this, "Leave Record Deleted", Toast.SHORT).show();
+                finish();
+            }
+        });
+    }
+
+    /**
+     * READ (One) - Fetches data and populates the form
+     */
+    private void loadLeaveData() {
+        Cursor cursor = dbHelper.getLeaveDetails(leaveId);
+        if (cursor != null && cursor.moveToFirst()) {
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(LeaveDatabaseHelper.KEY_NAME));
+            String empId = cursor.getString(cursor.getColumnIndexOrThrow(LeaveDatabaseHelper.KEY_EMP_ID));
+            String fromDate = cursor.getString(cursor.getColumnIndexOrThrow(LeaveDatabaseHelper.KEY_FROM_DATE));
+            String toDate = cursor.getString(cursor.getColumnIndexOrThrow(LeaveDatabaseHelper.KEY_TO_DATE));
+            String leaveType = cursor.getString(cursor.getColumnIndexOrThrow(LeaveDatabaseHelper.KEY_LEAVE_TYPE));
+            String reason = cursor.getString(cursor.getColumnIndexOrThrow(LeaveDatabaseHelper.KEY_REASON));
+
+            // Set text
+            etName.setText(name);
+            etEmpId.setText(empId);
+            etFromDate.setText(fromDate);
+            etToDate.setText(toDate);
+            etReason.setText(reason);
+
+            // Set radio button
+            if (leaveType.equals("OD")) {
+                rbOd.setChecked(true);
+            } else if (leaveType.equals("Sick Leave")) {
+                rbSick.setChecked(true);
+            } else if (leaveType.equals("Casual Leave")) {
+                rbCasual.setChecked(true);
+            }
+            
+            cursor.close();
+        }
+    }
+
+    /**
+     * Re-uses the same validation logic from LeaveApplyActivity
+     */
+    private boolean validateForm() {
+        boolean isValid = true;
+        // (Validation logic is identical to LeaveApplyActivity)
+        tilName.setError(null);
+        tilEmpId.setError(null);
+        tilFromDate.setError(null);
+        tilToDate.setError(null);
+        tilReason.setError(null);
+        tvLeaveTypeError.setVisibility(View.GONE);
+
+        if (etName.getText().toString().isEmpty()) {
+            tilName.setError("Name cannot be empty");
+            isValid = false;
+        }
+        if (etEmpId.getText().toString().isEmpty()) {
+            tilEmpId.setError("Employee ID cannot be empty");
+            isValid = false;
+        }
+        if (etFromDate.getText().toString().isEmpty()) {
+            tilFromDate.setError("Please select a 'From' date");
+            isValid = false;
+        }
+        if (etToDate.getText().toString().isEmpty()) {
+            tilToDate.setError("Please select a 'To' date");
+            isValid = false;
+        }
+        if (rgLeaveType.getCheckedRadioButtonId() == -1) {
+            tvLeaveTypeError.setVisibility(View.VISIBLE);
+            isValid = false;
+        }
+        if (etReason.getText().toString().isEmpty()) {
+            tilReason.setError("Reason cannot be empty");
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    /**
+     * Shows a DatePickerDialog and sets the date to the provided EditText
+     */
+    private void showDatePickerDialog(final EditText dateField, final TextInputLayout til) {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                
+                String myFormat = "dd/MM/yyyy";
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+                dateField.setText(sdf.format(myCalendar.getTime()));
+                til.setError(null);
+Same as LeaveApplyActivity
+            }
+        };
+
+        new DatePickerDialog(LeaveDetailsActivity.this, dateSetListener,
+                myCalendar.get(Calendar.YEAR),
+                myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+}
+You are all set! You have now added a third, complete CRUD feature to your application, this time with Date Pickers.

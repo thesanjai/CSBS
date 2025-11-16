@@ -1,0 +1,232 @@
+Set-14
+Part A – Create an app with a Toggle Button that switches the layout background between two colors.
+Part B – Design a College Admission Application with the following fields:
+ Student Name: varchar(30), Roll Number: int, Department: varchar(20), Contact Number: int, Address: varchar(50).
+ Store admission details in an SQL table and display the list of admitted students.
+
+
+Great! Let’s solve Set-14 step by step using the same approach as previous sets.
+
+Part-A: Toggle Button to Switch Background Color
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#FFFFFF">
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="Switch to Color 2"
+        android:textOff="Switch to Color 1"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set14parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.ToggleButton;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout layoutMain;
+    ToggleButton toggleButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        layoutMain = findViewById(R.id.layoutMain);
+        toggleButton = findViewById(R.id.toggleButton);
+
+        toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                layoutMain.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            } else {
+                layoutMain.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            }
+        });
+    }
+}
+✅ Logic:
+ToggleButton switches between two background colors on state change.
+
+Part-B: College Admission Application
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etStudentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Student Name"
+            android:inputType="textPersonName"/>
+
+        <EditText
+            android:id="@+id/etRollNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Roll Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etDepartment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Department"
+            android:inputType="text"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Contact Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:inputType="textMultiLine"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Admission"
+            android:layout_marginTop="15dp"/>
+
+        <Button
+            android:id="@+id/btnViewAdmissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Admissions"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set14partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etStudentName, etRollNumber, etDepartment, etContact, etAddress;
+    Button btnSubmit, btnViewAdmissions;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etStudentName = findViewById(R.id.etStudentName);
+        etRollNumber = findViewById(R.id.etRollNumber);
+        etDepartment = findViewById(R.id.etDepartment);
+        etContact = findViewById(R.id.etContact);
+        etAddress = findViewById(R.id.etAddress);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAdmissions = findViewById(R.id.btnViewAdmissions);
+
+        db = openOrCreateDatabase("CollegeDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS admissions(" +
+                "studentName VARCHAR(30), rollNumber INT, department VARCHAR(20), contact INT, address VARCHAR(50));");
+
+        btnSubmit.setOnClickListener(v -> submitAdmission());
+        btnViewAdmissions.setOnClickListener(v -> viewAdmissions());
+    }
+
+    private void submitAdmission() {
+        String name = etStudentName.getText().toString().trim();
+        String rollStr = etRollNumber.getText().toString().trim();
+        String dept = etDepartment.getText().toString().trim();
+        String contactStr = etContact.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+
+        if(name.isEmpty() || rollStr.isEmpty() || dept.isEmpty() || contactStr.isEmpty() || address.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int roll = Integer.parseInt(rollStr);
+        int contact = Integer.parseInt(contactStr);
+
+        db.execSQL("INSERT INTO admissions VALUES('" + name + "'," + roll + ",'" + dept + "'," + contact + ",'" + address + "');");
+        showMessage("Success", "Admission submitted successfully!");
+        clearFields();
+    }
+
+    private void viewAdmissions() {
+        Cursor c = db.rawQuery("SELECT * FROM admissions", null);
+        if(c.getCount() == 0) {
+            showMessage("Info", "No admissions found");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        while(c.moveToNext()) {
+            sb.append("Name: ").append(c.getString(0)).append("\n")
+              .append("Roll Number: ").append(c.getInt(1)).append("\n")
+              .append("Department: ").append(c.getString(2)).append("\n")
+              .append("Contact: ").append(c.getInt(3)).append("\n")
+              .append("Address: ").append(c.getString(4)).append("\n\n");
+        }
+
+        showMessage("All Admissions", sb.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etStudentName.setText("");
+        etRollNumber.setText("");
+        etDepartment.setText("");
+        etContact.setText("");
+        etAddress.setText("");
+    }
+}
+
+✅ Logic:
+Part-A: ToggleButton switches the LinearLayout background between two colors.
+Part-B:
+Collects admission details and stores them in SQLite table admissions.
+Displays all records in an AlertDialog.
+
+I can continue and create Set-15 next, or if you want, I can compile all Sets 1–14 in a single master Android reference document with ready-to-use code for each Part-A and Part-B.
+Do you want me to compile all sets now?
+
+

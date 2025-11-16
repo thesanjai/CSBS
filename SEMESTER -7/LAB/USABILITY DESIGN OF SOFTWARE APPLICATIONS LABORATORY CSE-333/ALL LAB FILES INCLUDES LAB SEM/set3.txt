@@ -1,0 +1,98 @@
+🧩 1. activity_main.xml (UI Design)
+
+👉 Path: app > res > layout > activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#FAFAFA">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Count 'A' in Text"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginBottom="20dp" />
+
+    <EditText
+        android:id="@+id/etInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Type here..."
+        android:textSize="18sp"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:inputType="text"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Count of 'A': 0"
+        android:textSize="20sp"
+        android:textColor="#1976D2" />
+</LinearLayout>
+
+⚙️ 2. MainActivity.java
+
+👉 Path: app > java > com.example.countaapp > MainActivity.java
+
+package com.example.countaapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etInput;
+    TextView tvCount;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etInput = findViewById(R.id.etInput);
+        tvCount = findViewById(R.id.tvCount);
+
+        etInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int aCount = 0;
+                for (int i = 0; i < s.length(); i++) {
+                    char c = s.charAt(i);
+                    if (c == 'A' || c == 'a') {
+                        aCount++;
+                    }
+                }
+                tvCount.setText("Count of 'A': " + aCount);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+    }
+}
+
+🚀 3. Run the App
+
+✅ When you type in the EditText:
+
+The app will instantly update the number of ‘A’s typed (case-insensitive).
+
+Example: Typing "AaaaBCA" → shows Count of 'A': 6

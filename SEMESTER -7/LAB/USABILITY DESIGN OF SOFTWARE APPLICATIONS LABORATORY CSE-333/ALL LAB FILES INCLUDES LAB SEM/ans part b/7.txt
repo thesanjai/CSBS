@@ -1,0 +1,260 @@
+Set-7
+Part-A - Create an app that switches the image in an ImageView when a button is pressed.
+Part-B - Design an Employee Leave Application with the following fields:
+Employee ID: int, Name: varchar(30), Department: varchar(20), Leave Type: varchar(15), Reason: varchar(50).
+Store the leave applications in an SQL table and display all leave requests in a list.
+Perfect! Let’s solve Set-7 step by step, following the same approach as your previous sets. I’ll provide full XML + Java code for both Part-A and Part-B.
+
+Part-A: Switch Image on Button Click
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/image1"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/btnSwitchImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch Image"/>
+</LinearLayout>
+Note: Add two images in res/drawable named image1.png and image2.png.
+MainActivity.java
+package com.kasinadhuni.set7parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+
+public class MainActivity extends AppCompatActivity {
+
+    ImageView imageView;
+    Button btnSwitchImage;
+    boolean isImage1 = true;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        imageView = findViewById(R.id.imageView);
+        btnSwitchImage = findViewById(R.id.btnSwitchImage);
+
+        btnSwitchImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isImage1) {
+                    imageView.setImageResource(R.drawable.image2);
+                    isImage1 = false;
+                } else {
+                    imageView.setImageResource(R.drawable.image1);
+                    isImage1 = true;
+                }
+            }
+        });
+    }
+}
+✅ Logic:
+Boolean flag isImage1 tracks current image.
+On button click, ImageView.setImageResource() switches images.
+
+Part-B: Employee Leave Application with SQLite and ListView
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etEmpID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Employee ID"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:inputType="textPersonName"/>
+
+    <EditText
+        android:id="@+id/etDepartment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Department"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/etLeaveType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Leave Type"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/etReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Reason"
+        android:inputType="textMultiLine"/>
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit Leave"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btnViewAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View All Leaves"
+        android:layout_marginTop="10dp"/>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set7partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etEmpID, etName, etDepartment, etLeaveType, etReason;
+    Button btnSubmit, btnViewAll;
+    ListView listView;
+    SQLiteDatabase db;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> records;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etEmpID = findViewById(R.id.etEmpID);
+        etName = findViewById(R.id.etName);
+        etDepartment = findViewById(R.id.etDepartment);
+        etLeaveType = findViewById(R.id.etLeaveType);
+        etReason = findViewById(R.id.etReason);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAll = findViewById(R.id.btnViewAll);
+        listView = findViewById(R.id.listView);
+
+        records = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, records);
+        listView.setAdapter(adapter);
+
+        db = openOrCreateDatabase("LeaveDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS leaveapp(" +
+                "empID INT, name VARCHAR(30), department VARCHAR(20), leaveType VARCHAR(15), reason VARCHAR(50));");
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submitLeave();
+            }
+        });
+
+        btnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewAllLeaves();
+            }
+        });
+    }
+
+    private void submitLeave() {
+        String empID = etEmpID.getText().toString().trim();
+        String name = etName.getText().toString().trim();
+        String dept = etDepartment.getText().toString().trim();
+        String leaveType = etLeaveType.getText().toString().trim();
+        String reason = etReason.getText().toString().trim();
+
+        if(empID.isEmpty() || name.isEmpty() || dept.isEmpty() || leaveType.isEmpty() || reason.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        db.execSQL("INSERT INTO leaveapp VALUES(" + empID + ",'" + name + "','" +
+                dept + "','" + leaveType + "','" + reason + "');");
+        showMessage("Success", "Leave Submitted");
+        clearFields();
+    }
+
+    private void viewAllLeaves() {
+        records.clear();
+        Cursor c = db.rawQuery("SELECT * FROM leaveapp", null);
+        if(c.getCount() == 0) {
+            showMessage("Error", "No records found");
+            adapter.notifyDataSetChanged();
+            return;
+        }
+
+        while(c.moveToNext()) {
+            String record = "Emp ID: " + c.getInt(0) +
+                    "\nName: " + c.getString(1) +
+                    "\nDepartment: " + c.getString(2) +
+                    "\nLeave Type: " + c.getString(3) +
+                    "\nReason: " + c.getString(4);
+            records.add(record);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etEmpID.setText("");
+        etName.setText("");
+        etDepartment.setText("");
+        etLeaveType.setText("");
+        etReason.setText("");
+    }
+}
+✅ Logic:
+Part-A: Switches images using a boolean flag.
+Part-B: Uses SQLite + ListView to store and display leave applications.
+Validates input fields, clears after submission, and updates ListView dynamically.
+
+If you want, I can start Set-8 immediately and maintain the same Part-A dynamic UI action + Part-B SQLite formpattern for you, so your set solutions remain consistent.
+Do you want me to continue with Set-8?
+
+

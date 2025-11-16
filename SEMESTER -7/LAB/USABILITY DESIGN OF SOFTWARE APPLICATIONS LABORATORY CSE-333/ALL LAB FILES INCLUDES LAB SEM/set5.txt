@@ -1,0 +1,97 @@
+part a
+1. activity_main.xml (UI Design)
+
+👉 Path: app > res > layout > activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#FFFFFF"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tap the Button to Change Colors!"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginBottom="30dp" />
+
+    <Button
+        android:id="@+id/btnChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Color"
+        android:textSize="18sp"
+        android:padding="12dp"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFFFFF" />
+</LinearLayout>
+
+⚙️ 2. MainActivity.java
+
+👉 Path: app > java > com.example.colorchanger > MainActivity.java
+
+package com.example.colorchanger;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.graphics.Color;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout mainLayout;
+    TextView tvMessage;
+    Button btnChange;
+    Random random = new Random();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mainLayout = findViewById(R.id.mainLayout);
+        tvMessage = findViewById(R.id.tvMessage);
+        btnChange = findViewById(R.id.btnChange);
+
+        btnChange.setOnClickListener(v -> {
+            // Generate random RGB values
+            int red = random.nextInt(256);
+            int green = random.nextInt(256);
+            int blue = random.nextInt(256);
+
+            // Apply new background color
+            int bgColor = Color.rgb(red, green, blue);
+            mainLayout.setBackgroundColor(bgColor);
+
+            // Generate another random color for text
+            int textRed = random.nextInt(256);
+            int textGreen = random.nextInt(256);
+            int textBlue = random.nextInt(256);
+            int textColor = Color.rgb(textRed, textGreen, textBlue);
+
+            tvMessage.setTextColor(textColor);
+            tvMessage.setText("Colors Changed!");
+        });
+    }
+}
+
+🚀 3. How to Run
+
+Create a new Android Studio project.
+
+Replace the default code with the above XML and Java.
+
+Run the app.
+
+Tap “Change Color” — both the background and text color change randomly 🎨✨

@@ -1,0 +1,479 @@
+hospital reg system
+This is a complete guide to creating a Hospital Patient Registration app in Android Studio using Java and SQLite.
+
+Project Structure
+I will assume your package name is com.example.hospitalapp. If it is different, change the first line (package ...) in the Java files to match yours.
+
+Here is the file structure we will create:
+
+Java Classes (app/src/main/java/com/example/hospitalapp/):
+
+DatabaseHelper.java (Handles all SQLite connections and CRUD operations)
+
+Patient.java (A simple model to hold patient data)
+
+MainActivity.java (Displays the list of all patients)
+
+AddEditActivity.java (Screen to Register new or Edit existing patient)
+
+DetailsActivity.java (Screen to view a single patient's full details)
+
+Layouts (app/src/main/res/layout/):
+
+activity_main.xml
+
+patient_list_item.xml (Design for one row in the list)
+
+activity_add_edit.xml
+
+activity_details.xml
+
+Step 1: The Model Class
+This class defines what a "Patient" is. File: app/src/main/java/com/example/hospitalapp/Patient.java
+
+Java
+
+package com.example.hospitalapp;
+
+import java.io.Serializable;
+
+// Implementing Serializable lets us pass this object between activities
+public class Patient implements Serializable {
+    int id;
+    String name;
+    int age;
+    String gender;
+    long phone; // Using long because phone numbers can exceed standard int size
+    String address;
+
+    public Patient() { }
+
+    public Patient(int id, String name, int age, String gender, long phone, String address) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.phone = phone;
+        this.address = address;
+    }
+
+    // toString is useful for displaying in a simple ListView
+    @Override
+    public String toString() {
+        return "ID: " + id + " | " + name;
+    }
+}
+Step 2: Database Helper (Connecting SQLite)
+This file manages creating the database and all CRUD (Create, Read, Update, Delete) operations. File: app/src/main/java/com/example/hospitalapp/DatabaseHelper.java
+
+Java
+
+package com.example.hospitalapp;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String DATABASE_NAME = "Hospital.db";
+    private static final int DATABASE_VERSION = 1;
+
+    private static final String TABLE_PATIENTS = "patients";
+    private static final String COL_ID = "id";
+    private static final String COL_NAME = "name";
+    private static final String COL_AGE = "age";
+    private static final String COL_GENDER = "gender";
+    private static final String COL_PHONE = "phone";
+    private static final String COL_ADDRESS = "address";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTable = "CREATE TABLE " + TABLE_PATIENTS + " (" +
+                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_NAME + " TEXT, " +
+                COL_AGE + " INTEGER, " +
+                COL_GENDER + " TEXT, " +
+                COL_PHONE + " INTEGER, " +
+                COL_ADDRESS + " TEXT)";
+        db.execSQL(createTable);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PATIENTS);
+        onCreate(db);
+    }
+
+    // --- CRUD OPERATIONS ---
+
+    // CREATE
+    public long addPatient(Patient patient) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, patient.name);
+        values.put(COL_AGE, patient.age);
+        values.put(COL_GENDER, patient.gender);
+        values.put(COL_PHONE, patient.phone);
+        values.put(COL_ADDRESS, patient.address);
+        long id = db.insert(TABLE_PATIENTS, null, values);
+        db.close();
+        return id;
+    }
+
+    // READ (All)
+    public List<Patient> getAllPatients() {
+        List<Patient> patientList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_PATIENTS;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Patient p = new Patient();
+                p.id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID));
+                p.name = cursor.getString(cursor.getColumnIndexOrThrow(COL_NAME));
+                p.age = cursor.getInt(cursor.getColumnIndexOrThrow(COL_AGE));
+                p.gender = cursor.getString(cursor.getColumnIndexOrThrow(COL_GENDER));
+                p.phone = cursor.getLong(cursor.getColumnIndexOrThrow(COL_PHONE));
+                p.address = cursor.getString(cursor.getColumnIndexOrThrow(COL_ADDRESS));
+                patientList.add(p);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return patientList;
+    }
+
+    // READ (Single)
+    public Patient getPatient(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_PATIENTS, null, COL_ID + "=?",
+                new String[]{String.valueOf(id)}, null, null, null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+            Patient p = new Patient(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_NAME)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COL_AGE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_GENDER)),
+                    cursor.getLong(cursor.getColumnIndexOrThrow(COL_PHONE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_ADDRESS))
+            );
+            cursor.close();
+            return p;
+        }
+        return null;
+    }
+
+    // UPDATE
+    public int updatePatient(Patient patient) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, patient.name);
+        values.put(COL_AGE, patient.age);
+        values.put(COL_GENDER, patient.gender);
+        values.put(COL_PHONE, patient.phone);
+        values.put(COL_ADDRESS, patient.address);
+
+        return db.update(TABLE_PATIENTS, values, COL_ID + " = ?",
+                new String[]{String.valueOf(patient.id)});
+    }
+
+    // DELETE
+    public void deletePatient(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_PATIENTS, COL_ID + " = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+}
+Step 3: Layout Files (XML)
+File: app/src/main/res/layout/activity_main.xml (Main screen with a list and an 'Add' button)
+
+XML
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <ListView
+        android:id="@+id/listViewPatients"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/btnAddPatient"/>
+
+    <Button
+        android:id="@+id/btnAddPatient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register New Patient"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>
+File: app/src/main/res/layout/activity_add_edit.xml (Form to enter patient details)
+
+XML
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText android:id="@+id/etName" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Name"/>
+        <EditText android:id="@+id/etAge" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Age" android:inputType="number"/>
+        <EditText android:id="@+id/etGender" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Gender (Male/Female)"/>
+        <EditText android:id="@+id/etPhone" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Phone Number" android:inputType="phone"/>
+        <EditText android:id="@+id/etAddress" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Address"/>
+
+        <Button android:id="@+id/btnSave" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Save Patient" android:layout_marginTop="20dp"/>
+    </LinearLayout>
+</ScrollView>
+File: app/src/main/res/layout/activity_details.xml (To display single patient details)
+
+XML
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView android:id="@+id/tvDetails" android:textSize="18sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+        <Button android:id="@+id/btnEdit" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Edit"/>
+        <Button android:id="@+id/btnDelete" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Delete" android:backgroundTint="#F44336"/>
+    </LinearLayout>
+</LinearLayout>
+Step 4: Java Activity Files
+File: app/src/main/java/com/example/hospitalapp/MainActivity.java (Handles displaying the list and clicking items)
+
+Java
+
+package com.example.hospitalapp;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    ListView listView;
+    Button btnAdd;
+    DatabaseHelper dbHelper;
+    ArrayAdapter<Patient> adapter;
+    List<Patient> patientList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        listView = findViewById(R.id.listViewPatients);
+        btnAdd = findViewById(R.id.btnAddPatient);
+        dbHelper = new DatabaseHelper(this);
+
+        // "Create" action
+        btnAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, AddEditActivity.class);
+            startActivity(intent);
+        });
+
+        // "Read" (Single) action - Click list item
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Patient selectedPatient = patientList.get(position);
+            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+            // Pass the selected patient object to the next activity
+            intent.putExtra("PATIENT_DATA", selectedPatient);
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadPatients(); // Reload list when returning to this screen
+    }
+
+    // "Read" (All) action
+    private void loadPatients() {
+        patientList = dbHelper.getAllPatients();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, patientList);
+        listView.setAdapter(adapter);
+    }
+}
+File: app/src/main/java/com/example/hospitalapp/AddEditActivity.java (Handles both Creating new and Updating existing patients)
+
+Java
+
+package com.example.hospitalapp;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class AddEditActivity extends AppCompatActivity {
+
+    EditText etName, etAge, etGender, etPhone, etAddress;
+    Button btnSave;
+    DatabaseHelper dbHelper;
+    Patient patientToEdit = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_edit);
+
+        etName = findViewById(R.id.etName);
+        etAge = findViewById(R.id.etAge);
+        etGender = findViewById(R.id.etGender);
+        etPhone = findViewById(R.id.etPhone);
+        etAddress = findViewById(R.id.etAddress);
+        btnSave = findViewById(R.id.btnSave);
+        dbHelper = new DatabaseHelper(this);
+
+        // Check if we are editing an existing patient
+        if (getIntent().hasExtra("EDIT_PATIENT")) {
+            patientToEdit = (Patient) getIntent().getSerializableExtra("EDIT_PATIENT");
+            etName.setText(patientToEdit.name);
+            etAge.setText(String.valueOf(patientToEdit.age));
+            etGender.setText(patientToEdit.gender);
+            etPhone.setText(String.valueOf(patientToEdit.phone));
+            etAddress.setText(patientToEdit.address);
+        }
+
+        btnSave.setOnClickListener(v -> savePatient());
+    }
+
+    private void savePatient() {
+        String name = etName.getText().toString();
+        String ageStr = etAge.getText().toString();
+        String gender = etGender.getText().toString();
+        String phoneStr = etPhone.getText().toString();
+        String address = etAddress.getText().toString();
+
+        if (name.isEmpty() || ageStr.isEmpty() || phoneStr.isEmpty()) {
+            Toast.makeText(this, "Please fill required fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int age = Integer.parseInt(ageStr);
+        long phone = Long.parseLong(phoneStr);
+
+        if (patientToEdit == null) {
+            // Create New
+            Patient newPatient = new Patient(0, name, age, gender, phone, address);
+            dbHelper.addPatient(newPatient);
+            Toast.makeText(this, "Patient Registered", Toast.LENGTH_SHORT).show();
+        } else {
+            // Update Existing
+            patientToEdit.name = name;
+            patientToEdit.age = age;
+            patientToEdit.gender = gender;
+            patientToEdit.phone = phone;
+            patientToEdit.address = address;
+            dbHelper.updatePatient(patientToEdit);
+            Toast.makeText(this, "Patient Updated", Toast.LENGTH_SHORT).show();
+        }
+        finish(); // Close activity and go back
+    }
+}
+File: app/src/main/java/com/example/hospitalapp/DetailsActivity.java (Displays full details and offers Edit/Delete options)
+
+Java
+
+package com.example.hospitalapp;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class DetailsActivity extends AppCompatActivity {
+
+    TextView tvDetails;
+    Button btnEdit, btnDelete;
+    DatabaseHelper dbHelper;
+    Patient currentPatient;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_details);
+
+        tvDetails = findViewById(R.id.tvDetails);
+        btnEdit = findViewById(R.id.btnEdit);
+        btnDelete = findViewById(R.id.btnDelete);
+        dbHelper = new DatabaseHelper(this);
+
+        // Get patient data passed from MainActivity
+        currentPatient = (Patient) getIntent().getSerializableExtra("PATIENT_DATA");
+
+        if (currentPatient != null) {
+            displayDetails();
+        }
+
+        // Update Action
+        btnEdit.setOnClickListener(v -> {
+            Intent intent = new Intent(DetailsActivity.this, AddEditActivity.class);
+            intent.putExtra("EDIT_PATIENT", currentPatient);
+            startActivity(intent);
+            finish(); // Close details view so we return to main list after edit
+        });
+
+        // Delete Action
+        btnDelete.setOnClickListener(v -> {
+            dbHelper.deletePatient(currentPatient.id);
+            Toast.makeText(this, "Patient Deleted", Toast.LENGTH_SHORT).show();
+            finish(); // Go back to main list
+        });
+    }
+
+    private void displayDetails() {
+        String details = "Patient ID: " + currentPatient.id + "\n\n" +
+                "Name: " + currentPatient.name + "\n" +
+                "Age: " + currentPatient.age + "\n" +
+                "Gender: " + currentPatient.gender + "\n" +
+                "Phone: " + currentPatient.phone + "\n" +
+                "Address: " + currentPatient.address;
+        tvDetails.setText(details);
+    }
+}
+Final Step: AndroidManifest.xml
+You must register the new activities in your AndroidManifest.xml file (located in app/src/main/). Add these lines inside the <application> tag, alongside the existing MainActivity entry:
+
+XML
+
+<activity android:name=".AddEditActivity" />
+<activity android:name=".DetailsActivity" />

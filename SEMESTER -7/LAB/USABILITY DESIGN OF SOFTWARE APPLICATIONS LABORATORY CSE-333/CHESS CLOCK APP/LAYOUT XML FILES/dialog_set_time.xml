@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Picker Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <!-- Minute Picker -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dialog_label_minute"
+                android:textSize="14sp"
+                android:textColor="?android:attr/textColorSecondary"/>
+            <NumberPicker
+                android:id="@+id/picker_minute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@style/Theme.ChessClock.Dialog" />
+        </LinearLayout>
+
+        <!-- Spacer -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:textSize="24sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginHorizontal="16dp"
+            android:layout_gravity="center_vertical"/>
+
+        <!-- Second Picker -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dialog_label_second"
+                android:textSize="14sp"
+                android:textColor="?android:attr/textColorSecondary"/>
+            <NumberPicker
+                android:id="@+id/picker_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@style/Theme.ChessClock.Dialog" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Button Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_button_cancel"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:textColor="@color/color_accent_green"/>
+
+        <Button
+            android:id="@+id/btn_save_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_button_save_simple"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:textColor="@color/color_accent_green"/>
+    </LinearLayout>
+
+</LinearLayout>

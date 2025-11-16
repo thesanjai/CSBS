@@ -1,0 +1,446 @@
+Set - 1
+Part A - Create a menu for a chat app with options to create a new group, new message and view starred messages (only the menu options)
+Part B - Create a form backed by a SQLite database to procure IT return information for Tax filing in Android with fields such as Name, PAN, Income from salary, Income from capital returns, Income from other sources, Financial Year (last 3 years as option), etc. with the necessary validations for each field.
+
+
+Part B
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!-- Name -->
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter Full Name"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/tvName"
+        app:layout_constraintTop_toTopOf="@+id/tvName"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="20dp"/>
+
+    <!-- PAN -->
+    <TextView
+        android:id="@+id/tvPAN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PAN"
+        app:layout_constraintTop_toBottomOf="@+id/tvName"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/etPAN"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="ABCDE1234F"
+        android:maxLength="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/tvPAN"
+        app:layout_constraintTop_toTopOf="@+id/tvPAN"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="20dp"/>
+
+    <!-- Income from Salary -->
+    <TextView
+        android:id="@+id/tvSalary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Salary Income"
+        app:layout_constraintTop_toBottomOf="@+id/tvPAN"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/etSalary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter Salary Income"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toEndOf="@+id/tvSalary"
+        app:layout_constraintTop_toTopOf="@+id/tvSalary"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="20dp"/>
+
+    <!-- Capital Returns -->
+    <TextView
+        android:id="@+id/tvCapital"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Capital Returns"
+        app:layout_constraintTop_toBottomOf="@+id/tvSalary"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/etCapital"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter Capital Returns"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toEndOf="@+id/tvCapital"
+        app:layout_constraintTop_toTopOf="@+id/tvCapital"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="20dp"/>
+
+    <!-- Other Income -->
+    <TextView
+        android:id="@+id/tvOther"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Other Income"
+        app:layout_constraintTop_toBottomOf="@+id/tvCapital"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/etOther"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter Other Income"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toEndOf="@+id/tvOther"
+        app:layout_constraintTop_toTopOf="@+id/tvOther"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="20dp"/>
+
+    <!-- Financial Year -->
+    <TextView
+        android:id="@+id/tvFY"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Financial Year"
+        app:layout_constraintTop_toBottomOf="@+id/tvOther"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Spinner
+        android:id="@+id/spinnerFY"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/tvFY"
+        app:layout_constraintTop_toTopOf="@+id/tvFY"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="20dp"/>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerFY"
+        android:layout_marginTop="40dp">
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ADD" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DELETE"
+            android:layout_marginStart="16dp" />
+
+        <Button
+            android:id="@+id/btnModify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MODIFY"
+            android:layout_marginStart="16dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/btnAdd"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/btnView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VIEW" />
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VIEW ALL"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+MainActivity.java
+package com.kasinadhuni.taxform;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    EditText etName, etPAN, etSalary, etCapital, etOther;
+    Spinner spinnerFY;
+    Button btnAdd, btnDelete, btnModify, btnView, btnViewAll;
+    SQLiteDatabase db;
+
+    String[] years = {"2022-23", "2021-22", "2020-21"};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etPAN = findViewById(R.id.etPAN);
+        etSalary = findViewById(R.id.etSalary);
+        etCapital = findViewById(R.id.etCapital);
+        etOther = findViewById(R.id.etOther);
+        spinnerFY = findViewById(R.id.spinnerFY);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, years);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFY.setAdapter(adapter);
+
+        btnAdd = findViewById(R.id.btnAdd);
+        btnDelete = findViewById(R.id.btnDelete);
+        btnModify = findViewById(R.id.btnModify);
+        btnView = findViewById(R.id.btnView);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        btnAdd.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
+        btnModify.setOnClickListener(this);
+        btnView.setOnClickListener(this);
+        btnViewAll.setOnClickListener(this);
+
+        db = openOrCreateDatabase("TaxDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS itreturns(name VARCHAR, pan VARCHAR PRIMARY KEY, salary VARCHAR, capital VARCHAR, other VARCHAR, year VARCHAR);");
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == btnAdd) {
+            if (!validateInputs()) return;
+            db.execSQL("INSERT INTO itreturns VALUES('" + etName.getText() + "','" + etPAN.getText() + "','" + etSalary.getText() + "','" + etCapital.getText() + "','" + etOther.getText() + "','" + spinnerFY.getSelectedItem().toString() + "');");
+            showMessage("Success", "Record Added");
+            clearText();
+        }
+
+        if (v == btnDelete) {
+            if (etPAN.getText().toString().trim().isEmpty()) {
+                showMessage("Error", "Enter PAN to delete");
+                return;
+            }
+            Cursor c = db.rawQuery("SELECT * FROM itreturns WHERE pan='" + etPAN.getText() + "'", null);
+            if (c.moveToFirst()) {
+                db.execSQL("DELETE FROM itreturns WHERE pan='" + etPAN.getText() + "'");
+                showMessage("Success", "Record Deleted");
+            } else {
+                showMessage("Error", "Invalid PAN");
+            }
+            clearText();
+        }
+
+        if (v == btnModify) {
+            if (!validateInputs()) return;
+            Cursor c = db.rawQuery("SELECT * FROM itreturns WHERE pan='" + etPAN.getText() + "'", null);
+            if (c.moveToFirst()) {
+                db.execSQL("UPDATE itreturns SET name='" + etName.getText() + "', salary='" + etSalary.getText() + "', capital='" + etCapital.getText() + "', other='" + etOther.getText() + "', year='" + spinnerFY.getSelectedItem().toString() + "' WHERE pan='" + etPAN.getText() + "'");
+                showMessage("Success", "Record Modified");
+            } else {
+                showMessage("Error", "Invalid PAN");
+            }
+            clearText();
+        }
+
+        if (v == btnView) {
+            if (etPAN.getText().toString().trim().isEmpty()) {
+                showMessage("Error", "Enter PAN to view");
+                return;
+            }
+            Cursor c = db.rawQuery("SELECT * FROM itreturns WHERE pan='" + etPAN.getText() + "'", null);
+            if (c.moveToFirst()) {
+                etName.setText(c.getString(0));
+                etSalary.setText(c.getString(2));
+                etCapital.setText(c.getString(3));
+                etOther.setText(c.getString(4));
+                // year shown via spinner automatically
+            } else {
+                showMessage("Error", "Invalid PAN");
+                clearText();
+            }
+        }
+
+        if (v == btnViewAll) {
+            Cursor c = db.rawQuery("SELECT * FROM itreturns", null);
+            if (c.getCount() == 0) {
+                showMessage("Error", "No records found");
+                return;
+            }
+            StringBuilder buffer = new StringBuilder();
+            while (c.moveToNext()) {
+                buffer.append("Name: ").append(c.getString(0)).append("\n");
+                buffer.append("PAN: ").append(c.getString(1)).append("\n");
+                buffer.append("Salary: ").append(c.getString(2)).append("\n");
+                buffer.append("Capital: ").append(c.getString(3)).append("\n");
+                buffer.append("Other: ").append(c.getString(4)).append("\n");
+                buffer.append("Year: ").append(c.getString(5)).append("\n\n");
+            }
+            showMessage("IT Returns", buffer.toString());
+        }
+    }
+
+    private boolean validateInputs() {
+        if (etName.getText().toString().trim().isEmpty() ||
+                etPAN.getText().toString().trim().isEmpty() ||
+                etSalary.getText().toString().trim().isEmpty()) {
+            showMessage("Error", "Name, PAN and Salary are mandatory");
+            return false;
+        }
+        if (etPAN.getText().toString().trim().length() != 10) {
+            showMessage("Error", "PAN must be 10 characters");
+            return false;
+        }
+        return true;
+    }
+
+    private void showMessage(String title, String msg) {
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setCancelable(true);
+        b.setTitle(title);
+        b.setMessage(msg);
+        b.show();
+    }
+
+    private void clearText() {
+        etName.setText("");
+        etPAN.setText("");
+        etSalary.setText("");
+        etCapital.setText("");
+        etOther.setText("");
+        etName.requestFocus();
+    }
+}
+
+Part A
+Xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- New Group -->
+    <item
+        android:id="@+id/action_new_group"
+        android:title="New Group"
+        android:icon="@drawable/ic_group"
+        android:showAsAction="never" />
+
+    <!-- New Message -->
+    <item
+        android:id="@+id/action_new_message"
+        android:title="New Message"
+        android:icon="@drawable/ic_message"
+        android:showAsAction="never" />
+
+    <!-- Starred Messages -->
+    <item
+        android:id="@+id/action_starred"
+        android:title="Starred Messages"
+        android:icon="@drawable/ic_star"
+        android:showAsAction="never" />
+
+</menu>
+
+Java
+package com.kasinadhuni.chatapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+    // Inflate the menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.chat_menu, menu); // linking to chat_menu.xml
+        return true;
+    }
+
+    // Handle menu clicks
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_new_group:
+                Toast.makeText(this, "New Group clicked", Toast.LENGTH_SHORT).show();
+                // 👉 Here you can open New Group Activity
+                return true;
+
+            case R.id.action_new_message:
+                Toast.makeText(this, "New Message clicked", Toast.LENGTH_SHORT).show();
+                // 👉 Here you can open New Message Activity
+                return true;
+
+            case R.id.action_starred:
+                Toast.makeText(this, "Starred Messages clicked", Toast.LENGTH_SHORT).show();
+                // 👉 Here you can open Starred Messages screen
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+}
+
+
+

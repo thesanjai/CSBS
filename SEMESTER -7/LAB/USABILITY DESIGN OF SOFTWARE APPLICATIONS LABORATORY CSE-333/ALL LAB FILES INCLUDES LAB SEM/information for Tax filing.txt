@@ -1,0 +1,985 @@
+information for Tax filing
+
+Hello! I can certainly help you with this. This is a classic and very important task in Android development. Creating a full CRUD (Create, Read, Update, Delete) app involves several files working together.
+
+I'll guide you through creating each file, explaining where it goes and what it does.
+
+Your Android project structure looks roughly like this:
+
+YourProjectName/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/yourcompany/yourpackagename/
+│   │   │   │       ├── MainActivity.java           (You'll create/edit this)
+│   │   │   │       ├── DatabaseHelper.java       (You'll create this)
+│   │   │   │       ├── ITReturn.java             (You'll create this model class)
+│   │   │   │       ├── RecordListActivity.java   (You'll create this)
+│   │   │   │       └── RecordDetailActivity.java (You'll create this)
+│   │   │   │
+│   │   │   ├── res/
+│   │   │   │   ├── layout/
+│   │   │   │   │   ├── activity_main.xml         (You'll create/edit this)
+│   │   │   │   │   ├── activity_record_list.xml  (You'll create this)
+│   │   │   │   │   └── activity_record_detail.xml(You'll create this)
+│   │   │   │
+│   │   │   └── AndroidManifest.xml                 (You'll edit this)
+I will provide the code for each file. You just need to create the file in the correct location and paste the code.
+
+1. The Database Helper (The "How to Connect")
+This class is the most important part. It creates the database, the table, and provides all the CRUD methods.
+
+File Location: app/src/main/java/com/yourcompany/yourpackagename/DatabaseHelper.java (Right-click your package folder -> New -> Java Class)
+DatabaseHelper.java
+7 Nov, 7:46 am
+package com.yourcompany.yourpackagename;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // Database Version
+    private static final int DATABASE_VERSION = 1;
+    // Database Name
+    private static final String DATABASE_NAME = "taxReturnsDB";
+    // Table Name
+    private static final String TABLE_RETURNS = "itReturns";
+
+    // Table Columns Names
+    private static final String KEY_ID = "id";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_PAN = "pan";
+    private static final String KEY_INCOME_SALARY = "incomeSalary";
+    private static final String KEY_INCOME_CAPITAL = "incomeCapital";
+    private static final String KEY_INCOME_OTHER = "incomeOther";
+    private static final String KEY_FINANCIAL_YEAR = "financialYear";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // Creating Tables
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String CREATE_RETURNS_TABLE = "CREATE TABLE " + TABLE_RETURNS + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + KEY_NAME + " TEXT,"
+                + KEY_PAN + " TEXT,"
+                + KEY_INCOME_SALARY + " REAL,"
+                + KEY_INCOME_CAPITAL + " REAL,"
+                + KEY_INCOME_OTHER + " REAL,"
+                + KEY_FINANCIAL_YEAR + " TEXT" + ")";
+        db.execSQL(CREATE_RETURNS_TABLE);
+    }
+
+    // Upgrading database
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Drop older table if existed
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RETURNS);
+        // Create tables again
+        onCreate(db);
+    }
+
+    /**
+     * All CRUD(Create, Read, Update, Delete) Operations
+     */
+
+    // --- CREATE Operation ---
+    public long addReturn(ITReturn itReturn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, itReturn.getName());
+        values.put(KEY_PAN, itReturn.getPan());
+        values.put(KEY_INCOME_SALARY, itReturn.getIncomeSalary());
+        values.put(KEY_INCOME_CAPITAL, itReturn.getIncomeCapital());
+        values.put(KEY_INCOME_OTHER, itReturn.getIncomeOther());
+        values.put(KEY_FINANCIAL_YEAR, itReturn.getFinancialYear());
+
+        // Inserting Row
+        long id = db.insert(TABLE_RETURNS, null, values);
+        db.close(); // Closing database connection
+        return id;
+    }
+
+    // --- READ Operation (Get Single Record) ---
+    public ITReturn getReturn(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_RETURNS, new String[]{KEY_ID,
+                        KEY_NAME, KEY_PAN, KEY_INCOME_SALARY, KEY_INCOME_CAPITAL,
+                        KEY_INCOME_OTHER, KEY_FINANCIAL_YEAR}, KEY_ID + "=?",
+                new String[]{String.valueOf(id)}, null, null, null, null);
+        
+        if (cursor != null)
+            cursor.moveToFirst();
+        else
+            return null;
+
+        ITReturn itReturn = new ITReturn(
+                Integer.parseInt(cursor.getString(0)), // id
+                cursor.getString(1), // name
+                cursor.getString(2), // pan
+                cursor.getDouble(3), // salary
+                cursor.getDouble(4), // capital
+                cursor.getDouble(5), // other
+                cursor.getString(6)  // financialYear
+        );
+        cursor.close();
+        db.close();
+        return itReturn;
+    }
+
+    // --- READ Operation (Get All Records) ---
+    public List<ITReturn> getAllReturns() {
+        List<ITReturn> returnList = new ArrayList<>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_RETURNS;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                ITReturn itReturn = new ITReturn();
+                itReturn.setId(Integer.parseInt(cursor.getString(0)));
+                itReturn.setName(cursor.getString(1));
+                itReturn.setPan(cursor.getString(2));
+                itReturn.setIncomeSalary(cursor.getDouble(3));
+                itReturn.setIncomeCapital(cursor.getDouble(4));
+                itReturn.setIncomeOther(cursor.getDouble(5));
+                itReturn.setFinancialYear(cursor.getString(6));
+                // Adding contact to list
+                returnList.add(itReturn);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return returnList;
+    }
+
+    // --- UPDATE Operation ---
+    public int updateReturn(ITReturn itReturn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, itReturn.getName());
+        values.put(KEY_PAN, itReturn.getPan());
+        values.put(KEY_INCOME_SALARY, itReturn.getIncomeSalary());
+        values.put(KEY_INCOME_CAPITAL, itReturn.getIncomeCapital());
+        values.put(KEY_INCOME_OTHER, itReturn.getIncomeOther());
+        values.put(KEY_FINANCIAL_YEAR, itReturn.getFinancialYear());
+
+        // updating row
+        int count = db.update(TABLE_RETURNS, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(itReturn.getId())});
+        db.close();
+        return count;
+    }
+
+    // --- DELETE Operation ---
+    public void deleteReturn(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_RETURNS, KEY_ID + " = ?",
+                new String[]{String.valueOf(id)});
+        db.close();
+    }
+}
+2. The Data Model Class
+This is a simple Java class (a POJO) to hold the data for a single IT return.
+
+File Location: app/src/main/java/com/yourcompany/yourpackagename/ITReturn.java (Right-click your package folder -> New -> Java Class)
+ITReturn.java
+7 Nov, 7:46 am
+
+Open
+package com.yourcompany.yourpackagename;
+
+public class ITReturn {
+    private int id;
+    private String name;
+    private String pan;
+    private double incomeSalary;
+    private double incomeCapital;
+    private double incomeOther;
+    private String financialYear;
+
+    // Constructors
+    public ITReturn() {
+    }
+
+    public ITReturn(int id, String name, String pan, double incomeSalary, double incomeCapital, double incomeOther, String financialYear) {
+        this.id = id;
+        this.name = name;
+        this.pan = pan;
+        this.incomeSalary = incomeSalary;
+        this.incomeCapital = incomeCapital;
+        this.incomeOther = incomeOther;
+        this.financialYear = financialYear;
+    }
+
+     public ITReturn(String name, String pan, double incomeSalary, double incomeCapital, double incomeOther, String financialYear) {
+        this.name = name;
+        this.pan = pan;
+        this.incomeSalary = incomeSalary;
+        this.incomeCapital = incomeCapital;
+        this.incomeOther = incomeOther;
+        this.financialYear = financialYear;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPan() {
+        return pan;
+    }
+
+    public void setPan(String pan) {
+        this.pan = pan;
+    }
+
+    public double getIncomeSalary() {
+        return incomeSalary;
+    }
+
+    public void setIncomeSalary(double incomeSalary) {
+        this.incomeSalary = incomeSalary;
+    }
+
+    public double getIncomeCapital() {
+        return incomeCapital;
+    }
+
+    public void setIncomeCapital(double incomeCapital) {
+        this.incomeCapital = incomeCapital;
+    }
+
+    public double getIncomeOther() {
+        return incomeOther;
+    }
+
+    public void setIncomeOther(double incomeOther) {
+        this.incomeOther = incomeOther;
+    }
+
+    public String getFinancialYear() {
+        return financialYear;
+    }
+
+    public void setFinancialYear(String financialYear) {
+        this.financialYear = financialYear;
+    }
+
+    // This is important for the ListView to display the name
+    @Override
+    public String toString() {
+        return name + " (" + pan + ")";
+    }
+}
+3. The Main Form (Create)
+This is the main screen with the form to add new records.
+
+Layout File: app/src/main/res/layout/activity_main.xml (This file probably exists. Just open it and paste this code.)
+activity_main.xml
+7 Nov, 7:46 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="IT Return Filing Form"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"/>
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/editTextPAN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="PAN (e.g., ABCDE1234F)"
+            android:inputType="textCapCharacters"
+            android:maxLength="10" />
+
+        <EditText
+            android:id="@+id/editTextSalary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Salary"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/editTextCapital"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Capital Returns"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/editTextOther"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Other Sources"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Financial Year:"
+            android:layout_marginTop="10dp"/>
+
+        <Spinner
+            android:id="@+id/spinnerFY"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"/>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Save Record" />
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="View All Records"
+            style="@style/Widget.AppCompat.Button.OutlinedButton"/>
+
+    </LinearLayout>
+</ScrollView>
+Java File: app/src/main/java/com/yourcompany/yourpackagename/MainActivity.java (This file also probably exists. Open it and paste.)
+MainActivity.java
+7 Nov, 7:46 am
+
+Open
+package com.yourcompany.yourpackagename;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.regex.Pattern;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etPAN, etSalary, etCapital, etOther;
+    Spinner spinnerFY;
+    Button btnSave, btnViewAll;
+    DatabaseHelper dbHelper;
+
+    // Basic PAN validation regex
+    private static final Pattern PAN_PATTERN = Pattern.compile("[A-Z]{5}[0-9]{4}[A-Z]{1}");
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        dbHelper = new DatabaseHelper(this);
+
+        etName = findViewById(R.id.editTextName);
+        etPAN = findViewById(R.id.editTextPAN);
+        etSalary = findViewById(R.id.editTextSalary);
+        etCapital = findViewById(R.id.editTextCapital);
+        etOther = findViewById(R.id.editTextOther);
+        spinnerFY = findViewById(R.id.spinnerFY);
+        btnSave = findViewById(R.id.btnSave);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        setupSpinner();
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveRecord();
+            }
+        });
+
+        btnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RecordListActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void setupSpinner() {
+        // You can get this dynamically, but for simplicity, we'll hardcode the last 3 years
+        String[] financialYears = {"2024-25", "2023-24", "2022-23"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, financialYears);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFY.setAdapter(adapter);
+    }
+
+    private void saveRecord() {
+        if (!validateInput()) {
+            return; // Stop if validation fails
+        }
+
+        String name = etName.getText().toString();
+        String pan = etPAN.getText().toString();
+        double salary = Double.parseDouble(etSalary.getText().toString());
+        double capital = Double.parseDouble(etCapital.getText().toString());
+        double other = Double.parseDouble(etOther.getText().toString());
+        String fy = spinnerFY.getSelectedItem().toString();
+
+        ITReturn newReturn = new ITReturn(name, pan, salary, capital, other, fy);
+        long id = dbHelper.addReturn(newReturn);
+
+        if (id != -1) {
+            Toast.makeText(this, "Record saved successfully!", Toast.LENGTH_SHORT).show();
+            clearForm();
+        } else {
+            Toast.makeText(this, "Error saving record.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean validateInput() {
+        // Name Validation
+        if (TextUtils.isEmpty(etName.getText().toString())) {
+            etName.setError("Name is required.");
+            etName.requestFocus();
+            return false;
+        }
+
+        // PAN Validation
+        String panInput = etPAN.getText().toString();
+        if (TextUtils.isEmpty(panInput)) {
+            etPAN.setError("PAN is required.");
+            etPAN.requestFocus();
+            return false;
+        }
+        if (!PAN_PATTERN.matcher(panInput).matches()) {
+            etPAN.setError("Invalid PAN format.");
+            etPAN.requestFocus();
+            return false;
+        }
+
+        // Income Validation (just checking if empty, you can add more)
+        if (TextUtils.isEmpty(etSalary.getText().toString())) {
+            etSalary.setError("Salary income is required.");
+            etSalary.requestFocus();
+            return false;
+        }
+        // Set default to 0 if empty
+        if (TextUtils.isEmpty(etCapital.getText().toString())) {
+            etCapital.setText("0");
+        }
+        if (TextUtils.isEmpty(etOther.getText().toString())) {
+            etOther.setText("0");
+        }
+
+        return true;
+    }
+
+    private void clearForm() {
+        etName.setText("");
+        etPAN.setText("");
+        etSalary.setText("");
+        etCapital.setText("");
+        etOther.setText("");
+        spinnerFY.setSelection(0);
+        etName.requestFocus();
+    }
+}
+4. The Record List Screen (Read All)
+This activity will show all the records in a list.
+
+Layout File: app/src/main/res/layout/activity_record_list.xml (Right-click res/layout -> New -> Layout Resource File)
+activity_record_list.xml
+7 Nov, 7:46 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All Saved Records"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <ListView
+        android:id="@+id/recordsListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
+Java File: app/src/main/java/com/yourcompany/yourpackagename/RecordListActivity.java (Right-click your package folder -> New -> Java Class. Important: Select "Class" not "Activity" for now, then paste this code which makes it an Activity.)
+RecordListActivity.java
+7 Nov, 7:46 am
+
+Open
+package com.yourcompany.yourpackagename;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
+
+public class RecordListActivity extends AppCompatActivity {
+
+    ListView recordsListView;
+    DatabaseHelper dbHelper;
+    ArrayAdapter<ITReturn> adapter;
+    List<ITReturn> returnList;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_record_list);
+
+        recordsListView = findViewById(R.id.recordsListView);
+        dbHelper = new DatabaseHelper(this);
+
+        loadRecords();
+
+        recordsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the selected record
+                ITReturn selectedReturn = returnList.get(position);
+
+                // Start the Detail activity, passing the ID of the record
+                Intent intent = new Intent(RecordListActivity.this, RecordDetailActivity.class);
+                intent.putExtra("RECORD_ID", selectedReturn.getId());
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh the list every time we come back to this activity
+        loadRecords();
+    }
+
+    private void loadRecords() {
+        returnList = dbHelper.getAllReturns();
+        if (returnList.isEmpty()) {
+            Toast.makeText(this, "No records found.", Toast.LENGTH_SHORT).show();
+        }
+        
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, // A simple built-in layout
+                returnList); // The list of records
+        
+        recordsListView.setAdapter(adapter);
+    }
+}
+5. The Record Detail Screen (Read One, Update, Delete)
+This activity shows the details of one record and allows updating or deleting it.
+
+Layout File: app/src/main/res/layout/activity_record_detail.xml (Right-click res/layout -> New -> Layout Resource File)
+activity_record_detail.xml
+7 Nov, 7:46 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Record Details"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- This form is identical to activity_main, but it's for updating -->
+        <EditText
+            android:id="@+id/detail_editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/detail_editTextPAN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="PAN (e.g., ABCDE1234F)"
+            android:inputType="textCapCharacters"
+            android:maxLength="10" />
+
+        <EditText
+            android:id="@+id/detail_editTextSalary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Salary"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/detail_editTextCapital"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Capital Returns"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/detail_editTextOther"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Income from Other Sources"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Financial Year:"
+            android:layout_marginTop="10dp"/>
+
+        <Spinner
+            android:id="@+id/detail_spinnerFY"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/btnUpdate"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Update"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:backgroundTint="@android:color/holo_red_light"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
+Java File: app/src/main/java/com/yourcompany/yourpackagename/RecordDetailActivity.java (Right-click your package folder -> New -> Java Class)
+RecordDetailActivity.java
+7 Nov, 7:46 am
+
+Open
+package com.yourcompany.yourpackagename;
+
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.regex.Pattern;
+
+public class RecordDetailActivity extends AppCompatActivity {
+
+    EditText etName, etPAN, etSalary, etCapital, etOther;
+    Spinner spinnerFY;
+    Button btnUpdate, btnDelete;
+    DatabaseHelper dbHelper;
+    int recordId;
+
+    private static final Pattern PAN_PATTERN = Pattern.compile("[A-Z]{5}[0-9]{4}[A-Z]{1}");
+    private String[] financialYears = {"2024-25", "2023-24", "2022-23"};
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_record_detail);
+
+        dbHelper = new DatabaseHelper(this);
+
+        etName = findViewById(R.id.detail_editTextName);
+        etPAN = findViewById(R.id.detail_editTextPAN);
+        etSalary = findViewById(R.id.detail_editTextSalary);
+        etCapital = findViewById(R.id.detail_editTextCapital);
+        etOther = findViewById(R.id.detail_editTextOther);
+        spinnerFY = findViewById(R.id.detail_spinnerFY);
+        btnUpdate = findViewById(R.id.btnUpdate);
+        btnDelete = findViewById(R.id.btnDelete);
+
+        setupSpinner();
+
+        // Get the ID from the intent
+        recordId = getIntent().getIntExtra("RECORD_ID", -1);
+
+        if (recordId != -1) {
+            loadRecordDetails();
+        } else {
+            Toast.makeText(this, "Error: Record ID not found.", Toast.LENGTH_SHORT).show();
+            finish(); // Go back if no ID
+        }
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRecord();
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmDelete();
+            }
+        });
+    }
+
+    private void setupSpinner() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, financialYears);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFY.setAdapter(adapter);
+    }
+
+    private void loadRecordDetails() {
+        ITReturn record = dbHelper.getReturn(recordId);
+        if (record != null) {
+            etName.setText(record.getName());
+            etPAN.setText(record.getPan());
+            etSalary.setText(String.valueOf(record.getIncomeSalary()));
+            etCapital.setText(String.valueOf(record.getIncomeCapital()));
+            etOther.setText(String.valueOf(record.getIncomeOther()));
+
+            // Find the position of the financial year in the adapter
+            int spinnerPosition = 0;
+            for (int i = 0; i < financialYears.length; i++) {
+                if (financialYears[i].equals(record.getFinancialYear())) {
+                    spinnerPosition = i;
+                    break;
+                }
+            }
+            spinnerFY.setSelection(spinnerPosition);
+        } else {
+            Toast.makeText(this, "Error loading record.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
+    private void updateRecord() {
+        if (!validateInput()) {
+            return; // Stop if validation fails
+        }
+
+        String name = etName.getText().toString();
+        String pan = etPAN.getText().toString();
+        double salary = Double.parseDouble(etSalary.getText().toString());
+        double capital = Double.parseDouble(etCapital.getText().toString());
+        double other = Double.parseDouble(etOther.getText().toString());
+        String fy = spinnerFY.getSelectedItem().toString();
+
+        ITReturn updatedReturn = new ITReturn(recordId, name, pan, salary, capital, other, fy);
+        int count = dbHelper.updateReturn(updatedReturn);
+
+        if (count > 0) {
+            Toast.makeText(this, "Record updated successfully!", Toast.LENGTH_SHORT).show();
+            finish(); // Go back to the list
+        } else {
+            Toast.makeText(this, "Error updating record.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void confirmDelete() {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Record")
+                .setMessage("Are you sure you want to delete this record?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteRecord();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void deleteRecord() {
+        dbHelper.deleteReturn(recordId);
+        Toast.makeText(this, "Record deleted.", Toast.LENGTH_SHORT).show();
+        finish(); // Go back to the list
+    }
+
+    // You can re-use the validation logic from MainActivity
+    private boolean validateInput() {
+        if (TextUtils.isEmpty(etName.getText().toString())) {
+            etName.setError("Name is required.");
+            etName.requestFocus();
+            return false;
+        }
+        String panInput = etPAN.getText().toString();
+        if (TextUtils.isEmpty(panInput)) {
+            etPAN.setError("PAN is required.");
+            etPAN.requestFocus();
+            return false;
+        }
+        if (!PAN_PATTERN.matcher(panInput).matches()) {
+            etPAN.setError("Invalid PAN format.");
+            etPAN.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(etSalary.getText().toString())) {
+            etSalary.setError("Salary income is required.");
+            etSalary.requestFocus();
+            return false;
+        }
+         if (TextUtils.isEmpty(etCapital.getText().toString())) {
+            etCapital.setText("0");
+        }
+        if (TextUtils.isEmpty(etOther.getText().toString())) {
+            etOther.setText("0");
+        }
+        return true;
+    }
+}
+6. The Android Manifest
+Finally, you must tell Android about your new activities.
+
+File Location: app/src/main/AndroidManifest.xml (Open this file. Find the <application ... > tag. Inside it, you already have an <activity android:name=".MainActivity">. You need to add the other two inside the <application> tag.)
+AndroidManifest.xml (Partial)
+7 Nov, 7:46 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.yourcompany.yourpackagename">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.YourProjectName">
+
+        <!-- Your MainActivity is already here, leave it -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ADD THESE TWO ACTIVITIES -->
+
+        <activity
+            android:name=".RecordListActivity"
+            android:label="All Records"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".RecordDetailActivity"
+            android:label="Record Details"
+            android:parentActivityName=".RecordListActivity" />
+
+    </application>
+
+</manifest>
+That's it! If you create all these files in the correct locations and paste the code, you will have a fully functional app that can:
+
+Create: Save new records from MainActivity.
+
+Read (All): View all records in RecordListActivity.
+
+Read (One): Click a record to see its details in RecordDetailActivity.
+
+Update: Edit and save changes in RecordDetailActivity.
+
+Delete: Remove records from RecordDetailActivity.
+
+Just run the app, and it should start on the form!

@@ -1,0 +1,30 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.ChessClock" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="android:windowBackground">@color/color_background</item>
+        <item name="android:statusBarColor">@color/color_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- STAGE 2: Style for the "Adjust Time" Dialog -->
+    <style name="Theme.ChessClock.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@color/middle_bar</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/text_moves</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- STAGE 4: Style for the "Custom Time" EditText -->
+    <style name="App.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">@color/text_moves</item>
+        <!-- This sets the line color when not focused -->
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/text_moves</item>
+        <!-- This sets the line color when focused -->
+        <item name="android:colorControlActivated" tools:targetApi="lollipop">@color/color_accent_green</item>
+    </style>
+
+</resources>
+

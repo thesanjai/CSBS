@@ -1,0 +1,640 @@
+Online Shopping Product
+
+Hello! I can certainly help you design this Android application. This is a classic "CRUD" (Create, Read, Update, Delete) app, and SQLite is the perfect built-in database for it.
+
+I'll provide you with all the necessary code files. You'll need to create these files in the correct folders within your Android Studio project.
+
+Here is the step-by-step guide on where to create the files and what code to paste.
+
+Project Structure Overview
+In Android Studio, your main files are in app/src/main/.
+
+Java Files: Go into app/src/main/java/. You'll see a folder like com/example/yourappname/. This is your main package. You will create all your .java files here.
+
+Layout Files: Go into app/src/main/res/layout/. This is where your app's screen designs (.xml files) go.
+
+Manifest File: This is at app/src/main/AndroidManifest.xml. It's like the table of contents for your app. We need to add one line here.
+
+Let's start with the files.
+
+1. The Database Helper (The Core of SQLite)
+This class creates the database, the products table, and handles all the CRUD operations.
+
+File Location: app/src/main/java/com/example/yourappname/DatabaseHelper.java (Create a new Java file named DatabaseHelper in your package)
+DatabaseHelper.java
+7 Nov, 7:57 am
+package com.example.yourappname;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // Database Version
+    private static final int DATABASE_VERSION = 1;
+
+    // Database Name
+    private static final String DATABASE_NAME = "ProductManager.db";
+
+    // Table Name
+    private static final String TABLE_PRODUCTS = "products";
+
+    // Table Columns
+    private static final String KEY_ID = "id";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_PRICE = "price";
+    private static final String KEY_QUANTITY = "quantity";
+    private static final String KEY_CATEGORY = "category";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // Creating Tables
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String CREATE_PRODUCTS_TABLE = "CREATE TABLE " + TABLE_PRODUCTS + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + KEY_NAME + " TEXT,"
+                + KEY_PRICE + " INTEGER,"
+                + KEY_QUANTITY + " INTEGER,"
+                + KEY_CATEGORY + " TEXT" + ")";
+        db.execSQL(CREATE_PRODUCTS_TABLE);
+    }
+
+    // Upgrading database
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Drop older table if existed
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
+        // Create tables again
+        onCreate(db);
+    }
+
+    // --- CRUD Operations ---
+
+    // CREATE: Add new product
+    public void addProduct(Product product) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, product.getName());
+        values.put(KEY_PRICE, product.getPrice());
+        values.put(KEY_QUANTITY, product.getQuantity());
+        values.put(KEY_CATEGORY, product.getCategory());
+
+        // Inserting Row
+        db.insert(TABLE_PRODUCTS, null, values);
+        db.close();
+    }
+
+    // READ: Get single product
+    public Product getProduct(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_PRODUCTS, new String[]{KEY_ID,
+                        KEY_NAME, KEY_PRICE, KEY_QUANTITY, KEY_CATEGORY}, KEY_ID + "=?",
+                new String[]{String.valueOf(id)}, null, null, null, null);
+        
+        if (cursor != null)
+            cursor.moveToFirst();
+        else
+            return null; // Handle case where cursor is null
+
+        if (cursor.getCount() == 0) {
+            cursor.close();
+            return null; // Handle case where no product is found
+        }
+
+        Product product = new Product(
+                Integer.parseInt(cursor.getString(0)), // id
+                cursor.getString(1), // name
+                Integer.parseInt(cursor.getString(2)), // price
+                Integer.parseInt(cursor.getString(3)), // quantity
+                cursor.getString(4) // category
+        );
+        cursor.close();
+        return product;
+    }
+
+    // READ: Get all products
+    public ArrayList<Product> getAllProducts() {
+        ArrayList<Product> productList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Product product = new Product();
+                product.setId(Integer.parseInt(cursor.getString(0)));
+                product.setName(cursor.getString(1));
+                product.setPrice(Integer.parseInt(cursor.getString(2)));
+                product.setQuantity(Integer.parseInt(cursor.getString(3)));
+                product.setCategory(cursor.getString(4));
+                // Adding product to list
+                productList.add(product);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return productList;
+    }
+
+    // UPDATE: Update single product
+    public int updateProduct(Product product) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, product.getName());
+        values.put(KEY_PRICE, product.getPrice());
+        values.put(KEY_QUANTITY, product.getQuantity());
+        values.put(KEY_CATEGORY, product.getCategory());
+
+        // updating row
+        return db.update(TABLE_PRODUCTS, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(product.getId())});
+    }
+
+    // DELETE: Delete single product
+    public void deleteProduct(Product product) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_PRODUCTS, KEY_ID + " = ?",
+                new String[]{String.valueOf(product.getId())});
+        db.close();
+    }
+}
+2. The Product Model Class
+This is a simple Java class to hold the data for a single product.
+
+File Location: app/src/main/java/com/example/yourappname/Product.java (Create a new Java file named Product in your package)
+Product.java
+7 Nov, 7:57 am
+
+Open
+package com.example.yourappname;
+
+public class Product {
+    int id;
+    String name;
+    int price;
+    int quantity;
+    String category;
+
+    // Constructors
+    public Product() {
+    }
+
+    public Product(int id, String name, int price, int quantity, String category) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+        this.category = category;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    // This is used by the ArrayAdapter in the ListView
+    @Override
+    public String toString() {
+        return name + "\nQty: " + quantity + " | Price: $" + price;
+    }
+}
+3. The Main Screen Layout (List of Products)
+This XML file defines the screen that shows the list of all products.
+
+File Location: app/src/main/res/layout/activity_main.xml (This file is probably already created. Just replace its content.)
+activity_main.xml
+7 Nov, 7:57 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ListView
+        android:id="@+id/listViewProducts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:padding="8dp" />
+
+    <!-- This is a "Floating Action Button" to add new products -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddProduct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="@android:color/white"
+        android:contentDescription="Add Product" />
+
+</RelativeLayout>
+4. The Main Screen Java Code (Activity)
+This Java file controls the activity_main.xml layout. It fetches all products from the database and displays them in the ListView.
+
+File Location: app/src/main/java/com/example/yourappname/MainActivity.java (This file is already created. Replace its content.)
+MainActivity.java
+7 Nov, 7:57 am
+
+Open
+package com.example.yourappname;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    ListView listViewProducts;
+    FloatingActionButton fabAddProduct;
+    DatabaseHelper dbHelper;
+    ArrayList<Product> productList;
+    ArrayAdapter<Product> productAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        dbHelper = new DatabaseHelper(this);
+        listViewProducts = findViewById(R.id.listViewProducts);
+        fabAddProduct = findViewById(R.id.fabAddProduct);
+
+        // Set listener for the "Add" button
+        fabAddProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start ProductDetailsActivity to create a new product
+                // We don't pass an ID, so it knows it's "Create" mode
+                Intent intent = new Intent(MainActivity.this, ProductDetailsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // Set listener for list item clicks
+        listViewProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the clicked product
+                Product clickedProduct = productList.get(position);
+
+                // Start ProductDetailsActivity and pass the product's ID
+                Intent intent = new Intent(MainActivity.this, ProductDetailsActivity.class);
+                intent.putExtra("PRODUCT_ID", clickedProduct.getId());
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh the list every time the activity resumes
+        loadProductList();
+    }
+
+    private void loadProductList() {
+        // Get all products from database
+        productList = dbHelper.getAllProducts();
+        
+        // Create the adapter
+        productAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, // A simple built-in layout
+                productList);
+        
+        // Set the adapter to the ListView
+        listViewProducts.setAdapter(productAdapter);
+    }
+}
+5. The Product Details Screen Layout (Add/Edit)
+This XML file defines the screen for adding a new product or editing/deleting an existing one.
+
+File Location: app/src/main/res/layout/activity_product_details.xml (Create a new "Layout XML File" named activity_product_details)
+activity_product_details.xml
+7 Nov, 7:57 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Product Name" />
+    <EditText
+        android:id="@+id/editTextProductName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter product name"
+        android:inputType="textCapWords" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Price" />
+    <EditText
+        android:id="@+id/editTextPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter price"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Quantity" />
+    <EditText
+        android:id="@+id/editTextQuantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter quantity"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Category" />
+    <EditText
+        android:id="@+id/editTextCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter category"
+        android:inputType="textCapWords" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/buttonSave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Save"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/buttonDelete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Delete"
+            style="?android:attr/buttonBarNegativeButtonStyle"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
+6. The Product Details Java Code (Activity)
+This is the code that controls the Add/Edit/Delete screen. It's the most complex part, handling all the logic.
+
+File Location: app/src/main/java/com/example/yourappname/ProductDetailsActivity.java (Create a new "Empty Activity" named ProductDetailsActivity. It will create this Java file and the XML file above for you.)
+ProductDetailsActivity.java
+7 Nov, 7:57 am
+
+Open
+package com.example.yourappname;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class ProductDetailsActivity extends AppCompatActivity {
+
+    EditText etName, etPrice, etQuantity, etCategory;
+    Button btnSave, btnDelete;
+    DatabaseHelper dbHelper;
+
+    private int productID = -1; // -1 indicates a new product
+    private Product currentProduct;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_product_details);
+
+        dbHelper = new DatabaseHelper(this);
+
+        // Find views
+        etName = findViewById(R.id.editTextProductName);
+        etPrice = findViewById(R.id.editTextPrice);
+        etQuantity = findViewById(R.id.editTextQuantity);
+        etCategory = findViewById(R.id.editTextCategory);
+        btnSave = findViewById(R.id.buttonSave);
+        btnDelete = findViewById(R.id.buttonDelete);
+
+        // Check if we're editing an existing product
+        Intent intent = getIntent();
+        if (intent.hasExtra("PRODUCT_ID")) {
+            productID = intent.getIntExtra("PRODUCT_ID", -1);
+            // We are in "Edit" mode
+            loadProductDetails();
+            btnSave.setText("Update");
+        } else {
+            // We are in "Create" mode
+            btnDelete.setVisibility(View.GONE); // Hide delete button for new product
+            btnSave.setText("Save");
+        }
+
+        // Save/Update button click
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveOrUpdateProduct();
+            }
+        });
+
+        // Delete button click
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteProduct();
+            }
+        });
+    }
+
+    private void loadProductDetails() {
+        if (productID != -1) {
+            currentProduct = dbHelper.getProduct(productID);
+            if (currentProduct != null) {
+                etName.setText(currentProduct.getName());
+                etPrice.setText(String.valueOf(currentProduct.getPrice()));
+                etQuantity.setText(String.valueOf(currentProduct.getQuantity()));
+                etCategory.setText(currentProduct.getCategory());
+            } else {
+                Toast.makeText(this, "Product not found", Toast.LENGTH_SHORT).show();
+                finish(); // Go back if product isn't found
+            }
+        }
+    }
+
+    private void saveOrUpdateProduct() {
+        // Get values from EditText fields
+        String name = etName.getText().toString().trim();
+        String priceStr = etPrice.getText().toString().trim();
+        String quantityStr = etQuantity.getText().toString().trim();
+        String category = etCategory.getText().toString().trim();
+
+        // Simple validation
+        if (name.isEmpty() || priceStr.isEmpty() || quantityStr.isEmpty() || category.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int price;
+        int quantity;
+        try {
+            price = Integer.parseInt(priceStr);
+            quantity = Integer.parseInt(quantityStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Please enter valid numbers for price and quantity", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (productID == -1) {
+            // CREATE new product
+            Product newProduct = new Product(0, name, price, quantity, category); // 0 for ID, DB will auto-increment
+            dbHelper.addProduct(newProduct);
+            Toast.makeText(this, "Product Saved", Toast.LENGTH_SHORT).show();
+        } else {
+            // UPDATE existing product
+            currentProduct.setName(name);
+            currentProduct.setPrice(price);
+            currentProduct.setQuantity(quantity);
+            currentProduct.setCategory(category);
+            dbHelper.updateProduct(currentProduct);
+            Toast.makeText(this, "Product Updated", Toast.LENGTH_SHORT).show();
+        }
+        
+        finish(); // Close this activity and go back to MainActivity
+    }
+
+    private void deleteProduct() {
+        if (currentProduct != null) {
+            dbHelper.deleteProduct(currentProduct);
+            Toast.makeText(this, "Product Deleted", Toast.LENGTH_SHORT).show();
+            finish(); // Close this activity and go back to MainActivity
+        }
+    }
+}
+7. The Android Manifest File
+You MUST tell Android that ProductDetailsActivity exists.
+
+File Location: app/src/main/AndroidManifest.xml (Open this file and add the single <activity ... /> line inside the <application> tag, right after the </activity> tag for .MainActivity.)
+AndroidManifest.xml
+7 Nov, 7:57 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.yourappname">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Yourappname"
+        tools:targetApi="31">
+        
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ADD THIS LINE FOR THE DETAILS ACTIVITY -->
+        <activity android:name=".ProductDetailsActivity" />
+        
+    </application>
+
+</manifest>
+That's it! Once you've created all these files and pasted the code, you can run the app.
+
+The first screen (MainActivity) will show your product list (it will be empty at first).
+
+Clicking the + button will open ProductDetailsActivity to Create a new product.
+
+After saving, you'll go back to the list and see your new product.
+
+Clicking that product in the list will open ProductDetailsActivity again, but this time to Read, Update, or Delete it.

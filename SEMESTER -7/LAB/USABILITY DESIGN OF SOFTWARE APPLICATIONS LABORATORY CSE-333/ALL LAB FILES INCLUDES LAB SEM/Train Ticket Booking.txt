@@ -1,0 +1,841 @@
+Train Ticket Booking
+
+his guide will help you build a complete Train Ticket Booking app that can Create (book), Read (view all and view one), Update (edit), and Delete bookings using a local SQLite database.
+
+Here are the files we will create:
+
+DatabaseHelper.java: The most important file. This is your SQLite "connector."
+
+activity_main.xml: The layout for your main booking screen (Create).
+
+MainActivity.java: The Java code for the booking screen.
+
+activity_booking_list.xml: The layout to display all bookings in a list (Read all).
+
+list_item_booking.xml: A small layout defining how one row in your list will look.
+
+BookingListActivity.java: The Java code to fetch and display all bookings.
+
+activity_booking_detail.xml: The layout to show, update, or delete a single booking (Update/Delete).
+
+BookingDetailActivity.java: The Java code for the detail screen.
+
+AndroidManifest.xml: We'll add a few lines here to register your new screens.
+
+Let's start!
+
+1. The Database Connector (DatabaseHelper.java)
+This class is the core of your database operations. It creates the database, the table, and provides easy-to-use methods for all CRUD operations.
+
+How to create: In Android Studio, right-click on your package folder (e.g., app/src/main/java/com.example.yourprojectname) and select New > Java Class. Name it DatabaseHelper.
+DatabaseHelper.java
+7 Nov, 7:44 am
+package com.example.yourprojectname;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // Database Info
+    public static final String DATABASE_NAME = "Bookings.db";
+    public static final int DATABASE_VERSION = 1;
+
+    // Table Info
+    public static final String TABLE_NAME = "bookings_table";
+    public static final String COL_ID = "ID";
+    public static final String COL_NAME = "PASSENGER_NAME";
+    public static final String COL_AGE = "AGE";
+    public static final String COL_SOURCE = "SOURCE";
+    public static final String COL_DESTINATION = "DESTINATION";
+    public static final String COL_TICKETS = "NUMBER_OF_TICKETS";
+
+    // Constructor
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // This is called the first time the database is created
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTableQuery = "CREATE TABLE " + TABLE_NAME + " (" +
+                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_NAME + " TEXT, " +
+                COL_AGE + " INTEGER, " +
+                COL_SOURCE + " TEXT, " +
+                COL_DESTINATION + " TEXT, " +
+                COL_TICKETS + " INTEGER)";
+        db.execSQL(createTableQuery);
+    }
+
+    // This is called if the database version number changes
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    // --- CRUD Operations ---
+
+    /**
+     * CREATE: Insert a new booking
+     */
+    public boolean insertBooking(String name, int age, String source, String dest, int numTickets) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_NAME, name);
+        contentValues.put(COL_AGE, age);
+        contentValues.put(COL_SOURCE, source);
+        contentValues.put(COL_DESTINATION, dest);
+        contentValues.put(COL_TICKETS, numTickets);
+
+        long result = db.insert(TABLE_NAME, null, contentValues);
+        return result != -1; // returns true if insert was successful
+    }
+
+    /**
+     * READ: Get all bookings
+     */
+    public Cursor getAllBookings() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        return res;
+    }
+
+    /**
+     * READ: Get a single booking by its ID
+     */
+    public Cursor getBookingById(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID + " = ?", new String[]{id});
+        return res;
+    }
+
+    /**
+     * UPDATE: Update a booking
+     */
+    public boolean updateBooking(String id, String name, int age, String source, String dest, int numTickets) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_ID, id);
+        contentValues.put(COL_NAME, name);
+        contentValues.put(COL_AGE, age);
+        contentValues.put(COL_SOURCE, source);
+        contentValues.put(COL_DESTINATION, dest);
+        contentValues.put(COL_TICKETS, numTickets);
+
+        int rowsAffected = db.update(TABLE_NAME, contentValues, "ID = ?", new String[]{id});
+        return rowsAffected > 0; // returns true if update was successful
+    }
+
+    /**
+     * DELETE: Delete a booking
+     */
+    public Integer deleteBooking(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_NAME, "ID = ?", new String[]{id});
+    }
+}
+2. Main Screen Layout (activity_main.xml)
+This is your app's home screen. It will have fields to enter booking details and two buttons: "Book Ticket" and "View All Bookings".
+
+How to create: This file should already exist. Find it in app/src/main/res/layout/activity_main.xml and replace its contents.
+activity_main.xml
+7 Nov, 7:44 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Train Ticket Booking"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"/>
+
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Passenger Name"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextAge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Age"
+        android:inputType="number"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextSource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Source Station"
+        android:inputType="text"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Destination Station"
+        android:inputType="text"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextNumTickets"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Number of Tickets"
+        android:inputType="number"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Book Ticket"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnViewAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View All Bookings"
+        style="?android:attr/buttonStyleSmall" />
+
+</LinearLayout>
+3. Main Screen Logic (MainActivity.java)
+This Java file controls activity_main.xml. It handles button clicks, gets text from the fields, and uses your DatabaseHelper to save the data.
+
+How to create: This file should also already exist. Find it in app/src/main/java/com/example/yourprojectname/MainActivity.java and replace its contents.
+MainActivity.java
+7 Nov, 7:44 am
+
+Open
+package com.example.yourprojectname;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    DatabaseHelper myDb;
+    EditText editName, editAge, editSource, editDest, editNumTickets;
+    Button btnBook, btnViewAll;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // --- IMPORTANT: Instantiate your DatabaseHelper ---
+        myDb = new DatabaseHelper(this);
+
+        // Get references to all layout elements
+        editName = findViewById(R.id.editTextName);
+        editAge = findViewById(R.id.editTextAge);
+        editSource = findViewById(R.id.editTextSource);
+        editDest = findViewById(R.id.editTextDestination);
+        editNumTickets = findViewById(R.id.editTextNumTickets);
+        btnBook = findViewById(R.id.btnBook);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        // Set click listeners
+        handleBookButton();
+        handleViewAllButton();
+    }
+
+    private void handleBookButton() {
+        btnBook.setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Get text from fields
+                    String name = editName.getText().toString();
+                    String ageStr = editAge.getText().toString();
+                    String source = editSource.getText().toString();
+                    String dest = editDest.getText().toString();
+                    String ticketsStr = editNumTickets.getText().toString();
+
+                    // Basic Validation
+                    if (name.isEmpty() || ageStr.isEmpty() || source.isEmpty() || dest.isEmpty() || ticketsStr.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    try {
+                        int age = Integer.parseInt(ageStr);
+                        int numTickets = Integer.parseInt(ticketsStr);
+
+                        // Use the insertBooking method from DatabaseHelper
+                        boolean isInserted = myDb.insertBooking(name, age, source, dest, numTickets);
+
+                        if (isInserted) {
+                            // Show confirmation dialog as requested
+                            showConfirmationDialog(name, age, source, dest, numTickets);
+                            // Clear fields after successful booking
+                            clearFields();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Booking Failed", Toast.LENGTH_LONG).show();
+                        }
+
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(MainActivity.this, "Please enter valid numbers for Age and Tickets", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        );
+    }
+
+    private void handleViewAllButton() {
+        btnViewAll.setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Start the BookingListActivity
+                    Intent intent = new Intent(MainActivity.this, BookingListActivity.class);
+                    startActivity(intent);
+                }
+            }
+        );
+    }
+
+    private void showConfirmationDialog(String name, int age, String source, String dest, int numTickets) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Booking Confirmed");
+        builder.setMessage(
+                "Passenger: " + name + "\n" +
+                "Age: " + age + "\n" +
+                "From: " + source + "\n" +
+                "To: " + dest + "\n" +
+                "Tickets: " + numTickets
+        );
+        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void clearFields() {
+        editName.setText("");
+        editAge.setText("");
+        editSource.setText("");
+        editDest.setText("");
+        editNumTickets.setText("");
+        editName.requestFocus(); // Set focus back to the first field
+    }
+}
+4. Booking List Layout (activity_booking_list.xml)
+This is a new screen that will only contain a ListView to show all the bookings from the database.
+
+How to create: Right-click on your app/src/main/res/layout folder and select New > Layout Resource File. Name it activity_booking_list.
+activity_booking_list.xml
+7 Nov, 7:44 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All Bookings"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"/>
+
+    <ListView
+        android:id="@+id/listViewBookings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/textViewTitle" />
+
+</RelativeLayout>
+5. List Item Row Layout (list_item_booking.xml)
+This small file defines the layout for a single row in the ListView. It will show the passenger's name and their route.
+
+How to create: Right-click on your app/src/main/res/layout folder and select New > Layout Resource File. Name it list_item_booking.
+list_item_booking.xml
+7 Nov, 7:44 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This layout is for a single row in the ListView -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Passenger Name"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/item_route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Source to Destination"
+        android:textSize="14sp" />
+
+    <!-- This TextView will hold the ID but be hidden -->
+    <!-- We'll use this to know which item was clicked -->
+    <TextView
+        android:id="@+id/item_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+</LinearLayout>
+6. Booking List Logic (BookingListActivity.java)
+This is the Java code for your activity_booking_list.xml layout. It fetches all records from the DatabaseHelper and displays them in the ListView. It also handles clicking an item to see its details.
+
+How to create: Right-click on your package folder (e.g., app/src/main/java/com/example.yourprojectname) and select New > Java Class. Name it BookingListActivity.
+BookingListActivity.java
+7 Nov, 7:44 am
+
+Open
+package com.example.yourprojectname;
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class BookingListActivity extends AppCompatActivity {
+
+    DatabaseHelper myDb;
+    ListView listViewBookings;
+    SimpleCursorAdapter adapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_booking_list);
+
+        myDb = new DatabaseHelper(this);
+        listViewBookings = findViewById(R.id.listViewBookings);
+
+        loadBookings();
+        setupListViewClickListener();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh the list when we return to this activity
+        loadBookings();
+    }
+
+    private void loadBookings() {
+        Cursor cursor = myDb.getAllBookings();
+
+        if (cursor.getCount() == 0) {
+            Toast.makeText(this, "No bookings found", Toast.LENGTH_SHORT).show();
+            // If adapter exists, update it with an empty cursor
+            if (adapter != null) {
+                adapter.swapCursor(null);
+            }
+            return;
+        }
+
+        // Define which columns from the database you want to display
+        // We need COL_ID for the click listener, even if we hide it
+        String[] from = {DatabaseHelper.COL_NAME, DatabaseHelper.COL_SOURCE, DatabaseHelper.COL_DESTINATION, DatabaseHelper.COL_ID};
+
+        // Define which layout elements in list_item_booking.xml to map them to
+        int[] to = {R.id.item_name, R.id.item_route, R.id.item_id}; // Note: We map 3 data columns to 3 text views
+
+        if (adapter == null) {
+            adapter = new SimpleCursorAdapter(
+                    this,
+                    R.layout.list_item_booking, // Your custom row layout
+                    cursor,
+                    from,
+                    to,
+                    0 // flags
+            );
+
+            // This is a bit advanced, but it allows us to combine "Source" and "Destination"
+            // into one TextView (R.id.item_route)
+            adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+                @Override
+                public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                    if (view.getId() == R.id.item_route) {
+                        int sourceIndex = cursor.getColumnIndex(DatabaseHelper.COL_SOURCE);
+                        int destIndex = cursor.getColumnIndex(DatabaseHelper.COL_DESTINATION);
+                        String source = cursor.getString(sourceIndex);
+                        String dest = cursor.getString(destIndex);
+                        TextView routeTextView = (TextView) view;
+                        routeTextView.setText("From: " + source + "  To: " + dest);
+                        return true; // We handled this view
+                    }
+                    if (view.getId() == R.id.item_id) {
+                        // This sets the ID to the hidden TextView
+                        TextView idTextView = (TextView) view;
+                        idTextView.setText(cursor.getString(columnIndex));
+                        return true;
+                    }
+                    return false; // Let the adapter handle other views
+                }
+            });
+
+            listViewBookings.setAdapter(adapter);
+        } else {
+            // If adapter already exists, just update the cursor
+            adapter.swapCursor(cursor);
+        }
+    }
+
+    private void setupListViewClickListener() {
+        listViewBookings.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 'id' here is the database row ID, which is exactly what we need!
+
+                // Start the BookingDetailActivity and pass the clicked item's ID
+                Intent intent = new Intent(BookingListActivity.this, BookingDetailActivity.class);
+                intent.putExtra("BOOKING_ID", String.valueOf(id));
+                startActivity(intent);
+            }
+        });
+    }
+}
+7. Booking Detail Layout (activity_booking_detail.xml)
+This layout is for editing and deleting. It will look very similar to activity_main.xml but will have "Update" and "Delete" buttons.
+
+How to create: Right-click on your app/src/main/res/layout folder and select New > Layout Resource File. Name it activity_booking_detail.
+activity_booking_detail.xml
+7 Nov, 7:44 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".BookingDetailActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit Booking"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/textView_ID_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Booking ID: #"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/editTextName_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Passenger Name"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextAge_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Age"
+        android:inputType="number"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextSource_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Source Station"
+        android:inputType="text"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextDestination_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Destination Station"
+        android:inputType="text"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/editTextNumTickets_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Number of Tickets"
+        android:inputType="number"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnUpdate_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update Booking"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnDelete_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Booking"
+        android:backgroundTint="#D81B1B"
+        android:textColor="@android:color/white"/>
+
+</LinearLayout>
+8. Booking Detail Logic (BookingDetailActivity.java)
+This is the Java code for the detail screen. It gets the ID passed from the list, loads the data for that specific booking, and handles the "Update" and "Delete" button clicks.
+
+How to create: Right-click on your package folder (e.g., app/src/main/java/com.example.yourprojectname) and select New > Java Class. Name it BookingDetailActivity.
+BookingDetailActivity.java
+7 Nov, 7:44 am
+
+Open
+package com.example.yourprojectname;
+
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class BookingDetailActivity extends AppCompatActivity {
+
+    DatabaseHelper myDb;
+    EditText editName, editAge, editSource, editDest, editNumTickets;
+    TextView textId;
+    Button btnUpdate, btnDelete;
+    String bookingId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_booking_detail);
+
+        myDb = new DatabaseHelper(this);
+
+        // Get references to all layout elements
+        textId = findViewById(R.id.textView_ID_detail);
+        editName = findViewById(R.id.editTextName_detail);
+        editAge = findViewById(R.id.editTextAge_detail);
+        editSource = findViewById(R.id.editTextSource_detail);
+        editDest = findViewById(R.id.editTextDestination_detail);
+        editNumTickets = findViewById(R.id.editTextNumTickets_detail);
+        btnUpdate = findViewById(R.id.btnUpdate_detail);
+        btnDelete = findViewById(R.id.btnDelete_detail);
+
+        // Get the ID passed from BookingListActivity
+        bookingId = getIntent().getStringExtra("BOOKING_ID");
+        if (bookingId == null) {
+            Toast.makeText(this, "Error: No Booking ID found", Toast.LENGTH_SHORT).show();
+            finish(); // Close this activity if no ID is found
+            return;
+        }
+
+        loadBookingDetails();
+
+        handleUpdateButton();
+        handleDeleteButton();
+    }
+
+    private void loadBookingDetails() {
+        Cursor cursor = myDb.getBookingById(bookingId);
+        if (cursor.moveToFirst()) {
+            // Load data from the cursor into the EditText fields
+            // Column indexes: 0=ID, 1=NAME, 2=AGE, 3=SOURCE, 4=DEST, 5=TICKETS
+            textId.setText("Booking ID: " + cursor.getString(0));
+            editName.setText(cursor.getString(1));
+            editAge.setText(cursor.getString(2));
+            editSource.setText(cursor.getString(3));
+            editDest.setText(cursor.getString(4));
+            editNumTickets.setText(cursor.getString(5));
+        } else {
+            Toast.makeText(this, "Error: Could not load booking details", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        cursor.close();
+    }
+
+    private void handleUpdateButton() {
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get text from fields
+                String name = editName.getText().toString();
+                String ageStr = editAge.getText().toString();
+                String source = editSource.getText().toString();
+                String dest = editDest.getText().toString();
+                String ticketsStr = editNumTickets.getText().toString();
+
+                // Basic Validation
+                if (name.isEmpty() || ageStr.isEmpty() || source.isEmpty() || dest.isEmpty() || ticketsStr.isEmpty()) {
+                    Toast.makeText(BookingDetailActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                try {
+                    int age = Integer.parseInt(ageStr);
+                    int numTickets = Integer.parseInt(ticketsStr);
+
+                    boolean isUpdated = myDb.updateBooking(bookingId, name, age, source, dest, numTickets);
+
+                    if (isUpdated) {
+                        Toast.makeText(BookingDetailActivity.this, "Booking Updated", Toast.LENGTH_LONG).show();
+                        finish(); // Close activity and go back to the list
+                    } else {
+                        Toast.makeText(BookingDetailActivity.this, "Update Failed", Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (NumberFormatException e) {
+                    Toast.makeText(BookingDetailActivity.this, "Please enter valid numbers for Age and Tickets", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void handleDeleteButton() {
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Show a confirmation dialog before deleting
+                new AlertDialog.Builder(BookingDetailActivity.this)
+                        .setTitle("Confirm Delete")
+                        .setMessage("Are you sure you want to delete this booking?")
+                        .setPositiveButton("Yes, Delete", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // User clicked Yes
+                                Integer deletedRows = myDb.deleteBooking(bookingId);
+                                if (deletedRows > 0) {
+                                    Toast.makeText(BookingDetailActivity.this, "Booking Deleted", Toast.LENGTH_LONG).show();
+                                    finish(); // Close activity and go back to the list
+                                } else {
+                                    Toast.makeText(BookingDetailActivity.this, "Delete Failed", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("No", null) // Do nothing on "No"
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+    }
+}
+9. Register Your New Activities (AndroidManifest.xml)
+Finally, you must tell Android that your two new activities (BookingListActivity and BookingDetailActivity) exist.
+
+How to modify: Open app/src/main/AndroidManifest.xml. Inside the <application> tag, after the existing <activity> block for .MainActivity, add the following two <activity> blocks.
+AndroidManifest.xml
+7 Nov, 7:44 am
+
+Open
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.yourprojectname"> <!-- Make sure this package name matches yours -->
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.YourProjectName" <!-- This theme name will be yours -->
+        tools:targetApi="31">
+
+        <!-- Your main activity (should already be here) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- !! ADD THESE TWO NEW ACTIVITIES !! -->
+
+        <activity
+            android:name=".BookingListActivity"
+            android:label="All Bookings"
+            android:parentActivityName=".MainActivity">
+            <!-- This parentActivityName adds a "Back" arrow to return to MainActivity -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".BookingDetailActivity"
+            android:label="Booking Details"
+            android:parentActivityName=".BookingListActivity">
+            <!-- This parentActivityName adds a "Back" arrow to return to the List -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".BookingListActivity" />
+        </activity>
+
+    </application>
+
+</manifest>
+You're all done! Run the app on your emulator or device.
+
+You can Create bookings on the main screen.
+
+You can Read all bookings by clicking "View All Bookings."
+
+From the list, you can click any item to open the detail screen.
+
+On the detail screen, you can Update the booking or Delete it.	

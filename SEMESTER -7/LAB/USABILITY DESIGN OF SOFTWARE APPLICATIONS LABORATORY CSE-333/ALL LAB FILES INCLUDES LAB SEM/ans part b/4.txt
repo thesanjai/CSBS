@@ -1,0 +1,227 @@
+Part-A: Count number of times 
+Enter
+ key is pressed
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/etInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Type here and press Enter"
+        android:inputType="textMultiLine"
+        android:imeOptions="actionDone" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter key pressed: 0 times"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set4parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.KeyEvent;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etInput;
+    TextView tvCount;
+    int enterCount = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etInput = findViewById(R.id.etInput);
+        tvCount = findViewById(R.id.tvCount);
+
+        etInput.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                enterCount++;
+                tvCount.setText("Enter key pressed: " + enterCount + " times");
+                return true;
+            }
+            return false;
+        });
+    }
+}
+✅ Part-B: Tax Filing Application with SQLite and ListView
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:inputType="textPersonName"/>
+
+    <EditText
+        android:id="@+id/etPan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="PAN Number"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/etIncome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Income"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/etTax"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tax Amount"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit Tax Details"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btnViewAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View All Records"
+        android:layout_marginTop="10dp"/>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set4partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etPan, etIncome, etTax;
+    Button btnSubmit, btnViewAll;
+    ListView listView;
+    SQLiteDatabase db;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> records;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etPan = findViewById(R.id.etPan);
+        etIncome = findViewById(R.id.etIncome);
+        etTax = findViewById(R.id.etTax);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnViewAll = findViewById(R.id.btnViewAll);
+        listView = findViewById(R.id.listView);
+
+        records = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, records);
+        listView.setAdapter(adapter);
+
+        db = openOrCreateDatabase("TaxDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS tax(name VARCHAR(30), pan INT, income INT, tax INT);");
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveData();
+            }
+        });
+
+        btnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadData();
+            }
+        });
+    }
+
+    private void saveData() {
+        String name = etName.getText().toString().trim();
+        String pan = etPan.getText().toString().trim();
+        String income = etIncome.getText().toString().trim();
+        String tax = etTax.getText().toString().trim();
+
+        if (name.isEmpty() || pan.isEmpty() || income.isEmpty() || tax.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        db.execSQL("INSERT INTO tax VALUES('" + name + "'," + pan + "," + income + "," + tax + ");");
+        showMessage("Success", "Record Inserted");
+        clearFields();
+    }
+
+    private void loadData() {
+        records.clear();
+        Cursor c = db.rawQuery("SELECT * FROM tax", null);
+        if (c.getCount() == 0) {
+            showMessage("Error", "No records found");
+            adapter.notifyDataSetChanged();
+            return;
+        }
+        while (c.moveToNext()) {
+            String record = "Name: " + c.getString(0) +
+                    "\nPAN: " + c.getInt(1) +
+                    "\nIncome: " + c.getInt(2) +
+                    "\nTax: " + c.getInt(3);
+            records.add(record);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void clearFields() {
+        etName.setText("");
+        etPan.setText("");
+        etIncome.setText("");
+        etTax.setText("");
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+}
+
+

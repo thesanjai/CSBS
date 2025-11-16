@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">Aesthetic Chess Clock</string>
+
+    <!-- Button Text (some are not used now) -->
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="start">Start</string>
+    <string name="reset">Reset</string>
+
+    <!-- Initial Timer Text -->
+    <string name="initial_time">01:00</string>
+
+    <!-- Moves Counter -->
+    <string name="moves_text">Moves: %d</string>
+
+    <!-- Content Descriptions for Icons (for accessibility) -->
+    <string name="desc_reset">Reset Game</string>
+    <string name="desc_play_pause">Play or Pause Timer</string>
+    <string name="desc_time_settings">Time Settings</string>
+    <string name="desc_sound">Toggle Sound</string>
+    <string name="desc_adjust_time">Adjust Time</string>
+
+    <!-- Dialog Strings -->
+    <string name="dialog_title_adjust_time">ADJUST TIME</string>
+    <string name="dialog_label_hour">Hour</string>
+    <string name="dialog_label_minute">Minute</string>
+    <string name="dialog_label_second">Second</string>
+    <string name="dialog_button_cancel">CANCEL</string>
+    <string name="dialog_button_save">SAVE TIME</string>
+    <string name="dialog_button_save_simple">SAVE</string>
+
+
+    <!-- STAGE 3: Time Settings Screen -->
+    <string name="title_time_controls">Time Controls</string>
+    <string name="button_new_custom_time">New Custom Time</string>
+    <string name="section_presets">Presets</string>
+    <string name="button_start_game">Start</string>
+
+    <!-- Preset Names -->
+    <string name="preset_30_sec">30 sec</string>
+    <string name="preset_1_min_2_sec">1 min | 2 sec</string>
+    <string name="preset_1_min">1 min</string>
+    <string name="preset_3_min_2_sec">3 min | 2 sec</string>
+    <string name="preset_5_min">5 min</string>
+    <string name="preset_10_min">10 min</string>
+
+    <!-- STAGE 4: Custom Time Screen -->
+    <string name="title_custom_time">Custom Time</string>
+    <string name="label_name">Name</string>
+    <string name="hint_name">e.g., My Bullet Preset</string>
+    <string name="label_time">Time</string>
+    <string name="label_increment">Increment</string>
+    <string name="initial_picker_time">00 : 00</string>
+    <string name="dialog_title_set_time">SET TIME</string>
+    <string name="dialog_title_set_increment">SET INCREMENT</string>
+
+</resources>
+

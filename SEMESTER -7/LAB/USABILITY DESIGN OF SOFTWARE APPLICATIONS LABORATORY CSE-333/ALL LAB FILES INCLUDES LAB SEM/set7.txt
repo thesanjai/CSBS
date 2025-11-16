@@ -1,0 +1,86 @@
+🧩 1. activity_main.xml (UI Design)
+
+👉 Path: app > res > layout > activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#ECEFF1"
+    android:padding="24dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/image1"
+        android:scaleType="centerCrop"
+        android:background="#FFFFFF"
+        android:elevation="5dp"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btnSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch Image"
+        android:textSize="18sp"
+        android:padding="12dp"
+        android:backgroundTint="#1976D2"
+        android:textColor="#FFFFFF" />
+</LinearLayout>
+
+⚙️ 2. MainActivity.java
+
+👉 Path: app > java > com.example.switchimage > MainActivity.java
+
+package com.example.switchimage;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageView;
+
+public class MainActivity extends AppCompatActivity {
+
+    ImageView imageView;
+    Button btnSwitch;
+    boolean isImageOne = true; // flag to track current image
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        imageView = findViewById(R.id.imageView);
+        btnSwitch = findViewById(R.id.btnSwitch);
+
+        btnSwitch.setOnClickListener(v -> {
+            if (isImageOne) {
+                imageView.setImageResource(R.drawable.image2);
+                btnSwitch.setText("Show First Image");
+            } else {
+                imageView.setImageResource(R.drawable.image1);
+                btnSwitch.setText("Show Second Image");
+            }
+            isImageOne = !isImageOne; // toggle the flag
+        });
+    }
+}
+
+🖼️ 3. Add Images
+
+Put two images in your project:
+📁 app > res > drawable
+Rename them as:
+
+image1.jpg
+image2.jpg
+
+🚀 4. Run the App
+
+✅ Initially shows image1.
+✅ Click the “Switch Image” button → shows image2.
+✅ Click again → switches back to image1.

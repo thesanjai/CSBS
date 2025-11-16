@@ -1,0 +1,62 @@
+🧩 Step 1: activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#FAFAFA"
+    android:padding="20dp">
+
+    <Button
+        android:id="@+id/btnWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Welcome Message"
+        android:textSize="18sp"
+        android:padding="12dp"/>
+</LinearLayout>
+
+🧠 Step 2: MainActivity.java
+package com.example.welcomeapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.Toast;
+import android.view.View;
+
+public class MainActivity extends AppCompatActivity {
+
+    Button btnWelcome;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        btnWelcome = findViewById(R.id.btnWelcome);
+
+        btnWelcome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Welcome to Android Programming", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+
+⚙️ Step 3: How to Run It
+
+Create a new Android Studio project → “Empty Activity”.
+
+Replace:
+
+activity_main.xml with the XML above.
+
+MainActivity.java with the Java code above.
+
+Click Run ▶️
+
+Tap the button → Toast appears saying ✅
+“Welcome to Android Programming”

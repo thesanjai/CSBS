@@ -1,0 +1,31 @@
+  function calculateOverlap(driverWorkingHours, assignmentStart, assignmentEnd) {
+            let totalOverlapHours = 0;
+
+            // Convert assignment start and end times to hours
+            const start = new Date(assignmentStart);
+            const end = new Date(assignmentEnd);
+            const startHour = start.getUTCHours();
+            const endHour = end.getUTCHours();
+
+            // Check for overlap within the driver's working hours
+            for (const window of driverWorkingHours) {
+                const [windowStartHour, windowEndHour] = window.start.split(':').map(Number);
+
+                // Handle overnight shifts
+                if (windowStartHour > windowEndHour) {
+                    // Adjust for the window that wraps overnight
+                    if (startHour >= windowStartHour || startHour < windowEndHour) {
+                        totalOverlapHours += Math.min(endHour, windowEndHour) - Math.max(startHour, windowStartHour);
+                    } else if (endHour <= windowEndHour || endHour > windowStartHour) {
+                        totalOverlapHours += Math.min(endHour, windowEndHour) - Math.max(startHour, windowStartHour);
+                    }
+                } else {
+                    if (startHour < windowEndHour && endHour > windowStartHour) {
+                        totalOverlapHours += Math.min(endHour, windowEndHour) - Math.max(startHour, windowStartHour);
+                    }
+                }
+            }
+
+            return totalOverlapHours;
+        }
+

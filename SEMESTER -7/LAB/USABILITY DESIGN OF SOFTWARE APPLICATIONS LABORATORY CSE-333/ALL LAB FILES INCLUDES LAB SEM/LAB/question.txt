@@ -1,0 +1,16 @@
+
+2.design an android application to display the text hello world
+3. Develop an android application to change background color and image
+4.implement a counter app for counting the number of times 'Enter' key is pressed
+5. Create an android application to add 5 images and change the image on button click
+6. Design a canteen app using menus, lists and layouts
+7. Design a registration form to open a bank account
+8. Create a screen that has input boxes for User Name, Password, Address, Gender (radio
+buttons for male and female), Age (numeric) and a Submit button. On clicking the submit
+button, print all the data below the Submit Button
+9. Design an android application to create page using Intent and one Button and pass the
+Values from one Activity to second Activity
+10. Design an android application to Send SMS via Internet
+11. Create an android application using Fragments
+12. Develop an application with login and registration page connecting to database
+

@@ -1,0 +1,319 @@
+Set-11
+Part A – Create an app where clicking a button changes the background color and text.
+Part B – Design an Online Shopping Product Entry Application with the following fields:
+ Product ID: int, Product Name: varchar(30), Price: int, Quantity: int, Category: varchar(20).
+ Store these details in an SQL table and display the list of available products
+Perfect! Let’s solve Set-11 in full, following the same style and logic you’ve been using.
+
+Part-A: Button Changes Background Color and Text
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World"
+        android:textSize="24sp"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/btnChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Color and Text"/>
+</LinearLayout>
+package com.kasinadhuni.set11parta;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout mainLayout;
+    TextView tvMessage;
+    Button btnChangeColor, btnChangeImage;
+    ImageView imageView;
+
+    // Arrays for cycling
+    int[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW};
+    int[] images = {R.drawable.image1, R.drawable.image2, R.drawable.image3};
+
+    int colorIndex = 0;
+    int imageIndex = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize UI
+        mainLayout = findViewById(R.id.mainLayout);
+        tvMessage = findViewById(R.id.tvMessage);
+        btnChangeColor = findViewById(R.id.btnChangeColor);
+        btnChangeImage = findViewById(R.id.btnChangeImage);
+        imageView = findViewById(R.id.imageView);
+
+        // Change Background Color
+        btnChangeColor.setOnClickListener(v -> {
+            mainLayout.setBackgroundColor(colors[colorIndex]);
+            tvMessage.setText("Background Changed!");
+            colorIndex = (colorIndex + 1) % colors.length; // cycle
+        });
+
+        // Change Image
+        btnChangeImage.setOnClickListener(v -> {
+            imageView.setImageResource(images[imageIndex]);
+            tvMessage.setText("Image Changed!");
+            imageIndex = (imageIndex + 1) % images.length; // cycle
+        });
+    }
+}✅ Logic:
+Clicking the button toggles background color and TextView text.
+Boolean flag isChanged tracks state.
+
+Part-B: Online Shopping Product Entry Application
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etProductID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Product ID"
+            android:inputType="number"/>
+
+        <EditText
+            android:id="@+id/etProductName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Product Name"
+            android:inputType="text"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Price"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quantity"
+            android:inputType="number"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:id="@+id/etCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Category"
+            android:inputType="text"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btnAddProduct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Product"
+            android:layout_marginTop="15dp"/>
+
+        <Button
+            android:id="@+id/btnViewProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Products"
+            android:layout_marginTop="10dp"/>
+
+        <ListView
+            android:id="@+id/listViewProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set11partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.widget.*;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etProductID, etProductName, etPrice, etQuantity, etCategory;
+    Button btnAddProduct, btnViewProducts;
+    ListView listViewProducts;
+    SQLiteDatabase db;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> productList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etProductID = findViewById(R.id.etProductID);
+        etProductName = findViewById(R.id.etProductName);
+        etPrice = findViewById(R.id.etPrice);
+        etQuantity = findViewById(R.id.etQuantity);
+        etCategory = findViewById(R.id.etCategory);
+        btnAddProduct = findViewById(R.id.btnAddProduct);
+        btnViewProducts = findViewById(R.id.btnViewProducts);
+        listViewProducts = findViewById(R.id.listViewProducts);
+
+        productList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, productList);
+        listViewProducts.setAdapter(adapter);
+
+        db = openOrCreateDatabase("ShoppingDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS products(" +
+                "productID INT, productName VARCHAR(30), price INT, quantity INT, category VARCHAR(20));");
+
+        btnAddProduct.setOnClickListener(v -> addProduct());
+        btnViewProducts.setOnClickListener(v -> viewProducts());
+    }
+
+    private void addProduct() {
+        String idStr = etProductID.getText().toString().trim();
+        String name = etProductName.getText().toString().trim();
+        String priceStr = etPrice.getText().toString().trim();
+        String quantityStr = etQuantity.getText().toString().trim();
+        String category = etCategory.getText().toString().trim();
+
+        if(idStr.isEmpty() || name.isEmpty() || priceStr.isEmpty() || quantityStr.isEmpty() || category.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        int id = Integer.parseInt(idStr);
+        int price = Integer.parseInt(priceStr);
+        int quantity = Integer.parseInt(quantityStr);
+
+        db.execSQL("INSERT INTO products VALUES(" + id + ",'" + name + "'," + price + "," + quantity + ",'" + category + "');");
+        showMessage("Success", "Product added successfully");
+        clearFields();
+    }
+
+    private void viewProducts() {
+        productList.clear();
+        Cursor c = db.rawQuery("SELECT * FROM products", null);
+        if(c.getCount() == 0) {
+            showMessage("Error", "No products found");
+            adapter.notifyDataSetChanged();
+            return;
+        }
+
+        while(c.moveToNext()) {
+            String product = "ID: " + c.getInt(0) +
+                    "\nName: " + c.getString(1) +
+                    "\nPrice: " + c.getInt(2) +
+                    "\nQuantity: " + c.getInt(3) +
+                    "\nCategory: " + c.getString(4);
+            productList.add(product);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etProductID.setText("");
+        etProductName.setText("");
+        etPrice.setText("");
+        etQuantity.setText("");
+        etCategory.setText("");
+    }
+}
+
+✅ Logic:
+Part-A: Button toggles background color and TextView text using a boolean flag.
+Part-B:
+Input validation before inserting into products table.
+ListView dynamically displays all products.
+
+If you want, I can start compiling Sets 1–11 into a single master document with UI logic, SQLite tables, and important notes, so you can use it as a ready reference for all your app assignments.
+Do you want me to do that?
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="@android:color/white">
+
+    <!-- Text -->
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- ImageView -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/image1"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Button to change background color -->
+    <Button
+        android:id="@+id/btnChangeColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Background Color"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Button to change image -->
+    <Button
+        android:id="@+id/btnChangeImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Image"/>
+
+</LinearLayout>
+
+

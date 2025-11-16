@@ -1,0 +1,229 @@
+Set-6
+Part-A - Create an app with a Button that shows a text in an AlertDialog when clicked.
+Part-B- Design a Student Event Registration Application with the following fields:
+Student Name: varchar(30), Roll Number: int, Department: varchar(20), Event Name: varchar(30).
+Store the registration details in an SQL table and display the list of registered students.
+
+
+
+Got it! Let’s solve Set-6 step by step in the same style as your previous sets, including XML + Java code for both Part-A and Part-B.
+
+Part-A: Button Shows Text in AlertDialog
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <Button
+        android:id="@+id/btnShowAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Message"/>
+</LinearLayout>
+MainActivity.java
+package com.kasinadhuni.set6parta;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
+public class MainActivity extends AppCompatActivity {
+
+    Button btnShowAlert;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        btnShowAlert = findViewById(R.id.btnShowAlert);
+
+        btnShowAlert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMessage("Hello!", "This is an AlertDialog message.");
+            }
+        });
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+}
+✅ Logic:
+Simple Button click listener.
+AlertDialog shows a predefined message when button is clicked.
+
+Part-B: Student Event Registration with SQLite
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etStudentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Student Name"
+            android:inputType="textPersonName"/>
+
+        <EditText
+            android:id="@+id/etRollNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Roll Number"
+            android:inputType="number"/>
+
+        <EditText
+            android:id="@+id/etDepartment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Department"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/etEventName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Event Name"
+            android:inputType="text"/>
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/btnViewAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View All Registrations"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>
+MainActivity.java
+package com.kasinadhuni.set6partb;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etStudentName, etRollNumber, etDepartment, etEventName;
+    Button btnRegister, btnViewAll;
+    SQLiteDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etStudentName = findViewById(R.id.etStudentName);
+        etRollNumber = findViewById(R.id.etRollNumber);
+        etDepartment = findViewById(R.id.etDepartment);
+        etEventName = findViewById(R.id.etEventName);
+        btnRegister = findViewById(R.id.btnRegister);
+        btnViewAll = findViewById(R.id.btnViewAll);
+
+        db = openOrCreateDatabase("EventDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS registration(" +
+                "studentName VARCHAR(30), rollNumber INT, department VARCHAR(20), eventName VARCHAR(30));");
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registerStudent();
+            }
+        });
+
+        btnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewAllRegistrations();
+            }
+        });
+    }
+
+    private void registerStudent() {
+        String name = etStudentName.getText().toString().trim();
+        String roll = etRollNumber.getText().toString().trim();
+        String dept = etDepartment.getText().toString().trim();
+        String event = etEventName.getText().toString().trim();
+
+        if(name.isEmpty() || roll.isEmpty() || dept.isEmpty() || event.isEmpty()) {
+            showMessage("Error", "Please fill all fields");
+            return;
+        }
+
+        db.execSQL("INSERT INTO registration VALUES('" + name + "'," + roll + ",'" + dept + "','" + event + "');");
+        showMessage("Success", "Student Registered Successfully");
+        clearFields();
+    }
+
+    private void viewAllRegistrations() {
+        Cursor c = db.rawQuery("SELECT * FROM registration", null);
+        if(c.getCount() == 0) {
+            showMessage("Error", "No records found");
+            return;
+        }
+
+        StringBuilder buffer = new StringBuilder();
+        while(c.moveToNext()) {
+            buffer.append("Name: ").append(c.getString(0)).append("\n");
+            buffer.append("Roll Number: ").append(c.getInt(1)).append("\n");
+            buffer.append("Department: ").append(c.getString(2)).append("\n");
+            buffer.append("Event: ").append(c.getString(3)).append("\n\n");
+        }
+        showMessage("Registered Students", buffer.toString());
+    }
+
+    private void showMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+
+    private void clearFields() {
+        etStudentName.setText("");
+        etRollNumber.setText("");
+        etDepartment.setText("");
+        etEventName.setText("");
+    }
+}
+✅ Logic:
+Button → AlertDialog (Part-A).
+Form + SQLite DB + AlertDialog for registrations (Part-B).
+Validation ensures no empty fields.
+All records are displayed in a scrollable AlertDialog.
+
+I can continue Set-7 and onwards in the same step-by-step pattern if you want, keeping Part-A dynamic actions and Part-B forms with SQLite consistent.
+Do you want me to proceed with Set-7 next?
+
+

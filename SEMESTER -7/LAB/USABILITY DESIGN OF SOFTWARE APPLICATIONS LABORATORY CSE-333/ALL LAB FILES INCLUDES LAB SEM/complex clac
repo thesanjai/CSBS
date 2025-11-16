@@ -1,0 +1,189 @@
+⚙️ Step 1: Create a new Empty Activity Project
+
+Name: ComplexCalculator
+Language: Java
+Minimum SDK: API 21 or higher
+
+🧩 Step 2: activity_main.xml
+
+Replace everything with this code 👇
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvExpression"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:text=""/>
+        
+    <TextView
+        android:id="@+id/tvResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:textColor="#64FFDA"
+        android:textSize="36sp"
+        android:text="0" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#FFFFFF"
+        android:layout_marginVertical="8dp"/>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="4"
+        android:rowCount="5"
+        android:alignmentMode="alignMargins"
+        android:useDefaultMargins="true">
+
+        <!-- Row 1 -->
+        <Button android:id="@+id/btnClear" android:text="C"/>
+        <Button android:id="@+id/btnDel" android:text="DEL"/>
+        <Button android:id="@+id/btnMod" android:text="%"/>
+        <Button android:id="@+id/btnDiv" android:text="/"/>
+
+        <!-- Row 2 -->
+        <Button android:id="@+id/btn7" android:text="7"/>
+        <Button android:id="@+id/btn8" android:text="8"/>
+        <Button android:id="@+id/btn9" android:text="9"/>
+        <Button android:id="@+id/btnMul" android:text="*"/>
+
+        <!-- Row 3 -->
+        <Button android:id="@+id/btn4" android:text="4"/>
+        <Button android:id="@+id/btn5" android:text="5"/>
+        <Button android:id="@+id/btn6" android:text="6"/>
+        <Button android:id="@+id/btnSub" android:text="-"/>
+
+        <!-- Row 4 -->
+        <Button android:id="@+id/btn1" android:text="1"/>
+        <Button android:id="@+id/btn2" android:text="2"/>
+        <Button android:id="@+id/btn3" android:text="3"/>
+        <Button android:id="@+id/btnAdd" android:text="+"/>
+
+        <!-- Row 5 -->
+        <Button android:id="@+id/btnDot" android:text="."/>
+        <Button android:id="@+id/btn0" android:text="0"/>
+        <Button android:id="@+id/btnEq" android:text="="/>
+        <Button android:id="@+id/btnSqrt" android:text="√"/>
+
+    </GridLayout>
+</LinearLayout>
+
+💻 Step 3: MainActivity.java
+
+Now paste this code:
+
+package com.example.complexcalculator;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+public class MainActivity extends AppCompatActivity {
+
+    TextView tvExpression, tvResult;
+    String expression = "";
+    ScriptEngine engine;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvExpression = findViewById(R.id.tvExpression);
+        tvResult = findViewById(R.id.tvResult);
+
+        engine = new ScriptEngineManager().getEngineByName("rhino"); // JS evaluator
+
+        setNumericButtonListeners();
+        setOperatorButtonListeners();
+    }
+
+    private void setNumericButtonListeners() {
+        int[] numberIds = {R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9, R.id.btnDot};
+        View.OnClickListener listener = v -> {
+            Button b = (Button) v;
+            expression += b.getText().toString();
+            tvExpression.setText(expression);
+        };
+
+        for (int id : numberIds) {
+            findViewById(id).setOnClickListener(listener);
+        }
+    }
+
+    private void setOperatorButtonListeners() {
+        findViewById(R.id.btnAdd).setOnClickListener(v -> appendOp("+"));
+        findViewById(R.id.btnSub).setOnClickListener(v -> appendOp("-"));
+        findViewById(R.id.btnMul).setOnClickListener(v -> appendOp("*"));
+        findViewById(R.id.btnDiv).setOnClickListener(v -> appendOp("/"));
+        findViewById(R.id.btnMod).setOnClickListener(v -> appendOp("%"));
+
+        findViewById(R.id.btnClear).setOnClickListener(v -> {
+            expression = "";
+            tvExpression.setText("");
+            tvResult.setText("0");
+        });
+
+        findViewById(R.id.btnDel).setOnClickListener(v -> {
+            if (expression.length() > 0) {
+                expression = expression.substring(0, expression.length() - 1);
+                tvExpression.setText(expression);
+            }
+        });
+
+        findViewById(R.id.btnEq).setOnClickListener(v -> evaluateExpression());
+
+        findViewById(R.id.btnSqrt).setOnClickListener(v -> {
+            try {
+                Object result = engine.eval(expression);
+                double val = Double.parseDouble(result.toString());
+                tvResult.setText(String.valueOf(Math.sqrt(val)));
+            } catch (Exception e) {
+                tvResult.setText("Error");
+            }
+        });
+    }
+
+    private void appendOp(String op) {
+        expression += op;
+        tvExpression.setText(expression);
+    }
+
+    private void evaluateExpression() {
+        try {
+            Object result = engine.eval(expression);
+            tvResult.setText(result.toString());
+        } catch (ScriptException e) {
+            tvResult.setText("Error");
+        }
+    }
+}
+
+🧾 Step 4: Instructions to add
+
+Create a new Android project → Empty Activity.
+
+Replace the XML in activity_main.xml.
+
+Replace the Java code in MainActivity.java.
+
+Make sure your package name (com.example.complexcalculator) matches your project.
+
+Run the app — you’ll get a working scientific-like calculator.

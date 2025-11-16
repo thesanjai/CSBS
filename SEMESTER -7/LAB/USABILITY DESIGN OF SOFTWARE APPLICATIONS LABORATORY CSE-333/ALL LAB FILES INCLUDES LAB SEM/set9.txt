@@ -1,0 +1,192 @@
+Step 2: activity_main.xml
+
+Paste this inside res/layout/activity_main.xml 👇
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#F3F3F3">
+
+    <TextView
+        android:text="Login Screen"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Username"
+        android:inputType="textPersonName"
+        android:padding="10dp"
+        android:background="@android:drawable/edit_text" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:background="@android:drawable/edit_text"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#007BFF"
+        android:textColor="#fff"/>
+
+    <TextView
+        android:id="@+id/tvAttempts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Attempts left: 5"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:textColor="#333"/>
+</LinearLayout>
+
+🧱 Step 3: Create SQLite Helper
+
+Create a new Java class → DatabaseHelper.java
+
+package com.example.loginsqliteapp;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String DB_NAME = "LoginDB";
+    private static final int DB_VERSION = 1;
+    private static final String TABLE_USERS = "users";
+
+    public DatabaseHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTable = "CREATE TABLE " + TABLE_USERS +
+                "(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)";
+        db.execSQL(createTable);
+
+        // Insert a demo user
+        ContentValues cv = new ContentValues();
+        cv.put("username", "admin");
+        cv.put("password", "1234");
+        db.insert(TABLE_USERS, null, cv);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        onCreate(db);
+    }
+
+    // Check login credentials
+    public boolean checkUser(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS +
+                " WHERE username=? AND password=?", new String[]{username, password});
+        boolean result = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return result;
+    }
+}
+
+💻 Step 4: MainActivity.java
+
+Paste this inside your MainActivity 👇
+
+package com.example.loginsqliteapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etUsername, etPassword;
+    Button btnLogin;
+    TextView tvAttempts;
+    DatabaseHelper dbHelper;
+    int attempts = 5;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etUsername = findViewById(R.id.etUsername);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        tvAttempts = findViewById(R.id.tvAttempts);
+
+        dbHelper = new DatabaseHelper(this);
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String user = etUsername.getText().toString();
+                String pass = etPassword.getText().toString();
+
+                if (user.isEmpty() || pass.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                boolean isValid = dbHelper.checkUser(user, pass);
+
+                if (isValid) {
+                    Toast.makeText(MainActivity.this, "Login Successful ✅", Toast.LENGTH_LONG).show();
+                } else {
+                    attempts--;
+                    tvAttempts.setText("Attempts left: " + attempts);
+                    Toast.makeText(MainActivity.this, "Invalid Credentials ❌", Toast.LENGTH_SHORT).show();
+                    if (attempts == 0) {
+                        btnLogin.setEnabled(false);
+                        btnLogin.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                        Toast.makeText(MainActivity.this, "Login Disabled after 5 failed attempts!", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+    }
+}
+
+🧾 Step 5: Instructions to run
+
+Create new project → Empty Activity.
+
+Replace XML in activity_main.xml.
+
+Create DatabaseHelper.java inside java > your package.
+
+Replace MainActivity.java with the above code.
+
+Run the app → use:
+
+Username: admin
+
+Password: 1234
+
+After 5 wrong attempts, login button will disable automatically.

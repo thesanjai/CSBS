@@ -1,0 +1,728 @@
+Library Book Management
+
+Complete Guide: Android Library Book Management App (Java + SQLite)
+
+This guide provides all the code and instructions you need. Android Studio organizes projects into specific folders. You will create files in these folders and copy/paste the code provided below.
+
+Project Structure Overview:
+
+app/src/main/java/com/yourpackage/: This is where all your Java code (like Activities and the DatabaseHelper) will go.
+
+app/src/main/res/layout/: This is where all your UI layout (XML) files will be.
+
+app/src/main/AndroidManifest.xml: This file (which already exists) registers your app's components, like new activities.
+
+Step 1: The Database Helper (DatabaseHelper.java)
+
+This is the most important file for connecting to SQLite. It creates the database and your Books table.
+
+Where to create: Right-click your Java package (e.g., com.example.libraryapp) in the java folder and select New > Java Class.
+File Name: DatabaseHelper.java
+
+Paste this code:
+
+package com.example.libraryapp; // Make sure this matches your package name
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.Nullable;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // Database Info
+    public static final String DATABASE_NAME = "Library.db";
+    public static final int DATABASE_VERSION = 1;
+
+    // Table Info
+    public static final String TABLE_BOOKS = "books";
+    public static final String COL_ID = "ID";
+    public static final String COL_TITLE = "BookTitle";
+    public static final String COL_AUTHOR = "Author";
+    public static final String COL_GENRE = "Genre";
+    public static final String COL_PRICE = "Price";
+    public static final String COL_AVAILABILITY = "Availability"; // "Yes" or "No"
+
+    // SQL statement to create the table
+    public static final String CREATE_TABLE_BOOKS = "CREATE TABLE " + TABLE_BOOKS + " (" +
+            COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COL_TITLE + " VARCHAR(30), " +
+            COL_AUTHOR + " VARCHAR(30), " +
+            COL_GENRE + " VARCHAR(20), " +
+            COL_PRICE + " INTEGER, " +
+            COL_AVAILABILITY + " VARCHAR(5))";
+
+    public DatabaseHelper(@Nullable Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        // This is called only when the database is created for the first time
+        db.execSQL(CREATE_TABLE_BOOKS);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // This is called if you change the DATABASE_VERSION
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKS);
+        onCreate(db);
+    }
+
+    // --- CRUD Operations ---
+
+    // CREATE: Add a new book
+    public boolean addBook(String title, String author, String genre, int price, String availability) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(COL_TITLE, title);
+        cv.put(COL_AUTHOR, author);
+        cv.put(COL_GENRE, genre);
+        cv.put(COL_PRICE, price);
+        cv.put(COL_AVAILABILITY, availability);
+
+        long result = db.insert(TABLE_BOOKS, null, cv);
+        db.close();
+
+        // if result == -1, it failed
+        return result != -1;
+    }
+
+    // READ: Get all books
+    public Cursor getAllBooks() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_BOOKS, null);
+    }
+
+    // READ: Get one book by ID
+    public Cursor getBookById(String id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_BOOKS + " WHERE " + COL_ID + " = ?", new String[]{id});
+    }
+
+    // UPDATE: Update a book's details
+    public boolean updateBook(String id, String title, String author, String genre, int price, String availability) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(COL_TITLE, title);
+        cv.put(COL_AUTHOR, author);
+        cv.put(COL_GENRE, genre);
+        cv.put(COL_PRICE, price);
+        cv.put(COL_AVAILABILITY, availability);
+
+        int rowsAffected = db.update(TABLE_BOOKS, cv, COL_ID + " = ?", new String[]{id});
+        db.close();
+
+        // returns true if at least one row was updated
+        return rowsAffected > 0;
+    }
+
+    // DELETE: Delete a book
+    public boolean deleteBook(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rowsAffected = db.delete(TABLE_BOOKS, COL_ID + " = ?", new String[]{id});
+        db.close();
+
+        // returns true if at least one row was deleted
+        return rowsAffected > 0;
+    }
+}
+
+
+Step 2: The Book Model (Book.java)
+
+A simple "POJO" (Plain Old Java Object) to hold book data. This is optional but makes code cleaner.
+
+Where to create: In your Java package, just like DatabaseHelper.java.
+File Name: Book.java
+
+Paste this code:
+
+package com.example.libraryapp; // Make sure this matches your package name
+
+// This class is a "model" to hold data for a single book.
+public class Book {
+    private String id;
+    private String title;
+    private String author;
+    private String genre;
+    private int price;
+    private String availability;
+
+    // Constructor
+    public Book(String id, String title, String author, String genre, int price, String availability) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+        this.price = price;
+        this.availability = availability;
+    }
+
+    // Getters
+    public String getId() { return id; }
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public String getGenre() { return genre; }
+    public int getPrice() { return price; }
+    public String getAvailability() { return availability; }
+
+    // This is used by the ArrayAdapter to display text in the ListView
+    @Override
+    public String toString() {
+        return this.title + " by " + this.author;
+    }
+}
+
+
+Step 3: Main Layout (activity_main.xml)
+
+This is the UI for your first screen. It will have a list and a button to add new books.
+
+Where to create: Right-click the app/src/main/res/layout folder and select New > Layout Resource File.
+File Name: activity_main.xml
+
+Paste this code:
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Library"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"/>
+
+    <ListView
+        android:id="@+id/listViewBooks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/textViewTitle"
+        android:layout_above="@id/buttonAddBook"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/buttonAddBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add New Book"
+        android:layout_alignParentBottom="true"
+        android:padding="12dp"
+        android:backgroundTint="#6200EE"
+        android:textColor="@android:color/white"/>
+
+</RelativeLayout>
+
+
+Step 4: Main Activity Logic (MainActivity.java)
+
+This is the Java code that controls the activity_main.xml layout. It performs the Create and Read (All) operations.
+
+Where to create: This file probably already exists. You just need to replace its contents.
+File Name: MainActivity.java
+
+Paste this code:
+
+package com.example.libraryapp; // Make sure this matches your package name
+
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    DatabaseHelper myDb;
+    ListView listViewBooks;
+    Button buttonAddBook;
+
+    ArrayList<Book> bookList;
+    ArrayAdapter<Book> bookAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        myDb = new DatabaseHelper(this);
+        listViewBooks = findViewById(R.id.listViewBooks);
+        buttonAddBook = findViewById(R.id.buttonAddBook);
+
+        bookList = new ArrayList<>();
+
+        // Load all books when the app starts
+        loadBookList();
+
+        // --- READ (ONE) ---
+        // Set a click listener for items in the list
+        listViewBooks.setOnItemClickListener((parent, view, position, id) -> {
+            // Get the book that was clicked
+            Book clickedBook = bookList.get(position);
+
+            // Create an Intent to open the BookDetailsActivity
+            Intent intent = new Intent(MainActivity.this, BookDetailsActivity.class);
+
+            // Pass the ID of the clicked book to the new activity
+            intent.putExtra("BOOK_ID", clickedBook.getId());
+
+            // Start the new activity
+            startActivity(intent);
+        });
+
+        // --- CREATE ---
+        // Set a click listener for the "Add Book" button
+        buttonAddBook.setOnClickListener(v -> showAddBookDialog());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh the list every time we come back to this activity
+        loadBookList();
+    }
+
+    private void loadBookList() {
+        bookList.clear(); // Clear the old list
+        Cursor cursor = myDb.getAllBooks();
+
+        if (cursor.getCount() == 0) {
+            Toast.makeText(this, "No books in library", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        while (cursor.moveToNext()) {
+            // Get data from the database using column indexes
+            String id = cursor.getString(0); // Index 0 is COL_ID
+            String title = cursor.getString(1); // Index 1 is COL_TITLE
+            String author = cursor.getString(2); // Index 2 is COL_AUTHOR
+            String genre = cursor.getString(3);
+            int price = cursor.getInt(4);
+            String availability = cursor.getString(5);
+
+            // Create a new Book object and add it to the list
+            bookList.add(new Book(id, title, author, genre, price, availability));
+        }
+        cursor.close();
+
+        // Set up the adapter to display the book list
+        bookAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, bookList);
+        listViewBooks.setAdapter(bookAdapter);
+    }
+
+    private void showAddBookDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add New Book");
+
+        // Inflate a custom layout for the dialog
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_book, null);
+        builder.setView(view);
+
+        final EditText etTitle = view.findViewById(R.id.editTextBookTitle);
+        final EditText etAuthor = view.findViewById(R.id.editTextAuthor);
+        final EditText etGenre = view.findViewById(R.id.editTextGenre);
+        final EditText etPrice = view.findViewById(R.id.editTextPrice);
+        final RadioGroup rgAvailability = view.findViewById(R.id.radioGroupAvailability);
+
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String title = etTitle.getText().toString().trim();
+            String author = etAuthor.getText().toString().trim();
+            String genre = etGenre.getText().toString().trim();
+            String priceStr = etPrice.getText().toString().trim();
+
+            // Get availability from radio group
+            int selectedRadioId = rgAvailability.getCheckedRadioButtonId();
+            RadioButton selectedRadio = view.findViewById(selectedRadioId);
+            String availability = selectedRadio.getText().toString(); // "Yes" or "No"
+
+            // Validation
+            if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || priceStr.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int price = Integer.parseInt(priceStr);
+
+            // Add to database
+            boolean isAdded = myDb.addBook(title, author, genre, price, availability);
+
+            if (isAdded) {
+                Toast.makeText(this, "Book Added!", Toast.LENGTH_SHORT).show();
+                loadBookList(); // Refresh the list
+            } else {
+                Toast.makeText(this, "Failed to add book", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        builder.create().show();
+    }
+}
+
+
+Step 5: "Add Book" Dialog Layout (dialog_add_book.xml)
+
+This is a new layout file used by the pop-up dialog in MainActivity.
+
+Where to create: In the app/src/main/res/layout folder.
+File Name: dialog_add_book.xml
+
+Paste this code:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <EditText
+        android:id="@+id/editTextBookTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Book Title"
+        android:inputType="textCapWords" />
+
+    <EditText
+        android:id="@+id/editTextAuthor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Author"
+        android:inputType="textCapWords" />
+
+    <EditText
+        android:id="@+id/editTextGenre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Genre"
+        android:inputType="textCapWords" />
+
+    <EditText
+        android:id="@+id/editTextPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Price"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Availability:"
+        android:textSize="16sp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupAvailability"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioAvailableYes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yes"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radioAvailableNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="No" />
+    </RadioGroup>
+
+</LinearLayout>
+
+
+Step 6: Book Details Layout (activity_book_details.xml)
+
+This is the UI for the second screen, where you will see, update, or delete a single book.
+
+Where to create: In the app/src/main/res/layout folder.
+File Name: activity_book_details.xml
+
+Paste this code:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:context=".BookDetailsActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Book Details"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"/>
+
+    <EditText
+        android:id="@+id/editTextDetailTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Book Title"
+        android:inputType="textCapWords" />
+
+    <EditText
+        android:id="@+id/editTextDetailAuthor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Author"
+        android:inputType="textCapWords" />
+
+    <EditText
+        android:id="@+id/editTextDetailGenre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Genre"
+        android:inputType="textCapWords" />
+
+    <EditText
+        android:id="@+id/editTextDetailPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Price"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Availability:"
+        android:textSize="16sp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupDetailAvailability"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioDetailAvailableYes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yes" />
+
+        <RadioButton
+            android:id="@+id/radioDetailAvailableNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="No" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/buttonUpdateBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Update Book"
+        android:backgroundTint="#008577"/>
+
+    <Button
+        android:id="@+id/buttonDeleteBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Delete Book"
+        android:backgroundTint="#D81B60"/>
+
+</LinearLayout>
+
+
+Step 7: Book Details Logic (BookDetailsActivity.java)
+
+This is the Java code for the details screen. It handles Read (One), Update, and Delete.
+
+Where to create: In your Java package, just like MainActivity.java.
+File Name: BookDetailsActivity.java
+
+Paste this code:
+
+package com.example.libraryapp; // Make sure this matches your package name
+
+import android.app.AlertDialog;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class BookDetailsActivity extends AppCompatActivity {
+
+    DatabaseHelper myDb;
+
+    EditText etTitle, etAuthor, etGenre, etPrice;
+    RadioGroup rgAvailability;
+    RadioButton radioYes, radioNo;
+    Button btnUpdate, btnDelete;
+
+    String bookId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_book_details);
+
+        myDb = new DatabaseHelper(this);
+
+        etTitle = findViewById(R.id.editTextDetailTitle);
+        etAuthor = findViewById(R.id.editTextDetailAuthor);
+        etGenre = findViewById(R.id.editTextDetailGenre);
+        etPrice = findViewById(R.id.editTextDetailPrice);
+        rgAvailability = findViewById(R.id.radioGroupDetailAvailability);
+        radioYes = findViewById(R.id.radioDetailAvailableYes);
+        radioNo = findViewById(R.id.radioDetailAvailableNo);
+        btnUpdate = findViewById(R.id.buttonUpdateBook);
+        btnDelete = findViewById(R.id.buttonDeleteBook);
+
+        // Get the Book ID passed from MainActivity
+        bookId = getIntent().getStringExtra("BOOK_ID");
+
+        // Load the book's data
+        loadBookDetails();
+
+        // --- UPDATE ---
+        btnUpdate.setOnClickListener(v -> updateBook());
+
+        // --- DELETE ---
+        btnDelete.setOnClickListener(v -> confirmDeleteBook());
+    }
+
+    private void loadBookDetails() {
+        Cursor cursor = myDb.getBookById(bookId);
+        if (cursor.moveToFirst()) {
+            String title = cursor.getString(1); // Index 1 is COL_TITLE
+            String author = cursor.getString(2);
+            String genre = cursor.getString(3);
+            int price = cursor.getInt(4);
+            String availability = cursor.getString(5);
+
+            etTitle.setText(title);
+            etAuthor.setText(author);
+            etGenre.setText(genre);
+            etPrice.setText(String.valueOf(price));
+
+            if ("Yes".equalsIgnoreCase(availability)) {
+                radioYes.setChecked(true);
+            } else {
+                radioNo.setChecked(true);
+            }
+        }
+        cursor.close();
+    }
+
+    private void updateBook() {
+        String title = etTitle.getText().toString().trim();
+        String author = etAuthor.getText().toString().trim();
+        String genre = etGenre.getText().toString().trim();
+        String priceStr = etPrice.getText().toString().trim();
+
+        int selectedRadioId = rgAvailability.getCheckedRadioButtonId();
+        RadioButton selectedRadio = findViewById(selectedRadioId);
+        String availability = selectedRadio.getText().toString(); // "Yes" or "No"
+
+        if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || priceStr.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int price = Integer.parseInt(priceStr);
+
+        boolean isUpdated = myDb.updateBook(bookId, title, author, genre, price, availability);
+
+        if (isUpdated) {
+            Toast.makeText(this, "Book Updated!", Toast.LENGTH_SHORT).show();
+            finish(); // Close this activity and go back to MainActivity
+        } else {
+            Toast.makeText(this, "Failed to update book", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void confirmDeleteBook() {
+        // Show a confirmation dialog before deleting
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Book")
+                .setMessage("Are you sure you want to delete this book?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    deleteBook();
+                })
+                .setNegativeButton("No", null) // Do nothing on "No"
+                .show();
+    }
+
+    private void deleteBook() {
+        boolean isDeleted = myDb.deleteBook(bookId);
+
+        if (isDeleted) {
+            Toast.makeText(this, "Book Deleted", Toast.LENGTH_SHORT).show();
+            finish(); // Close this activity and go back to MainActivity
+        } else {
+            Toast.makeText(this, "Failed to delete book", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+
+Step 8: Register Activity (AndroidManifest.xml)
+
+You must tell Android about your new BookDetailsActivity.
+
+Where to find: app/src/main/AndroidManifest.xml (This file already exists)
+
+Add this code: Open the file and find the <application> tag. Inside it, add the <activity> block below, right after the existing <activity> block for .MainActivity.
+
+<!-- Add this block INSIDE the <application> tag -->
+
+<activity android:name=".BookDetailsActivity" />
+
+<!-- Your existing MainActivity block will look something like this -->
+<!-- <activity android:name=".MainActivity"> ... </activity> -->
+
+
+This is a crucial step! If you forget this, the app will crash when you click a book.
+
+That's it! You have all the pieces. Just create each file in the correct location, paste the code, and then run your app.
