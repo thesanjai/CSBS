@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CKD Prediction System</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 20px auto; padding: 30px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #333; }
+        form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
+        
+        .button-container {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-submit:hover { background-color: #0056b3; }
+        .btn-reset {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-reset:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CKD Prediction System (Full Model)</h1>
+        <form action="/predict" method="post">
+            
+            <div class="form-group"><label for="age">Age</label><input type="number" step="1" id="age" name="age" placeholder="e.g., 48" required></div>
+            <div class="form-group"><label for="bp">Blood Pressure (bp)</label><input type="number" step="1" id="bp" name="bp" placeholder="e.g., 80" required></div>
+            <div class="form-group"><label for="sg">Specific Gravity (sg)</label><input type="number" step="0.001" id="sg" name="sg" placeholder="e.g., 1.010" required></div>
+            <div class="form-group"><label for="al">Albumin (al)</label><input type="number" step="1" id="al" name="al" placeholder="e.g., 1" required></div>
+            <div class="form-group"><label for="su">Sugar (su)</label><input type="number" step="1" id="su" name="su" placeholder="e.g., 0" required></div>
+            <div class="form-group"><label for="bgr">Blood Glucose (bgr)</label><input type="number" step="1" id="bgr" name="bgr" placeholder="e.g., 121" required></div>
+            <div class="form-group"><label for="bu">Blood Urea (bu)</label><input type="number" step="0.1" id="bu" name="bu" placeholder="e.g., 36" required></div>
+            <div class="form-group"><label for="sc">Serum Creatinine (sc)</label><input type="number" step="0.1" id="sc" name="sc" placeholder="e.g., 1.2" required></div>
+            <div class="form-group"><label for="sod">Sodium (sod)</label><input type="number" step="1" id="sod" name="sod" placeholder="e.g., 135" required></div>
+            <div class="form-group"><label for="pot">Potassium (pot)</label><input type="number" step="0.1" id="pot" name="pot" placeholder="e.g., 4.5" required></div>
+            <div class="form-group"><label for="hemo">Hemoglobin (hemo)</label><input type="number" step="0.1" id="hemo" name="hemo" placeholder="e.g., 15.4" required></div>
+            <div class="form-group"><label for="pcv">Packed Cell Vol (pcv)</label><input type="number" step="1" id="pcv" name="pcv" placeholder="e.g., 44" required></div>
+            <div class="form-group"><label for="wc">WBC Count (wc)</label><input type="number" step="1" id="wc" name="wc" placeholder="e.g., 7800" required></div>
+            <div class="form-group"><label for="rc">RBC Count (rc)</label><input type="number" step="0.1" id="rc" name="rc" placeholder="e.g., 5.2" required></div>
+
+            <div class="form-group"><label for="rbc">Red Blood Cells</label><select id="rbc" name="rbc"><option value="1">Normal</option><option value="0">Abnormal</option></select></div>
+            <div class="form-group"><label for="pc">Pus Cell</label><select id="pc" name="pc"><option value="1">Normal</option><option value="0">Abnormal</option></select></div>
+            <div class="form-group"><label for="pcc">Pus Cell Clumps</label><select id="pcc" name="pcc"><option value="0">Not Present</option><option value="1">Present</option></select></div>
+            <div class="form-group"><label for="ba">Bacteria</label><select id="ba" name="ba"><option value="0">Not Present</option><option value="1">Present</option></select></div>
+            <div class="form-group"><label for="htn">Hypertension</label><select id="htn" name="htn"><option value="0">No</option><option value="1">Yes</option></select></div>
+            <div class="form-group"><label for="dm">Diabetes Mellitus</label><select id="dm" name="dm"><option value="0">No</option><option value="1">Yes</option></select></div>
+            <div class="form-group"><label for="cad">Coronary Artery Disease</label><select id="cad" name="cad"><option value="0">No</option><option value="1">Yes</option></select></div>
+            <div class="form-group"><label for="appet">Appetite</label><select id="appet" name="appet"><option value="0">Good</option><option value="1">Poor</option></select></div>
+            <div class="form-group"><label for="pe">Pedal Edema</label><select id="pe" name="pe"><option value="0">No</option><option value="1">Yes</option></select></div>
+            <div class="form-group"><label for="ane">Anemia</label><select id="ane" name="ane"><option value="0">No</option><option value="1">Yes</option></select></div>
+            
+            <div class="button-container">
+                <button type="submit" class="btn btn-submit">Predict CKD</button>
+                <button type="reset" class="btn btn-reset">Reset Fields</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
