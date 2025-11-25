@@ -1,0 +1,23 @@
+p = fullfile(matlabroot,'toolbox','nnet','nndemos','nndatasets','DigitDataset');
+ds = imageDatastore(p,'IncludeSubfolders',true,'LabelSource','foldernames');
+[trainset,testset] = splitEachLabel(ds,0.8,'randomized');
+
+layers = [imageInputLayer([28 28 1]) convolution2dLayer(5,20) batchNormalizationLayer ...
+    reluLayer fullyConnectedLayer(10) softmaxLayer classificationLayer];
+
+options = trainingOptions('sgdm','MaxEpochs',4,'ValidationData',testset,'ValidationFrequency',30,...
+    'Verbose',false,'Plots','training-progress');
+
+net = trainNetwork(trainset,layers,options);
+
+pred = classify(net,testset);
+
+fprintf("Accuracy is %.4f",mean(pred == testset.Labels));
+
+figure;
+for i=1:9
+    img = imread(testset(randi(numel(testset.Files))));
+    subplot(3,3,i); imshow(img);
+    title("Number Predcited :" char(classf))
+end
+
