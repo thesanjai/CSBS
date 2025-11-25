@@ -1,0 +1,43 @@
+Digits Classification using machine learning techniques:  https://in.mathworks.com/help/vision/ug/digit-classification-using-hog-features.html
+
+Data set: https://drive.google.com/drive/folders/1ydRCvEoS2HtY0ilTeTlGVXxebmoh57wD?usp=sharing
+
+imds = imageDatastore('/MATLAB Drive/Digits/R', ...
+'IncludeSubfolders',true, ...
+'LabelSource','foldernames');
+[trainingSet,testSet] = splitEachLabel(imds,0.8,'randomized');
+countEachLabel(trainingSet);
+
+cellSize = [4 4];
+img=imread('/MATLAB Drive/Digits/R/4.jpg');
+img=imresize(img,[224 224]);
+
+[hog_4x4, vis4x4] = extractHOGFeatures(img,'CellSize',[4 4]);
+
+hogFeatureSize = length(hog_4x4);
+
+numImages = numel(trainingSet.Files);
+
+for i = 1:numImages
+img1 = readimage(trainingSet,i);
+img1=imresize(img1,[224 224]);
+img1 = im2gray(img1);
+
+% Apply pre-processing steps
+img1 = imbinarize(img1);
+
+trainingFeatures(i, :) = extractHOGFeatures(img1,'CellSize',cellSize);
+end
+% Get labels for each image.
+[hog_4x4, vis4x4] = extractHOGFeatures(img,'CellSize',[4 4]);
+
+%{trainingLabels = trainingSet.Labels;
+classifier = fitcnet(trainingFeatures, trainingLabels);
+[testFeatures, testLabels] = helperExtractHOGFeaturesFromImageSet(testSet, hogFeatureSize, cellSize);
+
+predictedLabels = predict(classifier, testFeatures);
+
+% Tabulate the results using a confusion matrix.
+confMat = confusionmat(testLabels, predictedLabels);
+
+helperDisplayConfusionMatrix(confMat)%}

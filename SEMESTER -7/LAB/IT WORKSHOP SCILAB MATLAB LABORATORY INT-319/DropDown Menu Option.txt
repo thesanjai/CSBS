@@ -1,0 +1,29 @@
+DropDown Menu Option:
+function ThresholdingMethodsDropDownClicked(app, event)
+item = event.InteractionInformation.Item;
+value=app.ThresholdingMethodsDropDown.Value;
+global I;
+if strcmp(value,'MultiThresh')
+I1=multithresh(I);
+imagesc(app.UIAxes2,I1);
+elseif strcmp(value,'AdaptThresh')
+I1=adaptthresh(I);
+imagesc(app.UIAxes2,I1);
+elseif strcmp(value,'GrayThresh')
+I1=graythresh(I);
+imagesc(app.UIAxes2,I1);
+elseif strcmp(value,'OtsuThresh')
+[counts,x]=imhist(I,20);
+stem(x,counts);
+T = otsuthresh(counts);
+I1=imbinarize(I,T);
+I2=kmeans(I1,2);
+imagesc(app.UIAxes2,I2);
+else
+%threshold=input('Enter threshold value');
+%binary_image=I>threshold;
+% imagesc(app.UIAxes2,binary_image);
+
+end
+end
+end
